@@ -1,4 +1,4 @@
-package cc.feitwnd.pojo;
+package cc.feitwnd.common;
 
 import lombok.Data;
 

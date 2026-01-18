@@ -1,0 +1,43 @@
+# IDE and Editor files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+nbproject/
+.project
+.classpath
+.settings/
+build/
+.DS_Store
+Thumbs.db
+
+# Java/Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Log files
+*.log
+logs/
+
+# Node.js/Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+.env.*
+.output
+coverage/
+
+# Package manager files
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
