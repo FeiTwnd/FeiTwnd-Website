@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="color-scheme" content="light dark" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+		<title>FeiTwnd | Blog</title>
+		<meta name="description" content="FeiTwnd 的博客 - 建设中" />
+
+		<style>
+			* {
+				box-sizing: border-box;
+			}
+			
+			:root {
+				--bg-light: #fafafa;
+				--bg-dark: #1a1a1a;
+				--card-light: #ffffff;
+				--card-dark: #242424;
+				--border-light: #e0e0e0;
+				--border-dark: #333333;
+				--text-light: #121212;
+				--text-dark: #f0f0f0;
+				--muted-light: #666666;
+				--muted-dark: #9e9e9e;
+				--hover-light: #f0f0f0;
+				--hover-dark: #333333;
+			}
+
+			html, body {
+				height: 100%;
+			}
+			body {
+				margin: 0;
+				background-color: var(--bg-light);
+				color: var(--text-light);
+				font: 16px/1.6 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+				display: grid;
+				place-items: center;
+				min-height: 100svh;
+				transition: background-color 0.3s ease;
+				padding: 1rem;
+				overflow-x: hidden;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				body {
+					background-color: var(--bg-dark);
+					color: var(--text-dark);
+				}
+			}
+
+			.card {
+				width: 100%;
+				max-width: 800px;
+				margin-inline: auto;
+				padding: clamp(2.5rem, 7vw, 4.5rem);
+				border-radius: 20px;
+				background-color: var(--card-light);
+				border: 1px solid var(--border-light);
+				box-shadow: 0 4px 25px rgba(0, 0, 0, 0.06);
+				text-align: center;
+				transition: all 0.3s ease;
+				max-height: 95vh;
+				overflow-y: auto;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				.card {
+					background-color: var(--card-dark);
+					border-color: var(--border-dark);
+					box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
+				}
+			}
+
+			.icon-container {
+				width: 120px;
+				height: 120px;
+				margin: 0 auto 2rem;
+				position: relative;
+			}
+
+			.construction-icon {
+				width: 100%;
+				height: 100%;
+				position: relative;
+				animation: pulse 2s infinite ease-in-out;
+			}
+
+			.hammer, .wrench {
+				position: absolute;
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 2;
+				stroke-linecap: round;
+				stroke-linejoin: round;
+			}
+
+			.hammer {
+				top: 20px;
+				left: 20px;
+				width: 60px;
+				height: 60px;
+				animation: swing 2s infinite ease-in-out;
+				transform-origin: 30px 30px;
+			}
+
+			.wrench {
+				bottom: 10px;
+				right: 10px;
+				width: 50px;
+				height: 50px;
+				animation: spin 4s infinite linear;
+				transform-origin: 25px 25px;
+			}
+
+			h1 {
+				margin: 0 0 1rem;
+				font-size: clamp(2rem, 5vw, 2.8rem);
+				letter-spacing: -0.02em;
+			}
+
+			.message {
+				margin: 0 0 2.5rem;
+				color: var(--muted-light);
+				font-size: clamp(1.1rem, 3vw, 1.3rem);
+				max-width: 600px;
+				margin-left: auto;
+				margin-right: auto;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				.message {
+					color: var(--muted-dark);
+				}
+			}
+
+			.back-link {
+				display: inline-flex;
+				align-items: center;
+				justify-content: center;
+				gap: 10px;
+				padding: 12px 24px;
+				border-radius: 12px;
+				border: 1px solid var(--border-light);
+				background-color: transparent;
+				color: inherit;
+				text-decoration: none;
+				transition: all 0.2s ease;
+				font-weight: 500;
+				font-size: 16px;
+				margin-top: 1rem;
+			}
+
+			.back-link:hover {
+				background-color: var(--hover-light);
+				border-color: currentColor;
+				transform: translateY(-2px);
+			}
+
+			@media (prefers-color-scheme: dark) {
+				.back-link {
+					border-color: var(--border-dark);
+				}
+				.back-link:hover {
+					background-color: var(--hover-dark);
+				}
+			}
+
+			footer {
+				margin-top: 3.2rem;
+				color: var(--muted-light);
+				font-size: 0.9rem;
+				line-height: 1.6;
+			}
+
+			@media (prefers-color-scheme: dark) {
+				footer {
+					color: var(--muted-dark);
+				}
+			}
+
+			.beian-info {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				flex-wrap: wrap;
+				gap: 0.5rem 1rem;
+				margin-top: 0.5rem;
+			}
+
+			.beian-info a {
+				color: inherit;
+				text-decoration: none;
+				border-bottom: 1px dotted currentColor;
+				transition: border-color 0.2s ease;
+			}
+
+			.beian-info a:hover {
+				border-bottom-style: solid;
+			}
+
+			.beian-divider {
+				opacity: 0.5;
+			}
+
+			@keyframes fadeIn {
+				from { opacity: 0; transform: translateY(10px); }
+				to { opacity: 1; transform: translateY(0); }
+			}
+
+			@keyframes pulse {
+				0%, 100% { transform: scale(1); opacity: 1; }
+				50% { transform: scale(1.05); opacity: 0.8; }
+			}
+
+			@keyframes swing {
+				0%, 100% { transform: rotate(-10deg); }
+				50% { transform: rotate(10deg); }
+			}
+
+			@keyframes spin {
+				0% { transform: rotate(0deg); }
+				100% { transform: rotate(360deg); }
+			}
+
+			.card {
+				animation: fadeIn 0.6s ease-out forwards;
+			}
+
+			.icon-container {
+				animation: fadeIn 0.5s ease-out 0.1s forwards;
+				opacity: 0;
+			}
+
+			h1, .message {
+				animation: fadeIn 0.5s ease-out 0.3s forwards;
+				opacity: 0;
+			}
+
+			.message {
+				animation-delay: 0.4s;
+			}
+
+			.back-link {
+				animation: fadeIn 0.6s ease-out 0.6s forwards;
+				opacity: 0;
+			}
+
+			footer {
+				animation: fadeIn 0.6s ease-out 0.8s forwards;
+				opacity: 0;
+			}
+
+			@media (max-width: 600px) {
+				body { place-items: start center; }
+				.card {
+					padding: clamp(2rem, 5vw, 3rem);
+				}
+				.icon-container {
+					width: 100px;
+					height: 100px;
+				}
+			}
+
+			@media (max-width: 600px), (max-height: 700px) {
+				.card {
+					max-height: none;
+					overflow: visible;
+					margin-block: 12px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main class="card" role="main">
+			<div class="icon-container">
+				<div class="construction-icon">
+					<svg class="hammer" viewBox="0 0 24 24">
+						<path d="M18 16V14H9.5a1.5 1.5 0 0 1-1.5-1.5v-5A1.5 1.5 0 0 1 9.5 6H13v2H9.5a.5.5 0 0 0-.5.5v5a.5.5 0 0 0 .5.5H18v2h-6v2h6a2 2 0 0 0 2-2z"/>
+						<path d="M7 18v2h2v-2H7z"/>
+					</svg>
+					<svg class="wrench" viewBox="0 0 24 24">
+						<path d="M14.7 6.3a1 1 0 0 0-1.4-1.4l-3.2 3.2 1.4 1.4 3.2-3.2z"/>
+						<path d="M17 7h-2V5c0-1.66-1.34-3-3-3S9 3.34 9 5v2H7c-1.1 0-1.99.9-1.99 2L5 21c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2zM7 21V9h10l.02 12H7z"/>
+					</svg>
+				</div>
+			</div>
+			
+			<h1>博客建设中</h1>
+			<p class="message">
+				抱歉，我的博客目前正在紧张建设中，很快就会与大家见面。<br>
+				请稍后再来访问，感谢您的耐心等待！
+			</p>
+
+			<a class="back-link" href="https://feitwnd.cc">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+					<path d="M19 12H5M12 19l-7-7 7-7"/>
+				</svg>
+				返回主页
+			</a>
+
+			<footer>
+				<div class="beian-info">
+					<span>豫公网安备41132702000130号</span>
+					<span class="beian-divider">|</span>
+					<a href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer">
+						豫ICP备2025138023号-1
+					</a>
+					<span class="beian-divider">|</span>
+					<span>© <span id="year">2025</span> FeiTwnd.</span>
+				</div>
+			</footer>
+		</main>
+
+		<script>
+			document.getElementById('year').textContent = new Date().getFullYear();
+		</script>
+	</body>
+</html>
