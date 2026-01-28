@@ -1,0 +1,59 @@
+server:
+  port: 5922
+
+spring:
+  application:
+    name: FeiTwndBackend
+  profiles:
+    active: dev
+  main:
+    allow-circular-references: true
+  #数据库连接信息
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource
+    driver-class-name: ${feitwnd.datasource.driver-class-name}
+    url: jdbc:mysql://${feitwnd.datasource.host}:${feitwnd.datasource.port}/${feitwnd.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${feitwnd.datasource.username}
+    password: ${feitwnd.datasource.password}
+    # Druid连接池专用配置
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+  redis:
+    host: ${feitwnd.redis.host}
+    port: ${feitwnd.redis.port}
+    password: ${feitwnd.redis.password}
+    database: ${feitwnd.redis.database}
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: cc.feitwnd.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+#配置事务管理日志级别
+logging:
+  level:
+    cc:
+      feitwnd:
+        mapper: debug
+        service: info
+        controller: info
+
+feitwnd:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: feitwnd-jwt
+    # 设置jwt过期时间
+    admin-ttl: 7200
+    # 设置前端传递过来的令牌名称
+    admin-token-name: Authentication
+  alioss:
+    endpoint: oss-cn-shanghai.aliyuncs.com
+    access-key-id: LTAI5t8oipjj3yq9cAFhCHwH
+    access-key-secret: VkalypYUyUHceTWbdgHgmJBEFOZq97
+    bucket-name: feitwnd
