@@ -47,11 +47,11 @@ logging:
 feitwnd:
   jwt:
     # 设置jwt签名加密时使用的秘钥
-    admin-secret-key: feitwnd-jwt
+    secret-key: feitwnd-jwt
     # 设置jwt过期时间
-    admin-ttl: 7200
+    ttl: 7200
     # 设置前端传递过来的令牌名称
-    admin-token-name: Authentication
+    token-name: Authentication
   alioss:
     endpoint: oss-cn-shanghai.aliyuncs.com
     access-key-id: LTAI5t8oipjj3yq9cAFhCHwH
