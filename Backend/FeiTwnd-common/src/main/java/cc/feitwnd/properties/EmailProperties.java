@@ -5,13 +5,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Component
-@ConfigurationProperties(prefix = "feitwnd.jwt")
+@ConfigurationProperties(prefix = "feitwnd.email")
 @Data
-public class JwtProperties {
+public class EmailProperties {
     /**
-     * jwt令牌相关配置
+     * 邮箱服务器邮箱
      */
-    private String secretKey;
-    private Long ttl;
-    private String tokenName;
+    private String personal;
+
+    private String from;
 }

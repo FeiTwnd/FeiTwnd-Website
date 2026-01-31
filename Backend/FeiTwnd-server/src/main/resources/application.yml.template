@@ -25,6 +25,21 @@ spring:
     password: your-redis-password-here # 如果没有密码则留空
     database: 0
 
+  mail:
+    host: smtp.qq.com
+    port: 587
+    username: # qq邮箱
+    password: # 邮箱授权码
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
 mybatis:
   #mapper配置文件
   mapper-locations: classpath:mapper/*.xml
@@ -55,3 +70,6 @@ feitwnd:
     access-key-id: your-alioss-access-key-id
     access-key-secret: your-alioss-access-key-secret
     bucket-name: your-bucket-name
+  email:
+    personal: # 发件人昵称
+    from: # 发件人邮箱

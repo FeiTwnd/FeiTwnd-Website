@@ -28,6 +28,12 @@ public class Admin implements Serializable {
     // 加密后的密码
     private String password;
 
+    // 盐值
+    private String salt;
+
+    // 昵称
+    private String nickname;
+
     // 电子邮箱
     private String email;
 
