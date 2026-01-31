@@ -3,7 +3,6 @@ package cc.feitwnd.utils;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 
 import javax.crypto.SecretKey;
@@ -14,7 +13,7 @@ import java.util.Map;
 public class JwtUtil {
     /**
      * 生成jwt
-     * 使用Hs256算法, 私匙使用固定秘钥
+     * 私匙使用固定密钥
      *
      * @param secretKey jwt秘钥
      * @param ttlMillis jwt过期时间(毫秒)

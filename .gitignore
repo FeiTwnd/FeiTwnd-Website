@@ -41,3 +41,9 @@ coverage/
 pnpm-lock.yaml
 yarn.lock
 package-lock.json
+
+# Configuration files with sensitive data
+**/application.yml
+**/application-*.yml
+!**/application.yml.template
+!**/application-*.yml.template

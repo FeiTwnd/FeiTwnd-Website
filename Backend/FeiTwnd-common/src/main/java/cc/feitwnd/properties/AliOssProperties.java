@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "feitwnd.alioss")
 @Data
 public class AliOssProperties {
+    /**
+     * 阿里云 Endpoint
+     */
     private String endpoint;
     private String accessKeyId;
     private String accessKeySecret;
