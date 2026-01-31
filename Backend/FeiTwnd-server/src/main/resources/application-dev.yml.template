@@ -1,0 +1,13 @@
+feitwnd:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: localhost
+    port: 3306
+    database: FeiTwnd
+    username: your_database_username
+    password: your_database_password
+  redis:
+    host: localhost
+    port: 6379
+    password: your_redis_password
+    database: 0
