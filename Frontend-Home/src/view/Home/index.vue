@@ -1,109 +1,119 @@
 <script setup>
-// 计算当前年份并设置到页面中
-document.getElementById('year').textContent = new Date().getFullYear()
-document.querySelectorAll('.link').forEach((link, index) => {
-  link.style.setProperty('--link-index', index + 1)
+import { onMounted, ref } from 'vue'
+
+const startYear = 2025
+const currentYear = ref(2025)
+
+onMounted(() => {
+  currentYear.value = new Date().getFullYear()
+
+  document.querySelectorAll('.link').forEach((link, index) => {
+    link.style.setProperty('--link-index', index + 1)
+  })
 })
 </script>
 
 <template>
-  <main class="card" role="main">
-    <div class="avatar-container">
-      <img src="./avatar.png" alt="FeiTwnd的头像" />
-    </div>
-    <h1 data-name>FeiTwnd</h1>
-    <p class="tagline">半栈工程师 | 科班码农 | 拾枝者 · 欢迎来到我的主页</p>
+  <div class="home-container">
+    <main class="card" role="main">
+      <div class="avatar-container">
+        <img src="@/assets/avatar.png" alt="FeiTwnd的头像" />
+      </div>
+      <h1 data-name>FeiTwnd</h1>
+      <p class="tagline">初出茅庐 | 科班码农 | 拾枝者 · 欢迎来到我的主页</p>
 
-    <nav class="links" aria-label="站点导航">
-      <a
-        class="link"
-        href="https://blog.feitwnd.cc"
-        rel="noopener noreferrer"
-        style="--link-index: 1"
-      >
-        <span class="iconfont icon-boke"></span>
-        博客
-      </a>
-      <a
-        class="link"
-        href="https://cv.feitwnd.cc"
-        rel="noopener noreferrer"
-        style="--link-index: 2"
-      >
-        <span class="iconfont icon-jianli"></span>
-        简历
-      </a>
-      <a
-        class="link"
-        href="mailto:kiwoba@qq.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="--link-index: 4"
-      >
-        <span class="iconfont icon-youxiang"></span>
-        邮箱
-      </a>
-      <a
-        class="link"
-        href="https://github.com/FeiTwnd"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="--link-index: 3"
-      >
-        <span class="iconfont icon-github"></span>
-        GitHub
-      </a>
-      <a
-        class="link"
-        href="https://space.bilibili.com/502786603"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="--link-index: 5"
-      >
-        <span class="iconfont icon-bilibili-line"></span>
-        Bilibili
-      </a>
-      <a
-        class="link"
-        href="https://blog.csdn.net/FeiTwnd"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="--link-index: 6"
-      >
-        <span class="iconfont icon-csdn1"></span>
-        CSDN
-      </a>
-      <a
-        class="link"
-        href="https://leetcode.cn/u/competent-maxwellmll/"
-        target="_blank"
-        rel="noopener noreferrer"
-        style="--link-index: 7"
-      >
-        <span class="iconfont icon-code"></span>
-        LeetCode
-      </a>
-    </nav>
-
-    <footer>
-      <div class="beian-info">
-        <span>豫公网安备41132702000130号</span>
-        <span class="beian-divider">|</span>
+      <nav class="links" aria-label="站点导航">
         <a
-          href="https://beian.miit.gov.cn/"
+          class="link"
+          href="https://blog.feitwnd.cc"
           target="_blank"
           rel="noopener noreferrer"
         >
-          豫ICP备2025138023号-1
+          <span class="iconfont icon-boke"></span>
+          博客
         </a>
-        <span class="beian-divider">|</span>
-        <span>© 2025-<span id="year"></span> FeiTwnd.</span>
-      </div>
-    </footer>
-  </main>
+        <a
+          class="link"
+          href="https://cv.feitwnd.cc"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="iconfont icon-jianli"></span>
+          简历
+        </a>
+        <a
+          class="link"
+          href="mailto:kiwoba@qq.com"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="iconfont icon-youxiang"></span>
+          邮箱
+        </a>
+        <a
+          class="link"
+          href="https://github.com/FeiTwnd"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="iconfont icon-github"></span>
+          GitHub
+        </a>
+        <a
+          class="link"
+          href="https://space.bilibili.com/502786603"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="iconfont icon-bilibili-line"></span>
+          Bilibili
+        </a>
+        <a
+          class="link"
+          href="https://blog.csdn.net/FeiTwnd"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="iconfont icon-csdn1"></span>
+          CSDN
+        </a>
+        <a
+          class="link"
+          href="https://leetcode.cn/u/competent-maxwellmll/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <span class="iconfont icon-code"></span>
+          LeetCode
+        </a>
+      </nav>
+
+      <footer>
+        <div class="beian-info">
+          <span>豫公网安备41132702000130号</span>
+          <span class="beian-divider">|</span>
+          <a
+            href="https://beian.miit.gov.cn/"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            豫ICP备2025138023号-1
+          </a>
+          <span class="beian-divider">|</span>
+          <span>© {{ startYear }}-{{ currentYear }} FeiTwnd.</span>
+        </div>
+      </footer>
+    </main>
+  </div>
 </template>
 
-<style scoped lang="scss">
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
 :root {
   --bg-light: #fafafa;
   --bg-dark: #1a1a1a;
@@ -122,9 +132,10 @@ document.querySelectorAll('.link').forEach((link, index) => {
 html,
 body {
   height: 100%;
+  width: 100%;
 }
+
 body {
-  margin: 0;
   background-color: var(--bg-light);
   color: var(--text-light);
   font:
@@ -135,12 +146,7 @@ body {
     Helvetica,
     Arial,
     sans-serif;
-  display: grid;
-  place-items: center;
-  min-height: 100svh;
   transition: background-color 0.3s ease;
-  padding: 1rem;
-  overflow-x: hidden;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -150,9 +156,18 @@ body {
   }
 }
 
+.home-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 卡片容器样式 */
 .card {
   width: 100%;
-  max-width: 1100px;
+  max-width: 1200px;
   margin-inline: auto;
   padding: clamp(2.5rem, 7vw, 4.5rem);
   border-radius: 20px;
@@ -163,6 +178,7 @@ body {
   transition: all 0.3s ease;
   max-height: 95vh;
   overflow-y: auto;
+  animation: fadeIn 0.6s ease-out forwards;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -173,6 +189,7 @@ body {
   }
 }
 
+/* 头像容器 */
 .avatar-container {
   width: 150px;
   height: 150px;
@@ -184,6 +201,8 @@ body {
   transition:
     transform 0.3s ease,
     border-color 0.3s ease;
+  animation: fadeIn 0.5s ease-out 0.1s forwards;
+  opacity: 0;
 }
 
 .avatar-container:hover {
@@ -207,17 +226,23 @@ body {
   }
 }
 
+/* 标题 */
 h1 {
   margin: 0 0 0.8rem;
   font-size: clamp(2.2rem, 6vw, 3.2rem);
   letter-spacing: -0.02em;
+  animation: fadeIn 0.5s ease-out 0.3s forwards;
+  opacity: 0;
 }
 
+/* 标语 */
 .tagline {
   margin: 0 0 2.5rem;
   color: var(--muted-light);
   font-size: clamp(1.2rem, 3vw, 1.4rem);
   font-weight: 400;
+  animation: fadeIn 0.5s ease-out 0.4s forwards;
+  opacity: 0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -226,12 +251,14 @@ h1 {
   }
 }
 
+/* 图标字体 */
 .iconfont {
   font-size: 22px;
   width: 26px;
   text-align: center;
 }
 
+/* 链接区域 */
 .links {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -239,6 +266,7 @@ h1 {
   margin-top: 1.5rem;
 }
 
+/* 链接样式 */
 .link {
   display: inline-flex;
   align-items: center;
@@ -253,6 +281,9 @@ h1 {
   transition: all 0.2s ease;
   font-weight: 500;
   font-size: 15px;
+  animation: fadeIn 0.6s ease-out forwards;
+  animation-delay: calc(var(--link-index) * 0.05s + 0.5s);
+  opacity: 0;
 }
 
 .link:hover {
@@ -270,11 +301,14 @@ h1 {
   }
 }
 
+/* 页脚 */
 footer {
   margin-top: 3.2rem;
   color: var(--muted-light);
   font-size: 0.9rem;
   line-height: 1.6;
+  animation: fadeIn 0.6s ease-out 0.8s forwards;
+  opacity: 0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -307,6 +341,7 @@ footer {
   opacity: 0.5;
 }
 
+/* 动画 */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -318,36 +353,7 @@ footer {
   }
 }
 
-.card {
-  animation: fadeIn 0.6s ease-out forwards;
-}
-
-.avatar-container {
-  animation: fadeIn 0.5s ease-out 0.1s forwards;
-  opacity: 0;
-}
-
-h1,
-.tagline {
-  animation: fadeIn 0.5s ease-out 0.3s forwards;
-  opacity: 0;
-}
-
-.tagline {
-  animation-delay: 0.4s;
-}
-
-.link {
-  animation: fadeIn 0.6s ease-out forwards;
-  animation-delay: calc(var(--link-index) * 0.05s + 0.5s);
-  opacity: 0;
-}
-
-footer {
-  animation: fadeIn 0.6s ease-out 0.8s forwards;
-  opacity: 0;
-}
-
+/* 响应式设计 */
 @media (max-width: 900px) {
   .links {
     grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
@@ -355,14 +361,11 @@ footer {
 }
 
 @media (max-width: 600px) {
-  body {
-    place-items: start center;
+  .card {
+    padding: clamp(2rem, 5vw, 3rem);
   }
   .links {
     grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  }
-  .card {
-    padding: clamp(2rem, 5vw, 3rem);
   }
 }
 

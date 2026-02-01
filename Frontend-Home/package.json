@@ -42,6 +42,7 @@
     "prettier": "3.6.2",
     "sass": "^1.93.2",
     "unplugin-auto-import": "^20.2.0",
+    "unplugin-icons": "^23.0.1",
     "unplugin-vue-components": "^30.0.0",
     "vite": "^7.1.11",
     "vite-plugin-vue-devtools": "^8.0.3"
