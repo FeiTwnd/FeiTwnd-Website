@@ -6,6 +6,7 @@ import cc.feitwnd.context.BaseContext;
 import cc.feitwnd.exception.NotLoginException;
 import cc.feitwnd.exception.UnauthorizedException;
 import cc.feitwnd.properties.JwtProperties;
+import cc.feitwnd.service.TokenService;
 import cc.feitwnd.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,6 +27,8 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
 
     @Autowired
     private JwtProperties jwtProperties;
+    @Autowired
+    private TokenService tokenService;
 
     /**
      * 校验jwt
@@ -45,16 +48,22 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         // 从请求头中获取令牌
         String token = request.getHeader(jwtProperties.getTokenName());
 
+        // 如果令牌为空，抛出未登录异常
         if(StringUtils.isEmpty(token)){
             throw new NotLoginException(MessageConstant.NOT_LOGIN);
         }
 
         // 校验令牌
         try {
-            log.info("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getSecretKey(), token);
             Long adminId = Long.valueOf(claims.get(JwtClaimsConstant.ADMIN_ID).toString());
-            log.info("当前管理员id：{}", adminId);
+            log.info("jwt校验,当前管理员id：{}", adminId);
+
+            // 检测令牌是否在服务端存在
+            if(!tokenService.isValidToken(adminId, token)){
+                throw new UnauthorizedException(MessageConstant.NOT_AUTHORIZED);
+            }
+
             BaseContext.setCurrentId(adminId);
             // 通过，放行
             return true;

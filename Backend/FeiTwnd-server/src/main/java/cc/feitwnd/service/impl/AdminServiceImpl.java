@@ -3,22 +3,27 @@ package cc.feitwnd.service.impl;
 import cc.feitwnd.constant.JwtClaimsConstant;
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.dto.AdminLoginDTO;
+import cc.feitwnd.dto.AdminLoginOutDTO;
 import cc.feitwnd.entity.Admin;
 import cc.feitwnd.exception.*;
 import cc.feitwnd.mapper.AdminMapper;
 import cc.feitwnd.properties.JwtProperties;
 import cc.feitwnd.service.AdminService;
 import cc.feitwnd.service.EmailService;
+import cc.feitwnd.service.TokenService;
 import cc.feitwnd.service.VerifyCodeService;
 import cc.feitwnd.utils.JwtUtil;
 import cc.feitwnd.vo.AdminLoginVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class AdminServiceImpl implements AdminService {
@@ -30,7 +35,7 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private EmailService emailService;
     @Autowired
-    private JwtProperties jwtProperties;
+    private TokenService tokenService;
 
     /**
      * 发送验证码
@@ -94,13 +99,8 @@ public class AdminServiceImpl implements AdminService {
         // 清空验证码及状态
         verifyCodeService.clearAll();
 
-        // 生成token
-        Map<String, Object> claims = new HashMap<>();
-        claims.put(JwtClaimsConstant.ADMIN_ID,admin.getId());
-        String token = JwtUtil.createJWT(
-                jwtProperties.getSecretKey(),
-                jwtProperties.getTtl(),
-                claims);
+        // 生成并存储token
+        String token = tokenService.createAndStoreToken(admin.getId());
 
         return AdminLoginVO.builder()
                 .id(admin.getId())
@@ -128,5 +128,14 @@ public class AdminServiceImpl implements AdminService {
             hexString.append(hex);
         }
         return hexString.toString();
+    }
+
+    /**
+     * 管理员退出登录
+     * @param adminLoginOutDTO
+     */
+    public void loginOut(AdminLoginOutDTO adminLoginOutDTO) {
+        // 删除Redis中的token
+        tokenService.logout(adminLoginOutDTO.getId(), adminLoginOutDTO.getToken());
     }
 }

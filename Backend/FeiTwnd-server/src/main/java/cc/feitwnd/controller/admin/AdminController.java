@@ -1,6 +1,7 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.dto.AdminLoginDTO;
+import cc.feitwnd.dto.AdminLoginOutDTO;
 import cc.feitwnd.dto.SendCodeDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.AdminService;
@@ -41,5 +42,14 @@ public class AdminController {
         log.info("管理员登录：{}", adminLoginDTO);
         AdminLoginVO adminLoginVO = adminService.login(adminLoginDTO);
         return Result.success(adminLoginVO);
+    }
+
+    /**
+     * 管理员退出登录
+     */
+    @PostMapping("/logout")
+    public Result logout(@RequestBody AdminLoginOutDTO adminLoginOutDTO) {
+        adminService.loginOut(adminLoginOutDTO);
+        return Result.success();
     }
 }
