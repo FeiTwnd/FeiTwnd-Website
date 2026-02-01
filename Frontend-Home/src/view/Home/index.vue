@@ -68,7 +68,7 @@ onMounted(() => {
           <span class="iconfont icon-bilibili-line"></span>
           Bilibili
         </a>
-        <a
+        <!-- <a
           class="link"
           href="https://blog.csdn.net/FeiTwnd"
           target="_blank"
@@ -76,7 +76,7 @@ onMounted(() => {
         >
           <span class="iconfont icon-csdn1"></span>
           CSDN
-        </a>
+        </a> -->
         <a
           class="link"
           href="https://leetcode.cn/u/competent-maxwellmll/"
@@ -360,20 +360,53 @@ footer {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .card {
-    padding: clamp(2rem, 5vw, 3rem);
-  }
-  .links {
-    grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    padding: 3rem 2rem;
   }
 }
 
-@media (max-width: 600px), (max-height: 700px) {
+@media (max-width: 600px) {
+  .home-container {
+    height: auto;
+    min-height: 100vh;
+    padding: 1rem;
+    align-items: flex-start;
+  }
+
+  .card {
+    padding: 2.5rem 1.5rem;
+    max-height: none;
+    overflow: visible;
+  }
+
+  .links {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+  }
+
+  .tagline {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .avatar-container {
+    width: 120px;
+    height: 120px;
+  }
+}
+
+@media (max-height: 720px) {
+  .home-container {
+    height: auto;
+    min-height: 100vh;
+    padding: 1rem;
+    align-items: flex-start;
+  }
+
   .card {
     max-height: none;
     overflow: visible;
-    margin-block: 12px;
   }
 }
 </style>
