@@ -1,13 +1,17 @@
 package cc.feitwnd.interceptor;
 
 import cc.feitwnd.constant.JwtClaimsConstant;
+import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.context.BaseContext;
+import cc.feitwnd.exception.NotLoginException;
+import cc.feitwnd.exception.UnauthorizedException;
 import cc.feitwnd.properties.JwtProperties;
 import cc.feitwnd.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.method.HandlerMethod;
@@ -38,22 +42,25 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        //1、从请求头中获取令牌
+        // 从请求头中获取令牌
         String token = request.getHeader(jwtProperties.getTokenName());
 
-        //2、校验令牌
+        if(StringUtils.isEmpty(token)){
+            throw new NotLoginException(MessageConstant.NOT_LOGIN);
+        }
+
+        // 校验令牌
         try {
             log.info("jwt校验:{}", token);
             Claims claims = JwtUtil.parseJWT(jwtProperties.getSecretKey(), token);
             Long adminId = Long.valueOf(claims.get(JwtClaimsConstant.ADMIN_ID).toString());
             log.info("当前管理员id：{}", adminId);
             BaseContext.setCurrentId(adminId);
-            //3、通过，放行
+            // 通过，放行
             return true;
         } catch (Exception ex) {
-            //4、不通过，响应401状态码
-            response.setStatus(401);
-            return false;
+            // 校验失败，抛出未授权异常
+            throw new UnauthorizedException(MessageConstant.NOT_AUTHORIZED);
         }
     }
 }

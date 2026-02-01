@@ -12,4 +12,6 @@ public class MessageConstant {
     public static final String EMAIL_SEND_ERROR = "邮件验证码发送失败";
     public static final String VERIFY_CODE_ERROR = "邮件验证码错误";
     public static final String VERIFY_CODE_LOCK = "验证码输入错误次数过多,验证码已被锁定";
+    public static final String NOT_LOGIN = "未登录,请先登录";
+    public static final String NOT_AUTHORIZED = "登录状态失效,请重新登录";
 }

@@ -62,9 +62,9 @@ feitwnd:
     # 设置jwt签名加密时使用的秘钥
     secret-key: your-jwt-secret-key-here
     # 设置jwt过期时间
-    ttl: 7200000 # 豪秒,2小时
+    ttl: ${feitwnd.jwt.ttl}
     # 设置前端传递过来的令牌名称
-    token-name: Authentication
+    token-name: Authorization
   alioss:
     endpoint: your-oss-endpoint-here
     access-key-id: your-alioss-access-key-id

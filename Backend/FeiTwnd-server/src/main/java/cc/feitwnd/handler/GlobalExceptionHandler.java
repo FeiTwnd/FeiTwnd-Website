@@ -2,10 +2,16 @@ package cc.feitwnd.handler;
 
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.exception.BaseException;
+import cc.feitwnd.exception.TokenException;
 import cc.feitwnd.result.Result;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 
@@ -23,7 +29,14 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler
     public Result exceptionHandler(BaseException ex){
-        log.error("异常信息：{}", ex.getMessage());
+        log.error("业务异常：{}", ex.getMessage());
+        return Result.error(ex.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Result exceptionHandler(TokenException ex){
+        log.error("令牌异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 

@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 管理员相关接口
+ * 管理端管理员相关接口
  */
 @RestController
 @RequestMapping("/admin/admin")
