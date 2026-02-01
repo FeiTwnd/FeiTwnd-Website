@@ -73,3 +73,5 @@ feitwnd:
   email:
     personal: # 发件人昵称
     from: # 发件人邮箱
+  visitor:
+    verify-code: # 游客验证码

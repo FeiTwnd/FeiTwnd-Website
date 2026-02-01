@@ -2,18 +2,21 @@ package cc.feitwnd.service.impl;
 
 import cc.feitwnd.constant.JwtClaimsConstant;
 import cc.feitwnd.constant.MessageConstant;
+import cc.feitwnd.constant.StatusConstant;
 import cc.feitwnd.dto.AdminLoginDTO;
 import cc.feitwnd.dto.AdminLoginOutDTO;
 import cc.feitwnd.entity.Admin;
 import cc.feitwnd.exception.*;
 import cc.feitwnd.mapper.AdminMapper;
 import cc.feitwnd.properties.JwtProperties;
+import cc.feitwnd.properties.VisitorProperties;
 import cc.feitwnd.service.AdminService;
 import cc.feitwnd.service.EmailService;
 import cc.feitwnd.service.TokenService;
 import cc.feitwnd.service.VerifyCodeService;
 import cc.feitwnd.utils.JwtUtil;
 import cc.feitwnd.vo.AdminLoginVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -25,6 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @Service
 public class AdminServiceImpl implements AdminService {
 
@@ -36,6 +40,8 @@ public class AdminServiceImpl implements AdminService {
     private EmailService emailService;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private VisitorProperties visitorProperties;
 
     /**
      * 发送验证码
@@ -46,6 +52,11 @@ public class AdminServiceImpl implements AdminService {
         if(admin == null){
             // 账号不存在
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+        if(admin.getRole() == StatusConstant.DISABLE){
+            // 游客无须邮箱验证码
+            throw new VisitorSendCodeException(MessageConstant.VISITOR_VERIFY_CODE_ERROR
+                    +visitorProperties.getVerifyCode());
         }
         // 检查是否可以发送验证码
         if(!verifyCodeService.canSendCode()){
@@ -83,21 +94,31 @@ public class AdminServiceImpl implements AdminService {
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
 
-        // 检查是否可以校验验证码
-        if(!verifyCodeService.canAttempt()){
-            Long lockRemainingMinutes = verifyCodeService.getLockRemainingMinutes();
-            throw new VerifyCodeLockException(MessageConstant.VERIFY_CODE_LOCK+lockRemainingMinutes+"分钟");
-        }
+        // 区分游客和管理员校验验证码
+        if(admin.getRole() == StatusConstant.ENABLE){
+            // 管理员需要校验邮箱验证码
 
-        // 校验验证码是否正确
-        boolean isValid = verifyCodeService.verifyCode(adminLoginDTO.getCode());
-        if(!isValid){
-            verifyCodeService.recordAttempt(false);
-            throw new VerifyCodeErrorException(MessageConstant.VERIFY_CODE_ERROR);
-        }
+            // 检查是否可以校验验证码
+            if(!verifyCodeService.canAttempt()){
+                Long lockRemainingMinutes = verifyCodeService.getLockRemainingMinutes();
+                throw new VerifyCodeLockException(MessageConstant.VERIFY_CODE_LOCK+lockRemainingMinutes+"分钟");
+            }
 
-        // 清空验证码及状态
-        verifyCodeService.clearAll();
+            // 校验验证码是否正确
+            boolean isValid = verifyCodeService.verifyCode(adminLoginDTO.getCode());
+            if(!isValid){
+                Long remainingAttempts = verifyCodeService.getRemainingAttempts();
+                throw new VerifyCodeErrorException(MessageConstant.VERIFY_CODE_ERROR
+                        +",还可以试"+remainingAttempts+"次");
+            }
+
+        }else{
+            // 游客直接校验固定验证码
+            if(!adminLoginDTO.getCode().equals(visitorProperties.getVerifyCode())){
+                throw new VerifyCodeErrorException(MessageConstant.VERIFY_CODE_ERROR
+                        +",请输入:"+visitorProperties.getVerifyCode());
+            }
+        }
 
         // 生成并存储token
         String token = tokenService.createAndStoreToken(admin.getId());

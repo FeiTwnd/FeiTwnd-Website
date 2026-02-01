@@ -19,6 +19,7 @@ create table admin(
     salt varchar(50) not null comment '盐值',
     nickname varchar(20) comment '昵称',
     email varchar(50) comment '电子邮箱',
+    role tinyint comment '角色,1-管理员,0-游客',
     create_time datetime comment '创建时间',
     update_time datetime comment '更新时间'
 ) comment '管理员表';

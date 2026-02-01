@@ -37,6 +37,9 @@ public class Admin implements Serializable {
     // 电子邮箱
     private String email;
 
+    // 角色 1-管理员 0-游客
+    private Integer role;
+
     // 创建时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

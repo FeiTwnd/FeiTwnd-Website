@@ -22,6 +22,9 @@ public class CommonServiceImpl implements CommonService {
      * @param file
      */
     public String uploadFile(MultipartFile file) {
+        if (file.isEmpty()) {
+            throw new UploadFileErrorException(MessageConstant.FILE_EMPTY);
+        }
         try {
             // 获取文件名
             String fileName = file.getOriginalFilename();
