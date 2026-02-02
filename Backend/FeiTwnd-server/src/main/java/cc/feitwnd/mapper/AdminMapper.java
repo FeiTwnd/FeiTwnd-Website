@@ -1,7 +1,9 @@
 package cc.feitwnd.mapper;
 
+import cc.feitwnd.annotation.AutoFill;
 import cc.feitwnd.dto.AdminChangePasswordDTO;
 import cc.feitwnd.entity.Admin;
+import cc.feitwnd.enumeration.OperationType;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -28,5 +30,6 @@ public interface AdminMapper {
      * 修改管理员信息
      * @param admin
      */
+    @AutoFill(value = OperationType.UPDATE)
     void update(Admin admin);
 }
