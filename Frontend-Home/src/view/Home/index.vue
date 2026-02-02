@@ -20,7 +20,9 @@ onMounted(() => {
         <img src="@/assets/avatar.png" alt="FeiTwnd的头像" />
       </div>
       <h1 data-name>FeiTwnd</h1>
-      <p class="tagline">初出茅庐 | 科班码农 | 拾枝者 · 欢迎来到我的主页</p>
+      <p class="tagline">
+        初出茅庐 &nbsp | &nbsp 科班码农 &nbsp | &nbsp 拾枝者 · 欢迎来到我的主页
+      </p>
 
       <nav class="links" aria-label="站点导航">
         <a

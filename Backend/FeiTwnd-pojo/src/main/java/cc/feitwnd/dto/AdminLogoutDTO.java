@@ -3,7 +3,7 @@ package cc.feitwnd.dto;
 import lombok.Data;
 
 @Data
-public class AdminLoginOutDTO {
+public class AdminLogoutDTO {
 
     private Long id;
 

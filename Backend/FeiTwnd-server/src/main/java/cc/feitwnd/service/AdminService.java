@@ -1,8 +1,8 @@
 package cc.feitwnd.service;
 
-import cc.feitwnd.dto.AdminLoginDTO;
-import cc.feitwnd.dto.AdminLoginOutDTO;
+import cc.feitwnd.dto.*;
 import cc.feitwnd.vo.AdminLoginVO;
+import cc.feitwnd.vo.AdminVO;
 
 public interface AdminService {
 
@@ -19,8 +19,32 @@ public interface AdminService {
     AdminLoginVO login(AdminLoginDTO adminLoginDTO) throws Exception;
 
     /**
-     * 管理员退出登录
-     * @param adminLoginOutDTO
+     * 获取管理员信息
+     * @return
      */
-    void loginOut(AdminLoginOutDTO adminLoginOutDTO);
+    AdminVO getAdminById();
+
+    /**
+     * 管理员退出登录
+     * @param adminLogoutDTO
+     */
+    void logout(AdminLogoutDTO adminLogoutDTO);
+
+    /**
+     * 管理员修改密码
+     * @param adminChangePasswordDTO
+     */
+    void changePassword(AdminChangePasswordDTO adminChangePasswordDTO) throws Exception;
+
+    /**
+     * 管理员更改昵称
+     * @param adminChangeNicknameDTO
+     */
+    void changeNickname(AdminChangeNicknameDTO adminChangeNicknameDTO);
+
+    /**
+     * 管理员换绑邮箱
+     * @param adminChangeEmailDTO
+     */
+    void changeEmail(AdminChangeEmailDTO adminChangeEmailDTO);
 }

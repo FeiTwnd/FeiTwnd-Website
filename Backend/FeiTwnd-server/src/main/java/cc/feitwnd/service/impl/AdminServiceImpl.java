@@ -1,32 +1,22 @@
 package cc.feitwnd.service.impl;
 
-import cc.feitwnd.constant.JwtClaimsConstant;
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.constant.StatusConstant;
-import cc.feitwnd.dto.AdminLoginDTO;
-import cc.feitwnd.dto.AdminLoginOutDTO;
+import cc.feitwnd.context.BaseContext;
+import cc.feitwnd.dto.*;
 import cc.feitwnd.entity.Admin;
 import cc.feitwnd.exception.*;
 import cc.feitwnd.mapper.AdminMapper;
-import cc.feitwnd.properties.JwtProperties;
 import cc.feitwnd.properties.VisitorProperties;
-import cc.feitwnd.service.AdminService;
-import cc.feitwnd.service.EmailService;
-import cc.feitwnd.service.TokenService;
-import cc.feitwnd.service.VerifyCodeService;
-import cc.feitwnd.utils.JwtUtil;
+import cc.feitwnd.service.*;
 import cc.feitwnd.vo.AdminLoginVO;
+import cc.feitwnd.vo.AdminVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -42,6 +32,8 @@ public class AdminServiceImpl implements AdminService {
     private TokenService tokenService;
     @Autowired
     private VisitorProperties visitorProperties;
+    @Autowired
+    private EncryptPassword encryptPassword;
 
     /**
      * 发送验证码
@@ -88,8 +80,9 @@ public class AdminServiceImpl implements AdminService {
             throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
 
+        // 对密码进行加密
+        String hashedPassword = encryptPassword.hashPassword(password, admin.getSalt());
         // 验证密码是否正确
-        String hashedPassword = hashPassword(password, admin.getSalt());
         if(!hashedPassword.equals(admin.getPassword())){
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
         }
@@ -125,38 +118,111 @@ public class AdminServiceImpl implements AdminService {
 
         return AdminLoginVO.builder()
                 .id(admin.getId())
-                .nickName(admin.getNickname())
                 .token(token)
                 .build();
     }
 
-    // 计算密码+盐的哈希
-    private String hashPassword(String password, String salt) throws Exception{
-        MessageDigest md = MessageDigest.getInstance("SHA-256");
-        String combined = password + salt;
-        byte[] hash = md.digest(combined.getBytes(StandardCharsets.UTF_8));
-        return bytesToHex(hash);
-    }
-
-     //将字节数组转换为十六进制字符串
-    private String bytesToHex(byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
-            }
-            hexString.append(hex);
+    /**
+     * 获取管理员信息
+     * @return
+     */
+    public AdminVO getAdminById() {
+        Long adminId = BaseContext.getCurrentId();
+        Admin admin = adminMapper.getById(adminId);
+        if(admin == null){
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
-        return hexString.toString();
+
+        // 构造管理员信息
+        return AdminVO.builder()
+                .id(adminId)
+                .nickName(admin.getNickname())
+                .email(admin.getEmail())
+                .build();
     }
 
     /**
      * 管理员退出登录
-     * @param adminLoginOutDTO
+     * @param adminLogoutDTO
      */
-    public void loginOut(AdminLoginOutDTO adminLoginOutDTO) {
+    public void logout(AdminLogoutDTO adminLogoutDTO) {
         // 删除Redis中的token
-        tokenService.logout(adminLoginOutDTO.getId(), adminLoginOutDTO.getToken());
+        tokenService.logout(adminLogoutDTO.getId(), adminLogoutDTO.getToken());
+    }
+
+    /**
+     * 管理员修改密码
+     * @param adminChangePasswordDTO
+     */
+    public void changePassword(AdminChangePasswordDTO adminChangePasswordDTO) throws Exception {
+        Long adminId = BaseContext.getCurrentId();
+        Admin admin = adminMapper.getById(adminId);
+        if(admin == null){
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+        // 验证两次输入的新密码是否一致
+        if(!adminChangePasswordDTO.getNewPassword().equals(adminChangePasswordDTO.getConfirmNewPassword())){
+            throw new PasswordErrorException(MessageConstant.NEW_PASSWORD_NOT_MATCH);
+        }
+        // 验证旧密码是否正确
+        String hashedOldPassword = encryptPassword.hashPassword(adminChangePasswordDTO.getOldPassword(), admin.getSalt());
+        if(!hashedOldPassword.equals(admin.getPassword())){
+            throw new PasswordErrorException(MessageConstant.OLD_PASSWORD_ERROR);
+        }
+        // 获取加密后的新密码
+        String hashedNewPassword = encryptPassword.hashPassword(adminChangePasswordDTO.getNewPassword(), admin.getSalt());
+        if(hashedNewPassword.equals(admin.getPassword())){
+            throw new PasswordErrorException(MessageConstant.NEW_PASSWORD_NOT_CHANGE);
+        }
+        // 更新管理员信息
+        admin.setPassword(hashedNewPassword);
+        adminMapper.update(admin);
+        // 登出所有设备
+        tokenService.logoutAll(adminId);
+    }
+
+    /**
+     * 管理员更改昵称
+     * @param adminChangeNicknameDTO
+     */
+    public void changeNickname(AdminChangeNicknameDTO adminChangeNicknameDTO) {
+        Long adminId = BaseContext.getCurrentId();
+        Admin admin = adminMapper.getById(adminId);
+        if(admin == null){
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+        // 更新昵称
+        admin.setNickname(adminChangeNicknameDTO.getNickname());
+        adminMapper.update(admin);
+    }
+
+    /**
+     * 管理员换绑邮箱
+     * @param adminChangeEmailDTO
+     */
+    public void changeEmail(AdminChangeEmailDTO adminChangeEmailDTO) {
+        Long adminId = BaseContext.getCurrentId();
+        Admin admin = adminMapper.getById(adminId);
+        if(admin == null){
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        }
+
+        // 效验邮箱验证码
+        // 检查是否可以校验验证码
+        if(!verifyCodeService.canAttempt()){
+            Long lockRemainingMinutes = verifyCodeService.getLockRemainingMinutes();
+            throw new VerifyCodeLockException(MessageConstant.VERIFY_CODE_LOCK+lockRemainingMinutes+"分钟");
+        }
+
+        // 校验验证码是否正确
+        boolean isValid = verifyCodeService.verifyCode(adminChangeEmailDTO.getCode());
+        if(!isValid){
+            Long remainingAttempts = verifyCodeService.getRemainingAttempts();
+            throw new VerifyCodeErrorException(MessageConstant.VERIFY_CODE_ERROR
+                    +",还可以试"+remainingAttempts+"次");
+        }
+        // 更新邮箱
+        admin.setEmail(adminChangeEmailDTO.getEmail());
+        adminMapper.update(admin);
     }
 }

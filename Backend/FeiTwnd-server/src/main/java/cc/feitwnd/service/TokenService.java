@@ -59,4 +59,12 @@ public class TokenService {
         String key = TOKEN_PREFIX + userId;
         redis.opsForSet().remove(key, token);
     }
+
+    /**
+     * 退出登录 - 删除所有token
+     */
+    public void logoutAll(Long userId) {
+        String key = TOKEN_PREFIX + userId;
+        redis.delete(key);
+    }
 }
