@@ -17,7 +17,7 @@ onMounted(() => {
   <div class="home-container">
     <main class="card" role="main">
       <div class="avatar-container">
-        <img src="@/assets/avatar.png" alt="FeiTwnd的头像" />
+        <img src="@/assets/images/avatar.png" alt="FeiTwnd的头像" />
       </div>
       <h1 data-name>FeiTwnd</h1>
       <p class="tagline">

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.feitwnd.mapper.PersonalInfoMapper">
+    <update id="updateById">
+        update personal_info
+        <set>
+            <if test="nickname != null">
+                nickname = #{nickname},
+            </if>
+            <if test="tag != null">
+                tag = #{tag},
+            </if>
+            <if test="description != null">
+                description = #{description},
+            </if>
+            <if test="avatar != null">
+                avatar = #{avatar},
+            </if>
+            <if test="website != null">
+                website = #{website},
+            </if>
+            <if test="email != null">
+                email = #{email},
+            </if>
+            <if test="github != null">
+                github = #{github},
+            </if>
+            <if test="location != null">
+                location = #{location},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
