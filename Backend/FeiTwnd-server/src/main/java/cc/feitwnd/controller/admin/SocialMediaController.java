@@ -5,9 +5,7 @@ import cc.feitwnd.service.SocialMediaService;
 import cc.feitwnd.vo.SocialMediaAdminVO;
 import cc.feitwnd.vo.SocialMediaVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -28,5 +26,31 @@ public class SocialMediaController {
     public Result<List<SocialMediaAdminVO>> getAllSocialMedia() {
         List<SocialMediaAdminVO> socialMediaAdminVOList = socialMediaService.getAllSocialMedia();
         return Result.success(socialMediaAdminVOList);
+    }
+
+    /**
+     * 添加社交媒体信息
+     */
+    @PostMapping
+    public Result addSocialMedia(@RequestBody SocialMediaAdminVO socialMediaAdminVO) {
+        socialMediaService.addSocialMedia(socialMediaAdminVO);
+        return Result.success();
+    }
+    /**
+     * 删除社交媒体信息
+     */
+    @DeleteMapping("/{id}")
+    public Result deleteSocialMedia(@PathVariable Long id) {
+        socialMediaService.deleteSocialMedia(id);
+        return Result.success();
+    }
+
+    /**
+     * 修改社交媒体信息
+     */
+    @PutMapping
+    public Result updateSocialMedia(@RequestBody SocialMediaAdminVO socialMediaAdminVO) {
+        socialMediaService.updateSocialMedia(socialMediaAdminVO);
+        return Result.success();
     }
 }

@@ -54,4 +54,40 @@ public class SocialMediaServiceImpl implements SocialMediaService {
         }
         return null;
     }
+
+    /**
+     * 添加社交媒体
+     */
+    public void addSocialMedia(SocialMediaAdminVO socialMediaAdminVO) {
+        SocialMedia socialMedia = SocialMedia.builder()
+                .name(socialMediaAdminVO.getName())
+                .icon(socialMediaAdminVO.getIcon())
+                .link(socialMediaAdminVO.getLink())
+                .sort(socialMediaAdminVO.getSort())
+                .isVisible(socialMediaAdminVO.getIsVisible())
+                .build();
+        socialMediaMapper.insert(socialMedia);
+    }
+
+    /**
+     * 删除社交媒体
+     */
+    public void deleteSocialMedia(Long id) {
+        socialMediaMapper.deleteById(id);
+    }
+
+    /**
+     * 修改社交媒体
+     */
+    public void updateSocialMedia(SocialMediaAdminVO socialMediaAdminVO) {
+        SocialMedia socialMedia = SocialMedia.builder()
+                .id(socialMediaAdminVO.getId())
+                .name(socialMediaAdminVO.getName())
+                .icon(socialMediaAdminVO.getIcon())
+                .link(socialMediaAdminVO.getLink())
+                .sort(socialMediaAdminVO.getSort())
+                .isVisible(socialMediaAdminVO.getIsVisible())
+                .build();
+        socialMediaMapper.updateById(socialMedia);
+    }
 }

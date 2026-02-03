@@ -15,4 +15,19 @@ public interface SocialMediaService {
      * 获取所有社交媒体信息
      */
     List<SocialMediaAdminVO> getAllSocialMedia();
+
+    /**
+     * 添加社交媒体信息
+     */
+    void addSocialMedia(SocialMediaAdminVO socialMediaAdminVO);
+
+    /**
+     * 删除社交媒体信息
+     */
+    void deleteSocialMedia(Long id);
+
+    /**
+     * 修改社交媒体信息
+     */
+    void updateSocialMedia(SocialMediaAdminVO socialMediaAdminVO);
 }
