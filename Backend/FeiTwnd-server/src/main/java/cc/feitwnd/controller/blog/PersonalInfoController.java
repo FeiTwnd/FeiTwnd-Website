@@ -1,16 +1,18 @@
-package cc.feitwnd.controller.admin;
+package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.PersonalInfoService;
 import cc.feitwnd.vo.PersonalInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
- * 管理端个人信息接口
+ * 博客端个人信息接口
  */
-@RestController("adminPersonalInfoController")
-@RequestMapping("/admin/personalInfo")
+@RestController("blogPersonalInfoController")
+@RequestMapping("/blog/personalInfo")
 public class PersonalInfoController {
 
     @Autowired
@@ -23,14 +25,5 @@ public class PersonalInfoController {
     public Result<PersonalInfoVO> getPersonalInfo() {
         PersonalInfoVO personalInfoVO = personalInfoService.getPersonalInfo();
         return Result.success(personalInfoVO);
-    }
-
-    /**
-     * 更新个人信息
-     */
-    @PutMapping
-    public Result updatePersonalInfo(@RequestBody PersonalInfoVO personalInfoVO) {
-        personalInfoService.updatePersonalInfo(personalInfoVO);
-        return Result.success();
     }
 }

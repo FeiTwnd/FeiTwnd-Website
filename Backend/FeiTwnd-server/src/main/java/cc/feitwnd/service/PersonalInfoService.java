@@ -1,6 +1,5 @@
 package cc.feitwnd.service;
 
-import cc.feitwnd.dto.PersonalInfoDTO;
 import cc.feitwnd.vo.PersonalInfoVO;
 
 public interface PersonalInfoService {
@@ -12,5 +11,5 @@ public interface PersonalInfoService {
     /**
      * 更新个人信息
      */
-    void updatePersonalInfo(PersonalInfoDTO personalInfoDTO);
+    void updatePersonalInfo(PersonalInfoVO personalInfoVO);
 }

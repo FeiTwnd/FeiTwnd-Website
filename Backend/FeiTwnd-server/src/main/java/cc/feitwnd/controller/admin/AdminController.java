@@ -71,7 +71,7 @@ public class AdminController {
     /**
      * 管理员更改昵称
      */
-    @PutMapping("/changeNickName")
+    @PutMapping("/changeNickname")
     public Result changeNickname(@RequestBody AdminChangeNicknameDTO adminChangeNicknameDTO) {
         log.info("管理员更改昵称：{}", adminChangeNicknameDTO);
         adminService.changeNickname(adminChangeNicknameDTO);

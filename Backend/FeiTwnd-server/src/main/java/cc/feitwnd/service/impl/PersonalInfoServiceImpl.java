@@ -1,8 +1,6 @@
 package cc.feitwnd.service.impl;
 
 
-import cc.feitwnd.context.BaseContext;
-import cc.feitwnd.dto.PersonalInfoDTO;
 import cc.feitwnd.entity.PersonalInfo;
 import cc.feitwnd.mapper.PersonalInfoMapper;
 import cc.feitwnd.service.PersonalInfoService;
@@ -38,19 +36,19 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
     /**
      * 更新个人信息
      */
-    public void updatePersonalInfo(PersonalInfoDTO personalInfoDTO) {
+    public void updatePersonalInfo(PersonalInfoVO personalInfoVO) {
         // 获取管理员的个人信息
         PersonalInfo personalInfo = personalInfoMapper.getPersonalInfo();
         // 更新个人信息
         personalInfo.setId(personalInfo.getId());
-        personalInfo.setNickname(personalInfoDTO.getNickname());
-        personalInfo.setTag(personalInfoDTO.getTag());
-        personalInfo.setDescription(personalInfoDTO.getDescription());
-        personalInfo.setAvatar(personalInfoDTO.getAvatar());
-        personalInfo.setWebsite(personalInfoDTO.getWebsite());
-        personalInfo.setEmail(personalInfoDTO.getEmail());
-        personalInfo.setGithub(personalInfoDTO.getGithub());
-        personalInfo.setLocation(personalInfoDTO.getLocation());
+        personalInfo.setNickname(personalInfoVO.getNickname());
+        personalInfo.setTag(personalInfoVO.getTag());
+        personalInfo.setDescription(personalInfoVO.getDescription());
+        personalInfo.setAvatar(personalInfoVO.getAvatar());
+        personalInfo.setWebsite(personalInfoVO.getWebsite());
+        personalInfo.setEmail(personalInfoVO.getEmail());
+        personalInfo.setGithub(personalInfoVO.getGithub());
+        personalInfo.setLocation(personalInfoVO.getLocation());
         personalInfoMapper.updateById(personalInfo);
     }
 }
