@@ -1,9 +1,8 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.entity.SocialMedia;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.SocialMediaService;
-import cc.feitwnd.vo.SocialMediaAdminVO;
-import cc.feitwnd.vo.SocialMediaVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +22,17 @@ public class SocialMediaController {
      * 获取所有社交媒体信息
      */
     @GetMapping
-    public Result<List<SocialMediaAdminVO>> getAllSocialMedia() {
-        List<SocialMediaAdminVO> socialMediaAdminVOList = socialMediaService.getAllSocialMedia();
-        return Result.success(socialMediaAdminVOList);
+    public Result<List<SocialMedia>> getAllSocialMedia() {
+        List<SocialMedia> socialMediaList = socialMediaService.getAllSocialMedia();
+        return Result.success(socialMediaList);
     }
 
     /**
      * 添加社交媒体信息
      */
     @PostMapping
-    public Result addSocialMedia(@RequestBody SocialMediaAdminVO socialMediaAdminVO) {
-        socialMediaService.addSocialMedia(socialMediaAdminVO);
+    public Result addSocialMedia(@RequestBody SocialMedia socialMedia) {
+        socialMediaService.addSocialMedia(socialMedia);
         return Result.success();
     }
     /**
@@ -49,8 +48,8 @@ public class SocialMediaController {
      * 修改社交媒体信息
      */
     @PutMapping
-    public Result updateSocialMedia(@RequestBody SocialMediaAdminVO socialMediaAdminVO) {
-        socialMediaService.updateSocialMedia(socialMediaAdminVO);
+    public Result updateSocialMedia(@RequestBody SocialMedia socialMedia) {
+        socialMediaService.updateSocialMedia(socialMedia);
         return Result.success();
     }
 }

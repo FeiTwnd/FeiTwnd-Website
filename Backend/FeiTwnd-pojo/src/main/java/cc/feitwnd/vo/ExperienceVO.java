@@ -1,6 +1,5 @@
-package cc.feitwnd.entity;
+package cc.feitwnd.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,18 +7,12 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
-/**
- * 经历
- */
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-public class Experiences implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@NoArgsConstructor
+public class ExperienceVO implements Serializable {
 
     private Long id;
 
@@ -43,15 +36,4 @@ public class Experiences implements Serializable {
 
     // 结束时间
     private LocalDate endDate;
-
-    // 是否可见
-    private Integer isVisible;
-
-    // 创建时间
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createTime;
-
-    // 更新时间
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateTime;
 }

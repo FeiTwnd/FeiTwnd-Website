@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.feitwnd.mapper.ExperienceMapper">
+    <select id="getExperienceByType" resultType="cc.feitwnd.entity.Experiences">
+        select * from experiences
+        <where>
+            <if test="type != null">
+                type = #{type}
+            </if>
+        </where>
+        order by start_date desc
+    </select>
+    <insert id="insert">
+        insert into experiences (type, title, subtitle, logo_url, content, start_date, end_date, is_visible, create_time, update_time)
+        values (#{type}, #{title}, #{subtitle}, #{logoUrl}, #{content}, #{startDate}, #{endDate}, #{isVisible}, #{createTime}, #{updateTime})
+    </insert>
+    <update id="update">
+        update experiences
+        <set>
+            <if test="type != null">type = #{type},</if>
+            <if test="title != null">title = #{title},</if>
+            <if test="subtitle != null">subtitle = #{subtitle},</if>
+            <if test="logoUrl != null">logo_url = #{logoUrl},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="startDate != null">start_date = #{startDate},</if>
+            <if test="endDate != null">end_date = #{endDate},</if>
+            <if test="isVisible != null">is_visible = #{isVisible},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

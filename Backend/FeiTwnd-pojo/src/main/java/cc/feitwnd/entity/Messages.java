@@ -34,29 +34,23 @@ public class Messages implements Serializable {
     // 父留言ID,null是一级留言
     private Long parentId;
 
+    // 访客ID
+    private Long visitorId;
+
     // 昵称
     private String nickname;
 
     // 邮箱或qq
     private String emailOrQq;
 
-    // IP地址
-    private String ipAddress;
-
     // 地址
     private String location;
-
-    // 用户代理
-    private String userAgent;
 
     // 操作系统名称
     private String userAgentOs;
 
     // 浏览器名称
     private String userAgentBrowser;
-
-    // 用户指纹
-    private String userFingerprint;
 
     // 是否审核通过，0-否，1-是
     private Integer isApproved;

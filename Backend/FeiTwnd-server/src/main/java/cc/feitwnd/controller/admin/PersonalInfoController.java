@@ -1,5 +1,6 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.entity.PersonalInfo;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.PersonalInfoService;
 import cc.feitwnd.vo.PersonalInfoVO;
@@ -20,17 +21,17 @@ public class PersonalInfoController {
      * 获取个人信息
      */
     @GetMapping
-    public Result<PersonalInfoVO> getPersonalInfo() {
-        PersonalInfoVO personalInfoVO = personalInfoService.getPersonalInfo();
-        return Result.success(personalInfoVO);
+    public Result<PersonalInfo> getPersonalInfo() {
+        PersonalInfo personalInfo = personalInfoService.getAllPersonalInfo();
+        return Result.success(personalInfo);
     }
 
     /**
      * 更新个人信息
      */
     @PutMapping
-    public Result updatePersonalInfo(@RequestBody PersonalInfoVO personalInfoVO) {
-        personalInfoService.updatePersonalInfo(personalInfoVO);
+    public Result updatePersonalInfo(@RequestBody PersonalInfo personalInfo) {
+        personalInfoService.updatePersonalInfo(personalInfo);
         return Result.success();
     }
 }

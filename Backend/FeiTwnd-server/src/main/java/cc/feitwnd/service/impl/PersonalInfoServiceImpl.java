@@ -14,8 +14,22 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
     @Autowired
     private PersonalInfoMapper personalInfoMapper;
 
+    // 管理端获取完整个人信息
+    public PersonalInfo getAllPersonalInfo() {
+        PersonalInfo personalInfo = personalInfoMapper.getPersonalInfo();
+        return personalInfo;
+    }
+
     /**
-     * 获取个人信息
+     * 管理端更新个人信息
+     */
+    public void updatePersonalInfo(PersonalInfo personalInfo) {
+        // 更新个人信息
+        personalInfoMapper.updateById(personalInfo);
+    }
+
+    /**
+     * 其他端获取个人信息
      */
     public PersonalInfoVO getPersonalInfo() {
         PersonalInfo personalInfo = personalInfoMapper.getPersonalInfo();
@@ -31,24 +45,5 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
                 .location(personalInfo.getLocation())
                 .build();
         return personalInfoVO;
-    }
-
-    /**
-     * 更新个人信息
-     */
-    public void updatePersonalInfo(PersonalInfoVO personalInfoVO) {
-        // 获取管理员的个人信息
-        PersonalInfo personalInfo = personalInfoMapper.getPersonalInfo();
-        // 更新个人信息
-        personalInfo.setId(personalInfo.getId());
-        personalInfo.setNickname(personalInfoVO.getNickname());
-        personalInfo.setTag(personalInfoVO.getTag());
-        personalInfo.setDescription(personalInfoVO.getDescription());
-        personalInfo.setAvatar(personalInfoVO.getAvatar());
-        personalInfo.setWebsite(personalInfoVO.getWebsite());
-        personalInfo.setEmail(personalInfoVO.getEmail());
-        personalInfo.setGithub(personalInfoVO.getGithub());
-        personalInfo.setLocation(personalInfoVO.getLocation());
-        personalInfoMapper.updateById(personalInfo);
     }
 }

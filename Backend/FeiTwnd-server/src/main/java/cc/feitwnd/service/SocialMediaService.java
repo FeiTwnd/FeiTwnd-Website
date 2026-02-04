@@ -1,6 +1,6 @@
 package cc.feitwnd.service;
 
-import cc.feitwnd.vo.SocialMediaAdminVO;
+import cc.feitwnd.entity.SocialMedia;
 import cc.feitwnd.vo.SocialMediaVO;
 
 import java.util.List;
@@ -14,12 +14,12 @@ public interface SocialMediaService {
     /**
      * 获取所有社交媒体信息
      */
-    List<SocialMediaAdminVO> getAllSocialMedia();
+    List<SocialMedia> getAllSocialMedia();
 
     /**
      * 添加社交媒体信息
      */
-    void addSocialMedia(SocialMediaAdminVO socialMediaAdminVO);
+    void addSocialMedia(SocialMedia socialMedia);
 
     /**
      * 删除社交媒体信息
@@ -29,5 +29,5 @@ public interface SocialMediaService {
     /**
      * 修改社交媒体信息
      */
-    void updateSocialMedia(SocialMediaAdminVO socialMediaAdminVO);
+    void updateSocialMedia(SocialMedia socialMedia);
 }
