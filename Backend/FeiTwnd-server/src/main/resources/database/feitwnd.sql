@@ -86,39 +86,22 @@ create table social_media(
 create table experiences(
     id int primary key auto_increment,
     type tinyint not null comment '类型，0-教育经历，1-实习及工作经历,2-项目经历',
-    is_visible tinyint default 1 comment '是否可见',
+
+    --  内容基本信息
+    title varchar(50) not null comment '标题,公司名/学校名/项目名',
+    subtitle varchar(100) comment '副标题,职位/专业/项目角色',
+    logo_url varchar(255) comment 'logo/校徽',
+    content text not null comment '内容',
     start_date DATE NOT NULL comment '开始时间',
     end_date DATE comment '结束时间',
+
+    is_visible tinyint default 1 comment '是否可见',
+
     create_time datetime comment '创建时间',
-    update_time datetime comment '更新时间'
+    update_time datetime comment '更新时间',
+
+    index idx_time(start_date desc)
 ) comment '经历表';
-
--- 教育经历表
-create table experiences_education(
-    id int primary key auto_increment,
-    experience_id int not null comment '经历ID',
-    badge varchar(255) comment '校徽url',
-    school varchar(50) comment '学校名称',
-    major varchar(50) comment '专业名称'
-) comment '教育经历表';
-
--- 实习及工作经历表
-create table experiences_work(
-    id int primary key auto_increment,
-    experience_id int not null comment '经历ID',
-    logo varchar(255) comment '公司logo',
-    company varchar(50) comment '公司名称',
-    position varchar(50) comment '职位名称',
-    content text not null comment '工作内容'
-) comment '实习及工作经历表';
-
--- 项目经历表
-create table experiences_project(
-    id int primary key auto_increment,
-    experience_id int not null comment '经历ID',
-    project_name varchar(50) not null comment '项目名称',
-    content text not null comment '项目内容'
-) comment '项目经历表';
 
 -- 技能表
 create table skills(
@@ -312,20 +295,18 @@ create table messages(
     id int primary key auto_increment,
 
     -- 留言信息
-    content text not null comment '评论内容',
+    content text not null comment '留言内容',
     content_html text not null comment '转换后的HTML内容,(如果是markdown)',
+    root_id int comment '根留言ID,null是一级留言',
+    parent_id int comment '父留言ID,null是一级留言',
 
     -- 留言者信息
-    root_id int comment '根留言ID,null是一级评论',
-    parent_id int comment '父留言ID,null是一级评论',
+    visitor_id int comment '访客ID',
     nickname varchar(15) comment '昵称',
     email_or_qq varchar(50) comment '邮箱或qq',
-    ip_address varchar(45) comment 'IP地址',
     location varchar(30) comment '地址',
-    user_agent text comment '用户代理',
     user_agent_os varchar(20) comment '操作系统名称',
     user_agent_browser varchar(20) comment '浏览器名称',
-    user_fingerprint varchar(150) comment '用户指纹',
 
     -- 状态信息
     is_approved tinyint default 0 comment '是否审核通过，0-否，1-是',
