@@ -17,6 +17,8 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     /**
      * 获取经历信息
+     * @param type
+     * @return
      */
     public List<Experiences> getExperience(Integer type) {
         List<Experiences> experienceList = experienceMapper.getExperienceByType(type);
@@ -25,6 +27,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     /**
      * 添加经历信息
+     * @param experiences
      */
     public void addExperience(Experiences experiences) {
         experienceMapper.insert(experiences);
@@ -32,6 +35,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     /**
      * 修改经历信息
+     * @param experiences
      */
     public void updateExperience(Experiences experiences) {
        experienceMapper.update(experiences);
@@ -39,6 +43,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     /**
      * 删除经历信息
+     * @param id
      */
     public void deleteExperience(Long id) {
         experienceMapper.deleteById(id);
@@ -46,6 +51,7 @@ public class ExperienceServiceImpl implements ExperienceService {
 
     /**
      * cv端获取全部经历信息
+     * @return
      */
     public List<ExperienceVO> getAllExperience() {
         List<Experiences> experienceList = experienceMapper.getAllExperience();

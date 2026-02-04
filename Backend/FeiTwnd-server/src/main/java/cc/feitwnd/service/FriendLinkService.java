@@ -1,0 +1,38 @@
+package cc.feitwnd.service;
+
+import cc.feitwnd.entity.FriendLinks;
+import cc.feitwnd.vo.FriendLinkVO;
+
+import java.util.List;
+
+public interface FriendLinkService {
+    /**
+     * 管理端获取所有友情链接
+     * @return
+     */
+    List<FriendLinks> getAllFriendLink();
+
+    /**
+     * 管理端添加友情链接
+     * @param friendLink
+     */
+    void addFriendLink(FriendLinks friendLink);
+
+    /**
+     * 管理端删除友情链接
+     * @param id
+     */
+    void deleteFriendLink(Long id);
+
+    /**
+     * 管理端修改友情链接
+     * @param friendLink
+     */
+    void updateFriendLink(FriendLinks friendLink);
+
+    /**
+     * 博客端获取可见友情链接
+     * @return
+     */
+    List<FriendLinkVO> getVisibleFriendLink();
+}

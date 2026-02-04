@@ -17,6 +17,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
 
     /**
      * 获取可见社交媒体信息
+     * @return
      */
     public List<SocialMediaVO> getVisibleSocialMedia() {
         // 获取数据库数据
@@ -36,6 +37,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
 
     /**
      * 获取所有社交媒体信息
+     * @return
      */
     public List<SocialMedia> getAllSocialMedia() {
         // 获取数据库数据
@@ -48,6 +50,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
 
     /**
      * 添加社交媒体
+     * @param socialMedia
      */
     public void addSocialMedia(SocialMedia socialMedia) {
         // 添加到数据库
@@ -56,6 +59,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
 
     /**
      * 删除社交媒体
+     * @param id
      */
     public void deleteSocialMedia(Long id) {
         socialMediaMapper.deleteById(id);
@@ -63,6 +67,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
 
     /**
      * 修改社交媒体
+     * @param socialMedia
      */
     public void updateSocialMedia(SocialMedia socialMedia) {
         // 更新到数据库

@@ -14,7 +14,10 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
     @Autowired
     private PersonalInfoMapper personalInfoMapper;
 
-    // 管理端获取完整个人信息
+    /**
+     * 管理端获取所有个人信息
+     * @return
+     */
     public PersonalInfo getAllPersonalInfo() {
         PersonalInfo personalInfo = personalInfoMapper.getPersonalInfo();
         return personalInfo;
@@ -22,6 +25,7 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
 
     /**
      * 管理端更新个人信息
+     * @param personalInfo
      */
     public void updatePersonalInfo(PersonalInfo personalInfo) {
         // 更新个人信息
@@ -30,6 +34,7 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
 
     /**
      * 其他端获取个人信息
+     * @return
      */
     public PersonalInfoVO getPersonalInfo() {
         PersonalInfo personalInfo = personalInfoMapper.getPersonalInfo();

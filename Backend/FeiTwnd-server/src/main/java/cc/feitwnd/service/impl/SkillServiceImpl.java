@@ -17,6 +17,7 @@ public class SkillServiceImpl implements SkillService {
 
     /**
      * 获取所有技能信息
+     * @return
      */
     public List<Skills> getAllSkill() {
         List<Skills> skillList = skillMapper.getAllSkill();
@@ -25,6 +26,7 @@ public class SkillServiceImpl implements SkillService {
 
     /**
      * 添加技能信息
+     * @param skills
      */
     public void addSkill(Skills skills) {
         skillMapper.addSkill(skills);
@@ -32,6 +34,7 @@ public class SkillServiceImpl implements SkillService {
 
     /**
      * 删除技能信息
+     * @param id
      */
     public void deleteSkill(Long id) {
         skillMapper.deleteById(id);
@@ -39,6 +42,7 @@ public class SkillServiceImpl implements SkillService {
 
     /**
      * 修改技能信息
+     * @param skills
      */
     public void updateSkill(Skills skills) {
         skillMapper.updateSkill(skills);
@@ -46,6 +50,7 @@ public class SkillServiceImpl implements SkillService {
 
     /**
      * 简历端获取技能信息
+     * @return
      */
     public List<SkillVO> getSkillVO() {
         List<Skills> skills = skillMapper.getVisibleSkill();

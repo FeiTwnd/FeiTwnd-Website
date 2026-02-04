@@ -171,6 +171,7 @@ public class AdminServiceImpl implements AdminService {
         }
         // 获取加密后的新密码
         String hashedNewPassword = encryptPassword.hashPassword(adminChangePasswordDTO.getNewPassword(), admin.getSalt());
+        // 验证新密码是否与旧密码一致
         if(hashedNewPassword.equals(admin.getPassword())){
             throw new PasswordErrorException(MessageConstant.NEW_PASSWORD_NOT_CHANGE);
         }
