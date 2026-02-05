@@ -31,6 +31,9 @@ public class Views implements Serializable {
     // 来源URL
     private String referer;
 
+    // 页面标题
+    private String pageTitle;
+
     // IP地址
     private String ipAddress;
 

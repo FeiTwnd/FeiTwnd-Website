@@ -149,6 +149,7 @@ create table views(
     visitor_id int comment '访客ID',
     page_path varchar(100) comment '页面路径',
     referer varchar(255) comment '来源URL',
+    page_title varchar(100) comment '页面标题',
     ip_address varchar(45) comment 'IP地址',
     user_agent varchar(255) comment '用户代理',
     view_time datetime comment '访问时间',
