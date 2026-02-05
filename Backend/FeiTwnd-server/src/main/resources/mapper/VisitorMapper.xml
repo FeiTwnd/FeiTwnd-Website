@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.feitwnd.mapper.VisitorMapper">
+
+    <insert id="insertVisitor" useGeneratedKeys="true" keyProperty="id">
+        insert into visitors (fingerprint, session_id, ip, user_agent, country, province, city, longitude, latitude,
+                              first_visit_time, last_visit_time, total_views, is_blocked, expires_at, create_time, update_time)
+        values (#{fingerprint}, #{sessionId}, #{ip}, #{userAgent}, #{country}, #{province}, #{city}, #{longitude}, #{latitude},
+                #{firstVisitTime}, #{lastVisitTime}, #{totalViews}, #{isBlocked}, #{expiresAt}, #{createTime}, #{updateTime})
+    </insert>
+    <update id="updateById">
+        update visitors
+        <set>
+            <if test="sessionId != null">session_id = #{sessionId},</if>
+            <if test="ip != null">ip = #{ip},</if>
+            <if test="userAgent != null">user_agent = #{userAgent},</if>
+            <if test="country != null">country = #{country},</if>
+            <if test="province != null">province = #{province},</if>
+            <if test="city != null">city = #{city},</if>
+            <if test="longitude != null">longitude = #{longitude},</if>
+            <if test="latitude != null">latitude = #{latitude},</if>
+            <if test="firstVisitTime != null">first_visit_time = #{firstVisitTime},</if>
+            <if test="lastVisitTime != null">last_visit_time = #{lastVisitTime},</if>
+            <if test="totalViews != null">total_views = #{totalViews},</if>
+            <if test="isBlocked != null">is_blocked = #{isBlocked},</if>
+            <if test="expiresAt != null">expires_at = #{expiresAt},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>

@@ -79,6 +79,11 @@
             <artifactId>jaxb-impl</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.tomcat.embed</groupId>
+            <artifactId>tomcat-embed-core</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
