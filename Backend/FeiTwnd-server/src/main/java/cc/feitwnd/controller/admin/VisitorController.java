@@ -10,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-
 /**
  * 管理端访客接口
  */
@@ -34,4 +32,5 @@ public class VisitorController {
         PageResult pageResult = visitorService.pageQuery(visitorPageQueryDTO);
         return Result.success(pageResult);
     }
+
 }

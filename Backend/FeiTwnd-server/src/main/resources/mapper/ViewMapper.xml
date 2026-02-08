@@ -7,4 +7,17 @@
         insert into views (visitor_id, page_path, referer, ip_address, user_agent, view_time)
         values (#{visitorId}, #{pagePath}, #{referer}, #{ipAddress}, #{userAgent}, #{viewTime})
     </insert>
+
+    <select id="pageQuery" resultType="cc.feitwnd.entity.Views">
+        select * from views
+        <where>
+            <if test="pagePath != null and pagePath != ''">
+                and page_path = #{pagePath}
+            </if>
+            <if test="visitorId != null">
+                and visitor_id = #{visitorId}
+            </if>
+        </where>
+        order by view_time desc
+    </select>
 </mapper>
