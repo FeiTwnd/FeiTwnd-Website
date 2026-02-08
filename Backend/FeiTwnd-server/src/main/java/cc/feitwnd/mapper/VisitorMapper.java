@@ -1,8 +1,10 @@
 package cc.feitwnd.mapper;
 
 import cc.feitwnd.annotation.AutoFill;
+import cc.feitwnd.dto.VisitorPageQueryDTO;
 import cc.feitwnd.entity.Visitors;
 import cc.feitwnd.enumeration.OperationType;
+import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
@@ -31,4 +33,11 @@ public interface VisitorMapper {
      */
     @AutoFill(value = OperationType.UPDATE)
     void updateById(Visitors visitor);
+
+    /**
+     * 分页查询
+     * @param visitorPageQueryDTO
+     * @return
+     */
+    Page<Visitors> pageQuery(VisitorPageQueryDTO visitorPageQueryDTO);
 }

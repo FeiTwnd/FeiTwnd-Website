@@ -1,6 +1,8 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.VisitorPageQueryDTO;
 import cc.feitwnd.dto.VisitorRecordDTO;
+import cc.feitwnd.result.PageResult;
 import cc.feitwnd.vo.VisitorRecordVO;
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -12,4 +14,11 @@ public interface VisitorService {
      * @return
      */
     VisitorRecordVO recordVisitorViewInfo(VisitorRecordDTO visitorRecordDTO, HttpServletRequest httpRequest);
+
+    /**
+     * 分页查询访客列表
+     * @param visitorPageQueryDTO
+     * @return
+     */
+    PageResult pageQuery(VisitorPageQueryDTO visitorPageQueryDTO);
 }

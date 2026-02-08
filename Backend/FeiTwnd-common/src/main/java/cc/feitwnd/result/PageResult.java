@@ -1,4 +1,4 @@
-package com.sky.result;
+package cc.feitwnd.result;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

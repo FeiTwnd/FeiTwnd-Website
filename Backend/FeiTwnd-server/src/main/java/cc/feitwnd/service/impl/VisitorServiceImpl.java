@@ -2,15 +2,19 @@ package cc.feitwnd.service.impl;
 
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.constant.StatusConstant;
+import cc.feitwnd.dto.VisitorPageQueryDTO;
 import cc.feitwnd.dto.VisitorRecordDTO;
 import cc.feitwnd.entity.Views;
 import cc.feitwnd.entity.Visitors;
 import cc.feitwnd.exception.BlockedException;
 import cc.feitwnd.mapper.ViewMapper;
 import cc.feitwnd.mapper.VisitorMapper;
+import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.VisitorService;
 import cc.feitwnd.utils.IpUtil;
 import cc.feitwnd.vo.VisitorRecordVO;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
@@ -81,8 +85,6 @@ public class VisitorServiceImpl implements VisitorService {
                 .build();
         return visitorRecordVO;
     }
-
-
 
     /**
      * 获取或创建会话ID
@@ -404,5 +406,18 @@ public class VisitorServiceImpl implements VisitorService {
                 .viewTime(LocalDateTime.now())
                 .build();
         viewMapper.insert(view);
+    }
+
+    /**
+     * 分页查询访客列表
+     * @param visitorPageQueryDTO
+     * @return
+     */
+    public PageResult pageQuery(VisitorPageQueryDTO visitorPageQueryDTO) {
+        PageHelper.startPage(visitorPageQueryDTO.getPage(), visitorPageQueryDTO.getPageSize());
+
+        Page<Visitors> page = visitorMapper.pageQuery(visitorPageQueryDTO);
+
+        return new PageResult(page.getTotal(), page.getResult());
     }
 }

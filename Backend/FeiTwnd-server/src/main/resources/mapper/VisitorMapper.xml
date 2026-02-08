@@ -29,4 +29,14 @@
         </set>
         where id = #{id}
     </update>
+    <select id="pageQuery" resultType="cc.feitwnd.entity.Visitors">
+        select * from visitors
+        <where>
+            <if test="country != null">and country like concat('%',#{country},'%')</if>
+            <if test="province != null">and province like concat('%',#{province},'%')</if>
+            <if test="city != null">and city like concat('%',#{city},'%')</if>
+            <if test="status != null">and is_blocked = #{status}</if>
+        </where>
+        order by last_visit_time desc
+    </select>
 </mapper>
