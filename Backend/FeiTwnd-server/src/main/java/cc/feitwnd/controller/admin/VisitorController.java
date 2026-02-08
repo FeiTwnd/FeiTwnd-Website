@@ -9,4 +9,5 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController("adminVisitorController")
 @RequestMapping("/admin/visitor")
 public class VisitorController {
+
 }

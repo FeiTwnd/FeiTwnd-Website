@@ -18,7 +18,7 @@ public class VisitorRecordDTO {
     // 来源页面
     private String referer;
 
-    // 前端收集浏览器信息
+    // 前端收集浏览器信息,用于制作访客指纹
 
     // 屏幕分辨率 "1920x1080"
     private String screen;

@@ -56,8 +56,8 @@ public class IpUtil {
             geoInfo.put("country", (String) jsonMap.getOrDefault("country", ""));
             geoInfo.put("province", (String) jsonMap.getOrDefault("regionName", ""));
             geoInfo.put("city", (String) jsonMap.getOrDefault("city", ""));
-            geoInfo.put("latitude", String.valueOf(jsonMap.getOrDefault("lat", "")));
-            geoInfo.put("longitude", String.valueOf(jsonMap.getOrDefault("lon", "")));
+            geoInfo.put("latitude", (String)jsonMap.getOrDefault("lat", ""));
+            geoInfo.put("longitude", (String)jsonMap.getOrDefault("lon", ""));
 
         } catch (Exception e) {
             log.error("解析IP地址信息失败", e);
