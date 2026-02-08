@@ -29,4 +29,16 @@ public class RssSubscriptionController {
         rssSubscriptionService.addSubscription(rssSubscriptionDTO);
         return Result.success();
     }
+
+    /**
+     * 取消RSS订阅（访客端）
+     * @param email
+     * @return
+     */
+    @PutMapping("/unsubscribe")
+    public Result unsubscribe(@RequestParam String email) {
+        log.info("取消RSS订阅,{}", email);
+        rssSubscriptionService.unsubscribeByEmail(email);
+        return Result.success();
+    }
 }

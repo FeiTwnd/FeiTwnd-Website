@@ -45,4 +45,10 @@ public interface RssSubscriptionService {
      * @return
      */
     List<RssSubscriptions> getAllActiveSubscriptions();
+
+    /**
+     * 根据邮箱取消订阅
+     * @param email
+     */
+    void unsubscribeByEmail(String email);
 }

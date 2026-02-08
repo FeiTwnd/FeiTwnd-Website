@@ -12,7 +12,10 @@
         select * from views
         <where>
             <if test="pagePath != null and pagePath != ''">
-                and page_path = #{pagePath}
+                and page_path like concat('%', #{pagePath}, '%')
+            </if>
+            <if test="referer != null and referer != ''">
+                and referer like concat('%', #{referer}, '%')
             </if>
             <if test="visitorId != null">
                 and visitor_id = #{visitorId}

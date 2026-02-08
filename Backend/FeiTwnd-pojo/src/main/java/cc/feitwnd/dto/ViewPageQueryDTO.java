@@ -20,6 +20,9 @@ public class ViewPageQueryDTO {
     // 页面路径
     private String pagePath;
 
+    // 来源URL
+    private String referer;
+
     // 访客ID
     private Long visitorId;
 }

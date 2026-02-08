@@ -102,4 +102,22 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
     public List<RssSubscriptions> getAllActiveSubscriptions() {
         return rssSubscriptionMapper.getAllActiveSubscriptions();
     }
+
+    /**
+     * 根据邮箱取消订阅
+     * @param email
+     */
+    @Override
+    public void unsubscribeByEmail(String email) {
+        RssSubscriptions subscription = rssSubscriptionMapper.getByEmail(email);
+        if (subscription == null) {
+            throw new BaseException("该邮箱未订阅");
+        }
+        if (subscription.getIsActive() == 0) {
+            throw new BaseException("该邮箱已取消订阅");
+        }
+        subscription.setIsActive(0);
+        subscription.setUnSubscribeTime(LocalDateTime.now());
+        rssSubscriptionMapper.update(subscription);
+    }
 }
