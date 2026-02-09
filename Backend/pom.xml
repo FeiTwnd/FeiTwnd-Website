@@ -34,6 +34,9 @@
         <fastjson>2.0.50</fastjson>
         <commons.lang>2.6</commons.lang>
         <druid>1.2.20</druid>
+        <thumbnailator>0.4.20</thumbnailator>
+        <imageio-webp>3.9.4</imageio-webp>
+        <webp-imageio>0.1.6</webp-imageio>
     </properties>
 
     <dependencyManagement>
@@ -139,6 +142,27 @@
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid-spring-boot-starter</artifactId>
                 <version>${druid}</version>
+            </dependency>
+
+            <!-- 缩略图 -->
+            <dependency>
+                <groupId>net.coobird</groupId>
+                <artifactId>thumbnailator</artifactId>
+                <version>${thumbnailator}</version>
+            </dependency>
+
+            <!-- 处理WebP格式 -->
+            <dependency>
+                <groupId>com.twelvemonkeys.imageio</groupId>
+                <artifactId>imageio-webp</artifactId>
+                <version>${imageio-webp}</version>
+            </dependency>
+
+            <!-- WebP支持sejda -->
+            <dependency>
+                <groupId>org.sejda.imageio</groupId>
+                <artifactId>webp-imageio</artifactId>
+                <version>${webp-imageio}</version>
             </dependency>
 
         </dependencies>

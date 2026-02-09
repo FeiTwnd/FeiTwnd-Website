@@ -7,6 +7,7 @@ import com.aliyun.oss.OSSException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+
 import java.io.ByteArrayInputStream;
 
 @Data
@@ -21,12 +22,12 @@ public class AliOssUtil {
 
     /**
      * 文件上传
-     * @param bytes
-     * @param extension
-     * @param fileName
+     * @param bytes 文件字节数组
+     * @param extension 文件后缀
+     * @param fileName 文件名
      * @return
      */
-    public String upload(byte[] bytes,String extension, String fileName) {
+    public String upload(byte[] bytes, String extension, String fileName) {
 
         String objectName = getFileCategory(extension) + "/" + fileName;
 
@@ -73,7 +74,7 @@ public class AliOssUtil {
      * @param extension
      * @return
      */
-    private String getFileCategory(String extension) {
+    public String getFileCategory(String extension) {
         switch (extension){
             // 图片
             case "jpg":
