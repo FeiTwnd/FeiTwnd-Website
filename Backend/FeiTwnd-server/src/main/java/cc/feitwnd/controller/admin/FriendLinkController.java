@@ -3,6 +3,7 @@ package cc.feitwnd.controller.admin;
 import cc.feitwnd.entity.FriendLinks;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.FriendLinkService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,7 @@ import java.util.List;
  */
 @RestController("adminFriendLinkController")
 @RequestMapping("/admin/friendLink")
+@Slf4j
 public class FriendLinkController {
 
     @Autowired
@@ -32,6 +34,7 @@ public class FriendLinkController {
      */
     @PostMapping
     public Result addFriendLink(@RequestBody FriendLinks friendLink) {
+        log.info("添加友情链接信息:{}", friendLink);
         friendLinkService.addFriendLink(friendLink);
         return Result.success();
     }
@@ -41,6 +44,7 @@ public class FriendLinkController {
      */
     @DeleteMapping("/{id}")
     public Result deleteFriendLink(@PathVariable Long id) {
+        log.info("删除友情链接信息:{}", id);
         friendLinkService.deleteFriendLink(id);
         return Result.success();
     }
@@ -50,6 +54,7 @@ public class FriendLinkController {
      */
     @PutMapping
     public Result updateFriendLink(@RequestBody FriendLinks friendLink) {
+        log.info("修改友情链接信息:{}", friendLink);
         friendLinkService.updateFriendLink(friendLink);
         return Result.success();
     }

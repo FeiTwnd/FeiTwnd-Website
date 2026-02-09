@@ -4,6 +4,7 @@ import cc.feitwnd.entity.PersonalInfo;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.PersonalInfoService;
 import cc.feitwnd.vo.PersonalInfoVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController("adminPersonalInfoController")
 @RequestMapping("/admin/personalInfo")
+@Slf4j
 public class PersonalInfoController {
 
     @Autowired
@@ -31,6 +33,7 @@ public class PersonalInfoController {
      */
     @PutMapping
     public Result updatePersonalInfo(@RequestBody PersonalInfo personalInfo) {
+        log.info("更新个人信息: {}", personalInfo);
         personalInfoService.updatePersonalInfo(personalInfo);
         return Result.success();
     }

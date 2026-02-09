@@ -1,0 +1,69 @@
+package cc.feitwnd.controller.admin;
+
+import cc.feitwnd.entity.ArticleCategories;
+import cc.feitwnd.result.Result;
+import cc.feitwnd.service.ArticleCategoryService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 管理端文章分类接口
+ */
+@Slf4j
+@RestController("adminArticleCategoryController")
+@RequestMapping("/admin/articleCategory")
+public class ArticleCategoryController {
+
+    @Autowired
+    private ArticleCategoryService articleCategoryService;
+
+    /**
+     * 获取所有文章分类
+     * @return
+     */
+    @GetMapping
+    public Result<List<ArticleCategories>> listAll() {
+        log.info("获取所有文章分类");
+        List<ArticleCategories> categoryList = articleCategoryService.listAll();
+        return Result.success(categoryList);
+    }
+
+    /**
+     * 添加文章分类
+     * @param articleCategories
+     * @return
+     */
+    @PostMapping
+    public Result addCategory(@RequestBody ArticleCategories articleCategories) {
+        log.info("添加文章分类,{}", articleCategories);
+        articleCategoryService.addCategory(articleCategories);
+        return Result.success();
+    }
+
+    /**
+     * 更新文章分类
+     * @param articleCategories
+     * @return
+     */
+    @PutMapping
+    public Result updateCategory(@RequestBody ArticleCategories articleCategories) {
+        log.info("更新文章分类,{}", articleCategories);
+        articleCategoryService.updateCategory(articleCategories);
+        return Result.success();
+    }
+
+    /**
+     * 删除文章分类
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/{id}")
+    public Result deleteCategory(@PathVariable Long id) {
+        log.info("删除文章分类,{}", id);
+        articleCategoryService.deleteCategory(id);
+        return Result.success();
+    }
+}

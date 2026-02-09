@@ -28,7 +28,6 @@ public class MusicController {
      */
     @GetMapping
     public Result<List<MusicVO>> getAllVisibleMusic() {
-        log.info("获取所有可见的音乐");
         List<MusicVO> musicVOList = musicService.getAllVisibleMusic();
         return Result.success(musicVOList);
     }

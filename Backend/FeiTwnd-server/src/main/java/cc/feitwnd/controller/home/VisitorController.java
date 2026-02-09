@@ -5,6 +5,7 @@ import cc.feitwnd.result.Result;
 import cc.feitwnd.service.VisitorService;
 import cc.feitwnd.vo.VisitorRecordVO;
 import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController("homeVisitorController")
 @RequestMapping("/home/visitor")
+@Slf4j
 public class VisitorController {
 
     @Autowired
@@ -30,6 +32,7 @@ public class VisitorController {
     @PostMapping("/record")
     public Result<VisitorRecordVO> recordVisitorViewInfo(@RequestBody VisitorRecordDTO visitorRecordDTO,
                                                          HttpServletRequest httpRequest) {
+        log.info("记录访客访问信息:{}", visitorRecordDTO);
         VisitorRecordVO visitorRecordVO = visitorService.recordVisitorViewInfo(visitorRecordDTO, httpRequest);
         return Result.success(visitorRecordVO);
     }

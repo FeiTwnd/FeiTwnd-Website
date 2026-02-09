@@ -25,7 +25,7 @@ public class AdminController {
      */
     @PostMapping("/sendCode")
     public Result sendCode(@RequestBody SendCodeDTO sendCodeDTO) {
-        log.info("发送验证码");
+        log.info("发送验证码,{}", sendCodeDTO);
         adminService.sendVerifyCode(sendCodeDTO.getUsername());
         return Result.success();
     }
@@ -54,6 +54,7 @@ public class AdminController {
      */
     @PostMapping("/logout")
     public Result logout(@RequestBody AdminLogoutDTO adminLogoutDTO) {
+        log.info("管理员退出登录：{}", adminLogoutDTO);
         adminService.logout(adminLogoutDTO);
         return Result.success();
     }
