@@ -1,6 +1,8 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.annotation.OperationLog;
 import cc.feitwnd.entity.Skills;
+import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.SkillService;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +34,7 @@ public class SkillController {
      * 添加技能信息
      */
     @PostMapping
+    @OperationLog(value = OperationType.INSERT, target = "skill")
     public Result addSkill(@RequestBody Skills skills) {
         log.info("添加技能信息,{}", skills);
         skillService.addSkill(skills);
@@ -42,6 +45,7 @@ public class SkillController {
      * 删除技能信息
      */
     @DeleteMapping("/{id}")
+    @OperationLog(value = OperationType.DELETE, target = "skill", targetId = "#id")
     public Result<String> deleteSkill(@PathVariable Long id) {
         log.info("删除技能信息,{}", id);
         skillService.deleteSkill(id);
@@ -52,6 +56,7 @@ public class SkillController {
      * 修改技能信息
      */
     @PutMapping
+    @OperationLog(value = OperationType.UPDATE, target = "skill", targetId = "#skills.id")
     public Result updateSkill(@RequestBody Skills skills) {
         log.info("修改技能信息,{}", skills);
         skillService.updateSkill(skills);

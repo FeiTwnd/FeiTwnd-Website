@@ -1,6 +1,8 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.annotation.OperationLog;
 import cc.feitwnd.entity.SystemConfig;
+import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.SystemConfigService;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +63,7 @@ public class SystemConfigController {
      * @return
      */
     @PostMapping
+    @OperationLog(value = OperationType.INSERT, target = "systemConfig")
     public Result addConfig(@RequestBody SystemConfig systemConfig) {
         log.info("添加系统配置,{}", systemConfig);
         systemConfigService.addConfig(systemConfig);
@@ -73,6 +76,7 @@ public class SystemConfigController {
      * @return
      */
     @PutMapping
+    @OperationLog(value = OperationType.UPDATE, target = "systemConfig", targetId = "#systemConfig.id")
     public Result updateConfig(@RequestBody SystemConfig systemConfig) {
         log.info("更新系统配置,{}", systemConfig);
         systemConfigService.updateConfig(systemConfig);
@@ -85,6 +89,7 @@ public class SystemConfigController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @OperationLog(value = OperationType.DELETE, target = "systemConfig", targetId = "#id")
     public Result deleteConfig(@PathVariable Long id) {
         log.info("删除系统配置,{}", id);
         systemConfigService.deleteConfig(id);

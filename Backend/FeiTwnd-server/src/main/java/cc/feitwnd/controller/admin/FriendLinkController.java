@@ -1,6 +1,8 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.annotation.OperationLog;
 import cc.feitwnd.entity.FriendLinks;
+import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.FriendLinkService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ public class FriendLinkController {
      * 添加友情链接信息
      */
     @PostMapping
+    @OperationLog(value = OperationType.INSERT, target = "friendLink")
     public Result addFriendLink(@RequestBody FriendLinks friendLink) {
         log.info("添加友情链接信息:{}", friendLink);
         friendLinkService.addFriendLink(friendLink);
@@ -43,6 +46,7 @@ public class FriendLinkController {
      * 删除友情链接信息
      */
     @DeleteMapping("/{id}")
+    @OperationLog(value = OperationType.DELETE, target = "friendLink", targetId = "#id")
     public Result deleteFriendLink(@PathVariable Long id) {
         log.info("删除友情链接信息:{}", id);
         friendLinkService.deleteFriendLink(id);
@@ -53,6 +57,7 @@ public class FriendLinkController {
      * 修改友情链接信息
      */
     @PutMapping
+    @OperationLog(value = OperationType.UPDATE, target = "friendLink", targetId = "#friendLink.id")
     public Result updateFriendLink(@RequestBody FriendLinks friendLink) {
         log.info("修改友情链接信息:{}", friendLink);
         friendLinkService.updateFriendLink(friendLink);

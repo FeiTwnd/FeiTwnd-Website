@@ -1,6 +1,8 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.annotation.OperationLog;
 import cc.feitwnd.entity.SocialMedia;
+import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.SocialMediaService;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +35,7 @@ public class SocialMediaController {
      * 添加社交媒体信息
      */
     @PostMapping
+    @OperationLog(value = OperationType.INSERT, target = "socialMedia")
     public Result addSocialMedia(@RequestBody SocialMedia socialMedia) {
         log.info("添加社交媒体信息: {}", socialMedia);
         socialMediaService.addSocialMedia(socialMedia);
@@ -42,6 +45,7 @@ public class SocialMediaController {
      * 删除社交媒体信息
      */
     @DeleteMapping("/{id}")
+    @OperationLog(value = OperationType.DELETE, target = "socialMedia", targetId = "#id")
     public Result deleteSocialMedia(@PathVariable Long id) {
         log.info("删除社交媒体信息: {}", id);
         socialMediaService.deleteSocialMedia(id);
@@ -52,6 +56,7 @@ public class SocialMediaController {
      * 修改社交媒体信息
      */
     @PutMapping
+    @OperationLog(value = OperationType.UPDATE, target = "socialMedia", targetId = "#socialMedia.id")
     public Result updateSocialMedia(@RequestBody SocialMedia socialMedia) {
         log.info("修改社交媒体信息: {}", socialMedia);
         socialMediaService.updateSocialMedia(socialMedia);

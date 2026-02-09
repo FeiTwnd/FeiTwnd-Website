@@ -1,7 +1,9 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.annotation.OperationLog;
 import cc.feitwnd.dto.MusicPageQueryDTO;
 import cc.feitwnd.entity.Music;
+import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.MusicService;
@@ -50,6 +52,7 @@ public class MusicController {
      * @return
      */
     @PostMapping
+    @OperationLog(value = OperationType.INSERT, target = "music")
     public Result addMusic(@RequestBody Music music) {
         log.info("添加音乐,{}", music);
         musicService.addMusic(music);
@@ -62,6 +65,7 @@ public class MusicController {
      * @return
      */
     @PutMapping
+    @OperationLog(value = OperationType.UPDATE, target = "music", targetId = "#music.id")
     public Result updateMusic(@RequestBody Music music) {
         log.info("更新音乐,{}", music);
         musicService.updateMusic(music);
@@ -74,6 +78,7 @@ public class MusicController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @OperationLog(value = OperationType.DELETE, target = "music", targetId = "#id")
     public Result deleteMusic(@PathVariable Long id) {
         log.info("删除音乐,{}", id);
         musicService.deleteMusic(id);

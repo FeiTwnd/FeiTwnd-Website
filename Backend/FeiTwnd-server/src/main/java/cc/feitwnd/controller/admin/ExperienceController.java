@@ -1,6 +1,8 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.annotation.OperationLog;
 import cc.feitwnd.entity.Experiences;
+import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ExperienceService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +36,7 @@ public class ExperienceController {
      * 添加经历信息
      */
     @PostMapping
+    @OperationLog(value = OperationType.INSERT, target = "experience")
     public Result addExperience(@RequestBody Experiences experiences) {
         log.info("添加经历信息,{}", experiences);
         experienceService.addExperience(experiences);
@@ -44,6 +47,7 @@ public class ExperienceController {
      * 修改经历信息
      */
     @PutMapping
+    @OperationLog(value = OperationType.UPDATE, target = "experience", targetId = "#experiences.id")
     public Result updateExperience(@RequestBody Experiences experiences) {
         log.info("修改经历信息,{}", experiences);
         experienceService.updateExperience(experiences);
@@ -54,6 +58,7 @@ public class ExperienceController {
      * 删除经历信息
      */
     @DeleteMapping("/{id}")
+    @OperationLog(value = OperationType.DELETE, target = "experience", targetId = "#id")
     public Result deleteExperience(@PathVariable Long id) {
         log.info("删除经历信息,{}", id);
         experienceService.deleteExperience(id);

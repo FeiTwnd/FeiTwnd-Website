@@ -1,7 +1,9 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.annotation.OperationLog;
 import cc.feitwnd.dto.RssSubscriptionPageQueryDTO;
 import cc.feitwnd.entity.RssSubscriptions;
+import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.RssSubscriptionService;
@@ -63,6 +65,7 @@ public class RssSubscriptionController {
      * @return
      */
     @PutMapping
+    @OperationLog(value = OperationType.UPDATE, target = "rssSubscription", targetId = "#rssSubscriptions.id")
     public Result updateSubscription(@RequestBody RssSubscriptions rssSubscriptions) {
         log.info("更新RSS订阅,{}", rssSubscriptions);
         rssSubscriptionService.updateSubscription(rssSubscriptions);
@@ -75,6 +78,7 @@ public class RssSubscriptionController {
      * @return
      */
     @DeleteMapping("/{id}")
+    @OperationLog(value = OperationType.DELETE, target = "rssSubscription", targetId = "#id")
     public Result deleteSubscription(@PathVariable Long id) {
         log.info("删除RSS订阅,{}", id);
         rssSubscriptionService.deleteSubscription(id);
