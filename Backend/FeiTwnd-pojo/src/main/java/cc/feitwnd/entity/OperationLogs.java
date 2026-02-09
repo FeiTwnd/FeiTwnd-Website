@@ -35,7 +35,7 @@ public class OperationLogs implements Serializable {
     private Integer targetId;
 
     // 操作数据
-    private String opreateData;
+    private String operateData;
 
     // 操作结果，0-失败，1-成功
     private Integer result;
