@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.feitwnd.mapper.MessageMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO messages
+            (content, content_html, root_id, parent_id, parent_nickname, visitor_id, 
+             nickname, email_or_qq, location, user_agent_os, user_agent_browser,
+             is_approved, is_markdown, is_secret, is_notice, is_edited,
+             create_time, update_time)
+        VALUES
+            (#{content}, #{contentHtml}, #{rootId}, #{parentId}, #{parentNickname}, #{visitorId},
+             #{nickname}, #{emailOrQq}, #{location}, #{userAgentOs}, #{userAgentBrowser},
+             #{isApproved}, #{isMarkdown}, #{isSecret}, #{isNotice}, #{isEdited},
+             #{createTime}, #{updateTime})
+    </insert>
+
+</mapper>

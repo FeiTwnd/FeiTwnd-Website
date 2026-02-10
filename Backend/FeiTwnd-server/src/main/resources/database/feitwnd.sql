@@ -224,6 +224,7 @@ create table article_comments(
     article_id int not null comment '文章ID',
     root_id int comment '根评论ID,null是一级评论',
     parent_id int comment '父评论ID,null是一级评论',
+    parent_nickname varchar(15) comment '父评论昵称',
     content text not null comment '评论内容',
     content_html text not null comment '转换后的HTML内容,(如果是markdown)',
 
@@ -300,6 +301,7 @@ create table messages(
     content_html text not null comment '转换后的HTML内容,(如果是markdown)',
     root_id int comment '根留言ID,null是一级留言',
     parent_id int comment '父留言ID,null是一级留言',
+    parent_nickname varchar(15) comment '父留言昵称',
 
     -- 留言者信息
     visitor_id int comment '访客ID',

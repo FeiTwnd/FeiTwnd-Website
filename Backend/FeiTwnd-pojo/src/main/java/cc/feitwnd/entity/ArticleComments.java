@@ -31,6 +31,9 @@ public class ArticleComments implements Serializable {
     // 父评论ID,null是一级评论
     private Long parentId;
 
+    // 父评论昵称
+    private String parentNickname;
+
     // 评论内容
     private String content;
 
