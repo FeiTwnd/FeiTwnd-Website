@@ -11,7 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserAgentServiceImpl implements UserAgentService {
 
-    @Override
+    /**
+     * 获取操作系统名称
+     * @param userAgent
+     * @return
+     */
     public String getOsName(String userAgent) {
         if (userAgent == null || userAgent.isEmpty()) {
             return "Unknown";
@@ -65,7 +69,11 @@ public class UserAgentServiceImpl implements UserAgentService {
         return "Unknown";
     }
 
-    @Override
+    /**
+     * 获取浏览器名称
+     * @param userAgent
+     * @return
+     */
     public String getBrowserName(String userAgent) {
         if (userAgent == null || userAgent.isEmpty()) {
             return "Unknown";

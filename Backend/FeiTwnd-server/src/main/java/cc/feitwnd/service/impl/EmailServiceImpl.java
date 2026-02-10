@@ -20,8 +20,6 @@ import java.time.LocalDate;
 @Slf4j
 public class EmailServiceImpl implements EmailService {
 
-    @Override
-
     @Autowired
     private JavaMailSender mailSender;
     @Autowired

@@ -9,7 +9,12 @@ import java.security.MessageDigest;
 @Service
 public class EncryptPasswordServiceImpl implements EncryptPasswordService {
 
-    @Override
+    /**
+     * 密码加密
+     * @param password
+     * @param salt
+     * @return
+     */
     public String hashPassword(String password, String salt) throws Exception{
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         String combined = password + salt;

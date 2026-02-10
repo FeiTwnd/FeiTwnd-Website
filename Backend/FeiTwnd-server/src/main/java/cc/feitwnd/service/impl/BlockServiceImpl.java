@@ -17,8 +17,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class BlockServiceImpl implements BlockService {
 
-    @Override
-
     @Autowired
     private VisitorMapper visitorMapper;
     @Autowired

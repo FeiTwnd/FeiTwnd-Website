@@ -37,6 +37,8 @@
         <thumbnailator>0.4.20</thumbnailator>
         <imageio-webp>3.9.4</imageio-webp>
         <webp-imageio>0.1.6</webp-imageio>
+        <commonmark.version>0.21.0</commonmark.version>
+        <jsoup.version>1.16.1</jsoup.version>
     </properties>
 
     <dependencyManagement>
@@ -163,6 +165,41 @@
                 <groupId>org.sejda.imageio</groupId>
                 <artifactId>webp-imageio</artifactId>
                 <version>${webp-imageio}</version>
+            </dependency>
+
+            <!-- CommonMark核心 -->
+            <dependency>
+                <groupId>org.commonmark</groupId>
+                <artifactId>commonmark</artifactId>
+                <version>${commonmark.version}</version>
+            </dependency>
+
+            <!-- 表格扩展 -->
+            <dependency>
+                <groupId>org.commonmark</groupId>
+                <artifactId>commonmark-ext-gfm-tables</artifactId>
+                <version>${commonmark.version}</version>
+            </dependency>
+
+            <!-- 自动链接扩展 -->
+            <dependency>
+                <groupId>org.commonmark</groupId>
+                <artifactId>commonmark-ext-autolink</artifactId>
+                <version>${commonmark.version}</version>
+            </dependency>
+
+            <!-- 任务列表扩展 -->
+            <dependency>
+                <groupId>org.commonmark</groupId>
+                <artifactId>commonmark-ext-task-list-items</artifactId>
+                <version>${commonmark.version}</version>
+            </dependency>
+
+            <!-- Jsoup HTML清理 -->
+            <dependency>
+                <groupId>org.jsoup</groupId>
+                <artifactId>jsoup</artifactId>
+                <version>${jsoup.version}</version>
             </dependency>
 
         </dependencies>

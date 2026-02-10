@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class TokenServiceImpl implements TokenService {
 
-    @Override
-
     @Autowired
     @Qualifier("redisTemplate")
     private RedisTemplate redis;
