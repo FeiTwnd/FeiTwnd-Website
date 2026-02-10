@@ -33,7 +33,7 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private VisitorProperties visitorProperties;
     @Autowired
-    private EncryptPassword encryptPassword;
+    private EncryptPasswordService encryptPasswordService;
 
     /**
      * 发送验证码
@@ -81,7 +81,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // 对密码进行加密
-        String hashedPassword = encryptPassword.hashPassword(password, admin.getSalt());
+        String hashedPassword = encryptPasswordService.hashPassword(password, admin.getSalt());
         // 验证密码是否正确
         if(!hashedPassword.equals(admin.getPassword())){
             throw new PasswordErrorException(MessageConstant.PASSWORD_ERROR);
@@ -165,12 +165,12 @@ public class AdminServiceImpl implements AdminService {
             throw new PasswordErrorException(MessageConstant.NEW_PASSWORD_NOT_MATCH);
         }
         // 验证旧密码是否正确
-        String hashedOldPassword = encryptPassword.hashPassword(adminChangePasswordDTO.getOldPassword(), admin.getSalt());
+        String hashedOldPassword = encryptPasswordService.hashPassword(adminChangePasswordDTO.getOldPassword(), admin.getSalt());
         if(!hashedOldPassword.equals(admin.getPassword())){
             throw new PasswordErrorException(MessageConstant.OLD_PASSWORD_ERROR);
         }
         // 获取加密后的新密码
-        String hashedNewPassword = encryptPassword.hashPassword(adminChangePasswordDTO.getNewPassword(), admin.getSalt());
+        String hashedNewPassword = encryptPasswordService.hashPassword(adminChangePasswordDTO.getNewPassword(), admin.getSalt());
         // 验证新密码是否与旧密码一致
         if(hashedNewPassword.equals(admin.getPassword())){
             throw new PasswordErrorException(MessageConstant.NEW_PASSWORD_NOT_CHANGE);

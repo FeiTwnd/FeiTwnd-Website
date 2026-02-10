@@ -1,14 +1,15 @@
-package cc.feitwnd.service;
+package cc.feitwnd.service.impl;
 
+import cc.feitwnd.service.EncryptPasswordService;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
 @Service
-public class EncryptPassword {
+public class EncryptPasswordServiceImpl implements EncryptPasswordService {
 
-    // 计算密码+盐的哈希
+    @Override
     public String hashPassword(String password, String salt) throws Exception{
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         String combined = password + salt;
