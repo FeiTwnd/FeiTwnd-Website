@@ -6,4 +6,23 @@
         insert into operation_logs (admin_id, operation_type, operation_target, target_id, operate_data, result, error_message, operation_time)
         values (#{adminId}, #{operationType}, #{operationTarget}, #{targetId}, #{operateData}, #{result}, #{errorMessage}, #{operationTime})
     </insert>
+
+    <select id="pageQuery" resultType="cc.feitwnd.entity.OperationLogs">
+        select * from operation_logs
+        <where>
+            <if test="adminId != null">
+                and admin_id = #{adminId}
+            </if>
+            <if test="operationType != null and operationType != ''">
+                and operation_type = #{operationType}
+            </if>
+            <if test="startTime != null">
+                and operation_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and operation_time &lt;= #{endTime}
+            </if>
+        </where>
+        order by operation_time desc
+    </select>
 </mapper>
