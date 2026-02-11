@@ -317,6 +317,7 @@ create table messages(
     is_secret tinyint default 0 comment '是否匿名，0-否，1-是',
     is_notice tinyint default 0 comment '有回复是否通知，0-否，1-是',
     is_edited tinyint default 0 comment '是否编辑过，0-否，1-是',
+    is_admin_reply tinyint default 0 comment '是否为管理员回复，0-否，1-是',
 
     create_time datetime comment '创建时间',
     update_time datetime comment '更新时间'

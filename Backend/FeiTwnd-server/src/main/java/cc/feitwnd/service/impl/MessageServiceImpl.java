@@ -3,13 +3,18 @@ package cc.feitwnd.service.impl;
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.context.BaseContext;
 import cc.feitwnd.dto.MessageDTO;
+import cc.feitwnd.dto.MessagePageQueryDTO;
+import cc.feitwnd.dto.MessageReplyDTO;
 import cc.feitwnd.entity.Messages;
 import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.MessageMapper;
+import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.MessageService;
 import cc.feitwnd.service.UserAgentService;
 import cc.feitwnd.utils.IpUtil;
 import cc.feitwnd.utils.MarkdownUtil;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -17,8 +22,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * 留言服务实现
@@ -125,5 +133,58 @@ public class MessageServiceImpl implements MessageService {
         } else {
             throw new ValidationException(MessageConstant.INVALID_EMAIL_FORMAT);
         }
+    }
+
+    @Override
+    public PageResult pageQuery(MessagePageQueryDTO messagePageQueryDTO) {
+        PageHelper.startPage(messagePageQueryDTO.getPage(), messagePageQueryDTO.getPageSize());
+        Page<Messages> page = (Page<Messages>) messageMapper.pageQuery(messagePageQueryDTO);
+        return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public void batchApprove(String ids) {
+        List<Long> idList = Arrays.stream(ids.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+        messageMapper.batchApprove(idList);
+        log.info("批量审核通过留言: {}", ids);
+    }
+
+    @Override
+    public void batchDelete(String ids) {
+        List<Long> idList = Arrays.stream(ids.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+        messageMapper.batchDelete(idList);
+        log.info("批量删除留言: {}", ids);
+    }
+
+    @Override
+    public void adminReply(MessageReplyDTO messageReplyDTO) {
+        // 1. 创建留言实体
+        Messages messages = new Messages();
+        BeanUtils.copyProperties(messageReplyDTO, messages);
+
+        // 2. 处理Markdown内容
+        if (messageReplyDTO.getIsMarkdown() != null && messageReplyDTO.getIsMarkdown() == 1) {
+            String html = MarkdownUtil.toHtml(messageReplyDTO.getContent());
+            messages.setContentHtml(html);
+        } else {
+            messages.setContentHtml(messageReplyDTO.getContent());
+        }
+
+        // 3. 设置管理员回复标识
+        messages.setIsAdminReply(1);
+        messages.setIsApproved(1); // 管理员回复自动审核通过
+        messages.setIsEdited(0);
+        messages.setNickname("管理员");
+        messages.setCreateTime(LocalDateTime.now());
+        messages.setUpdateTime(LocalDateTime.now());
+
+        // 4. 保存到数据库
+        messageMapper.save(messages);
+        
+        log.info("管理员回复留言成功: parentId={}, content={}", messageReplyDTO.getParentId(), messageReplyDTO.getContent());
     }
 }
