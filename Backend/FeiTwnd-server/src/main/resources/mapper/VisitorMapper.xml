@@ -39,4 +39,22 @@
         </where>
         order by last_visit_time desc
     </select>
+
+    <update id="batchBlock">
+        update visitors
+        set is_blocked = 1, expires_at = date_add(now(), interval 1 day), update_time = now()
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <update id="batchUnblock">
+        update visitors
+        set is_blocked = 0, expires_at = null, update_time = now()
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
 </mapper>

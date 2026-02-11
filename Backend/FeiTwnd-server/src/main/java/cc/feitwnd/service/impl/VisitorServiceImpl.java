@@ -26,7 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -212,5 +215,23 @@ public class VisitorServiceImpl implements VisitorService {
         Page<Visitors> page = visitorMapper.pageQuery(visitorPageQueryDTO);
 
         return new PageResult(page.getTotal(), page.getResult());
+    }
+
+    @Override
+    public void batchBlock(String ids) {
+        List<Long> idList = Arrays.stream(ids.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+        visitorMapper.batchBlock(idList);
+        log.info("批量封禁访客: {}", ids);
+    }
+
+    @Override
+    public void batchUnblock(String ids) {
+        List<Long> idList = Arrays.stream(ids.split(","))
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
+        visitorMapper.batchUnblock(idList);
+        log.info("批量解封访客: {}", ids);
     }
 }

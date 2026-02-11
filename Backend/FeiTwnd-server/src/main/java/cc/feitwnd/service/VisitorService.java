@@ -21,4 +21,16 @@ public interface VisitorService {
      * @return
      */
     PageResult pageQuery(VisitorPageQueryDTO visitorPageQueryDTO);
+
+    /**
+     * 批量封禁访客
+     * @param ids
+     */
+    void batchBlock(String ids);
+
+    /**
+     * 批量解封访客
+     * @param ids
+     */
+    void batchUnblock(String ids);
 }

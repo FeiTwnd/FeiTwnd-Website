@@ -4,12 +4,12 @@
 <mapper namespace="cc.feitwnd.mapper.MessageMapper">
 
     <insert id="save" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO messages
+        insert into messages
             (content, content_html, root_id, parent_id, parent_nickname, visitor_id, 
              nickname, email_or_qq, location, user_agent_os, user_agent_browser,
              is_approved, is_markdown, is_secret, is_notice, is_edited, is_admin_reply,
              create_time, update_time)
-        VALUES
+        values
             (#{content}, #{contentHtml}, #{rootId}, #{parentId}, #{parentNickname}, #{visitorId},
              #{nickname}, #{emailOrQq}, #{location}, #{userAgentOs}, #{userAgentBrowser},
              #{isApproved}, #{isMarkdown}, #{isSecret}, #{isNotice}, #{isEdited}, #{isAdminReply},
@@ -17,37 +17,37 @@
     </insert>
 
     <select id="pageQuery" resultType="cc.feitwnd.entity.Messages">
-        SELECT * FROM messages
+        select * from messages
         <where>
             <if test="isApproved != null">
-                AND is_approved = #{isApproved}
+                and is_approved = #{isApproved}
             </if>
             <if test="startTime != null">
-                AND create_time &gt;= #{startTime}
+                and create_time &gt;= #{startTime}
             </if>
             <if test="endTime != null">
-                AND create_time &lt;= #{endTime}
+                and create_time &lt;= #{endTime}
             </if>
         </where>
-        ORDER BY create_time DESC
+        order by create_time desc
     </select>
 
     <select id="getById" resultType="cc.feitwnd.entity.Messages">
-        SELECT * FROM messages WHERE id = #{id}
+        select * from messages where id = #{id}
     </select>
 
     <update id="batchApprove">
-        UPDATE messages
-        SET is_approved = 1, update_time = NOW()
-        WHERE id IN
+        update messages
+        set is_approved = 1, update_time = now()
+        where id in
         <foreach collection="list" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>
     </update>
 
     <delete id="batchDelete">
-        DELETE FROM messages
-        WHERE id IN
+        delete from messages
+        where id in
         <foreach collection="list" item="id" open="(" separator="," close=")">
             #{id}
         </foreach>

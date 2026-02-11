@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface VisitorMapper {
     /**
@@ -40,4 +42,16 @@ public interface VisitorMapper {
      * @return
      */
     Page<Visitors> pageQuery(VisitorPageQueryDTO visitorPageQueryDTO);
+
+    /**
+     * 批量封禁访客
+     * @param ids
+     */
+    void batchBlock(List<Long> ids);
+
+    /**
+     * 批量解封访客
+     * @param ids
+     */
+    void batchUnblock(List<Long> ids);
 }
