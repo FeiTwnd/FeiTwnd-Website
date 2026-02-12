@@ -4,6 +4,8 @@ import cc.feitwnd.entity.SystemConfig;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface SystemConfigService {
     /**
      * 获取所有系统配置
@@ -38,8 +40,8 @@ public interface SystemConfigService {
     void updateConfig(SystemConfig systemConfig);
 
     /**
-     * 删除系统配置
-     * @param id
+     * 批量删除系统配置
+     * @param ids
      */
-    void deleteConfig(Long id);
+    void batchDelete(List<Long> ids);
 }

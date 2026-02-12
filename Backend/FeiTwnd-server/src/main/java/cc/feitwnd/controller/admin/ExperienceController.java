@@ -55,13 +55,13 @@ public class ExperienceController {
     }
 
     /**
-     * 删除经历信息
+     * 批量删除经历信息
      */
-    @DeleteMapping("/{id}")
-    @OperationLog(value = OperationType.DELETE, target = "experience", targetId = "#id")
-    public Result deleteExperience(@PathVariable Long id) {
-        log.info("删除经历信息,{}", id);
-        experienceService.deleteExperience(id);
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "experience", targetId = "#ids")
+    public Result deleteExperience(@RequestParam List<Long> ids) {
+        log.info("批量删除经历信息,{}", ids);
+        experienceService.batchDelete(ids);
         return Result.success();
     }
 

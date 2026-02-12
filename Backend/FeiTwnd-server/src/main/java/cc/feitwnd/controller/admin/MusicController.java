@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 管理端音乐接口
  */
@@ -73,15 +75,15 @@ public class MusicController {
     }
 
     /**
-     * 删除音乐
-     * @param id
+     * 批量删除音乐
+     * @param ids
      * @return
      */
-    @DeleteMapping("/{id}")
-    @OperationLog(value = OperationType.DELETE, target = "music", targetId = "#id")
-    public Result deleteMusic(@PathVariable Long id) {
-        log.info("删除音乐,{}", id);
-        musicService.deleteMusic(id);
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "music", targetId = "#ids")
+    public Result deleteMusic(@RequestParam List<Long> ids) {
+        log.info("批量删除音乐,{}", ids);
+        musicService.batchDelete(ids);
         return Result.success();
     }
 }

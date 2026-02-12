@@ -35,6 +35,12 @@ public interface ExperienceMapper {
     void deleteById(Long id);
 
     /**
+     * 批量删除经历
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
+
+    /**
      * 获取全部经历信息
      */
     @Select("select * from experiences where is_visible = 1 order by start_date desc")

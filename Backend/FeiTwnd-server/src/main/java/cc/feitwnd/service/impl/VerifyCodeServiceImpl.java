@@ -50,33 +50,28 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
     }
 
     // 邮箱是否可以发送验证码（频率限制）
-    @Override
     public boolean canSendCode() {
         return redis.opsForValue().get(KEY_RATE_LIMIT) == null;
     }
 
     // 获取剩余验证码冷却时间(秒)
-    @Override
     public Long getRemainingCooldown() {
         Long ttl = redis.getExpire(KEY_RATE_LIMIT, TimeUnit.SECONDS);
         return ttl != null ? Math.max(ttl, 0) : 0;
     }
 
     // 是否被锁定
-    @Override
     public boolean isLocked() {
         return Boolean.TRUE.equals(redis.hasKey(KEY_LOCK));
     }
 
     // 获取锁定剩余时间（分钟）
-    @Override
     public Long getLockRemainingMinutes() {
         Long ttl = redis.getExpire(KEY_LOCK, TimeUnit.MINUTES);
         return ttl != null ? Math.max(ttl, 0) : 0;
     }
 
     // 是否允许尝试验证
-    @Override
     public boolean canAttempt() {
         // 检查是否被锁定
         if (isLocked()) {
@@ -159,7 +154,6 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
     }
 
     // 获取剩余尝试次数
-    @Override
     public Long getRemainingAttempts() {
         if (isLocked()) {
             return 0L;

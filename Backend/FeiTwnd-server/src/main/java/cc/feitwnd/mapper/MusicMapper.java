@@ -42,6 +42,12 @@ public interface MusicMapper {
     void deleteById(Long id);
 
     /**
+     * 批量删除音乐
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
+
+    /**
      * 根据ID查询音乐
      * @param id
      * @return

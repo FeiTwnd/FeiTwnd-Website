@@ -18,7 +18,6 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
      * 获取所有文章分类
      * @return
      */
-    @Override
     public List<ArticleCategories> listAll() {
         return articleCategoryMapper.listAll();
     }
@@ -27,7 +26,6 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
      * 添加文章分类
      * @param articleCategories
      */
-    @Override
     public void addCategory(ArticleCategories articleCategories) {
         articleCategoryMapper.insert(articleCategories);
     }
@@ -36,17 +34,15 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
      * 更新文章分类（含排序）
      * @param articleCategories
      */
-    @Override
     public void updateCategory(ArticleCategories articleCategories) {
         articleCategoryMapper.update(articleCategories);
     }
 
     /**
-     * 删除文章分类
-     * @param id
+     * 批量删除文章分类
+     * @param ids
      */
-    @Override
-    public void deleteCategory(Long id) {
-        articleCategoryMapper.deleteById(id);
+    public void batchDelete(List<Long> ids) {
+        articleCategoryMapper.batchDelete(ids);
     }
 }

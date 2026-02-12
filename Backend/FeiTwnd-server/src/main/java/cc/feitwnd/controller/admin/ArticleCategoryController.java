@@ -28,7 +28,6 @@ public class ArticleCategoryController {
      */
     @GetMapping
     public Result<List<ArticleCategories>> listAll() {
-        log.info("获取所有文章分类");
         List<ArticleCategories> categoryList = articleCategoryService.listAll();
         return Result.success(categoryList);
     }
@@ -60,15 +59,15 @@ public class ArticleCategoryController {
     }
 
     /**
-     * 删除文章分类
-     * @param id
+     * 批量删除文章分类
+     * @param ids
      * @return
      */
-    @DeleteMapping("/{id}")
-    @OperationLog(value = OperationType.DELETE, target = "articleCategory", targetId = "#id")
-    public Result deleteCategory(@PathVariable Long id) {
-        log.info("删除文章分类,{}", id);
-        articleCategoryService.deleteCategory(id);
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "articleCategory", targetId = "#ids")
+    public Result deleteCategory(@RequestParam List<Long> ids) {
+        log.info("批量删除文章分类,{}", ids);
+        articleCategoryService.batchDelete(ids);
         return Result.success();
     }
 }

@@ -43,13 +43,13 @@ public class FriendLinkController {
     }
 
     /**
-     * 删除友情链接信息
+     * 批量删除友情链接信息
      */
-    @DeleteMapping("/{id}")
-    @OperationLog(value = OperationType.DELETE, target = "friendLink", targetId = "#id")
-    public Result deleteFriendLink(@PathVariable Long id) {
-        log.info("删除友情链接信息:{}", id);
-        friendLinkService.deleteFriendLink(id);
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "friendLink", targetId = "#ids")
+    public Result deleteFriendLink(@RequestParam List<Long> ids) {
+        log.info("批量删除友情链接信息:{}", ids);
+        friendLinkService.batchDelete(ids);
         return Result.success();
     }
 

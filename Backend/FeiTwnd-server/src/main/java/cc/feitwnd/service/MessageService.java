@@ -31,13 +31,13 @@ public interface MessageService {
      * 批量审核通过留言
      * @param ids
      */
-    void batchApprove(String ids);
+    void batchApprove(List<Long> ids);
 
     /**
      * 批量删除留言
      * @param ids
      */
-    void batchDelete(String ids);
+    void batchDelete(List<Long> ids);
 
     /**
      * 管理员回复留言

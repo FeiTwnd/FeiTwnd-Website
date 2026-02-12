@@ -38,6 +38,12 @@ public interface RssSubscriptionMapper {
     void deleteById(Long id);
 
     /**
+     * 批量删除RSS订阅
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
+
+    /**
      * 根据ID查询RSS订阅
      * @param id
      * @return

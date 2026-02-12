@@ -42,11 +42,11 @@ public class ExperienceServiceImpl implements ExperienceService {
     }
 
     /**
-     * 删除经历信息
-     * @param id
+     * 批量删除经历信息
+     * @param ids
      */
-    public void deleteExperience(Long id) {
-        experienceMapper.deleteById(id);
+    public void batchDelete(List<Long> ids) {
+        experienceMapper.batchDelete(ids);
     }
 
     /**

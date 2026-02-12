@@ -4,12 +4,14 @@ import cc.feitwnd.entity.FriendLinks;
 import cc.feitwnd.mapper.FriendLinkMapper;
 import cc.feitwnd.service.FriendLinkService;
 import cc.feitwnd.vo.FriendLinkVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class FriendLinkServiceImpl implements FriendLinkService {
 
     @Autowired
@@ -17,6 +19,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
 
     /**
      * 获取所有友链
+     * @return
      */
     public List<FriendLinks> getAllFriendLink() {
         List<FriendLinks> friendLinkList = friendLinkMapper.getAllFriendLink();
@@ -35,11 +38,11 @@ public class FriendLinkServiceImpl implements FriendLinkService {
     }
 
     /**
-     * 删除友链
-     * @param id
+     * 批量删除友链
+     * @param ids
      */
-    public void deleteFriendLink(Long id) {
-        friendLinkMapper.delete(id);
+    public void batchDelete(List<Long> ids) {
+        friendLinkMapper.batchDelete(ids);
     }
 
     /**

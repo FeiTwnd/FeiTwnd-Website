@@ -5,6 +5,8 @@ import cc.feitwnd.vo.FriendLinkVO;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface FriendLinkService {
     /**
      * 管理端获取所有友情链接
@@ -19,10 +21,10 @@ public interface FriendLinkService {
     void addFriendLink(FriendLinks friendLink);
 
     /**
-     * 管理端删除友情链接
-     * @param id
+     * 批量删除友情链接
+     * @param ids
      */
-    void deleteFriendLink(Long id);
+    void batchDelete(List<Long> ids);
 
     /**
      * 管理端修改友情链接

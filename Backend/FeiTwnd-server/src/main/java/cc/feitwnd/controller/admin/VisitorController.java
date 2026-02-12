@@ -10,6 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 管理端访客接口
  */
@@ -35,12 +37,12 @@ public class VisitorController {
 
     /**
      * 批量封禁访客
-     * @param ids 逗号分隔的ID字符串
+     * @param ids
      * @return
      */
     @PutMapping("/block")
-    @OperationLog(type = OperationType.UPDATE, target = "visitor", targetId = "#ids")
-    public Result<String> batchBlock(@RequestParam String ids) {
+    @OperationLog(value = OperationType.UPDATE, target = "visitor", targetId = "#ids")
+    public Result batchBlock(@RequestParam List<Long> ids) {
         log.info("批量封禁访客: {}", ids);
         visitorService.batchBlock(ids);
         return Result.success();
@@ -48,12 +50,12 @@ public class VisitorController {
 
     /**
      * 批量解封访客
-     * @param ids 逗号分隔的ID字符串
+     * @param ids
      * @return
      */
     @PutMapping("/unblock")
-    @OperationLog(type = OperationType.UPDATE, target = "visitor", targetId = "#ids")
-    public Result<String> batchUnblock(@RequestParam String ids) {
+    @OperationLog(value = OperationType.UPDATE, target = "visitor", targetId = "#ids")
+    public Result<String> batchUnblock(@RequestParam List<Long> ids) {
         log.info("批量解封访客: {}", ids);
         visitorService.batchUnblock(ids);
         return Result.success();

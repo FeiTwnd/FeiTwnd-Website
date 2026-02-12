@@ -7,6 +7,8 @@ import cc.feitwnd.result.PageResult;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface RssSubscriptionService {
     /**
      * 添加RSS订阅
@@ -28,10 +30,10 @@ public interface RssSubscriptionService {
     void updateSubscription(RssSubscriptions rssSubscriptions);
 
     /**
-     * 删除RSS订阅
-     * @param id
+     * 批量删除RSS订阅
+     * @param ids
      */
-    void deleteSubscription(Long id);
+    void batchDelete(List<Long> ids);
 
     /**
      * 根据ID查询RSS订阅

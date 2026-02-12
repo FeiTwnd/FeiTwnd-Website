@@ -5,6 +5,8 @@ import cc.feitwnd.vo.SkillVO;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface SkillService {
     /**
      * 获取所有技能信息
@@ -19,10 +21,10 @@ public interface SkillService {
     void addSkill(Skills skills);
 
     /**
-     * 删除技能
-     * @param id
+     * 批量删除技能
+     * @param ids
      */
-    void deleteSkill(Long id);
+    void batchDelete(List<Long> ids);
 
     /**
      * 修改技能

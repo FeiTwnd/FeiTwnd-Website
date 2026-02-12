@@ -5,6 +5,8 @@ import cc.feitwnd.vo.SocialMediaVO;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface SocialMediaService {
     /**
      * 获取可见社交媒体信息
@@ -25,10 +27,10 @@ public interface SocialMediaService {
     void addSocialMedia(SocialMedia socialMedia);
 
     /**
-     * 删除社交媒体信息
-     * @param id
+     * 批量删除社交媒体
+     * @param ids
      */
-    void deleteSocialMedia(Long id);
+    void batchDelete(List<Long> ids);
 
     /**
      * 修改社交媒体信息

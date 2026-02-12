@@ -28,7 +28,6 @@ public class SystemConfigController {
      */
     @GetMapping
     public Result<List<SystemConfig>> listAll() {
-        log.info("获取所有系统配置");
         List<SystemConfig> configList = systemConfigService.listAll();
         return Result.success(configList);
     }
@@ -84,15 +83,15 @@ public class SystemConfigController {
     }
 
     /**
-     * 删除系统配置
-     * @param id
+     * 批量删除系统配置
+     * @param ids
      * @return
      */
-    @DeleteMapping("/{id}")
-    @OperationLog(value = OperationType.DELETE, target = "systemConfig", targetId = "#id")
-    public Result deleteConfig(@PathVariable Long id) {
-        log.info("删除系统配置,{}", id);
-        systemConfigService.deleteConfig(id);
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "systemConfig", targetId = "#ids")
+    public Result deleteConfig(@RequestParam List<Long> ids) {
+        log.info("批量删除系统配置,{}", ids);
+        systemConfigService.batchDelete(ids);
         return Result.success();
     }
 }

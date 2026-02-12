@@ -38,6 +38,12 @@ public interface SocialMediaMapper {
     void deleteById(Long id);
 
     /**
+     * 批量删除社交媒体
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
+
+    /**
      * 修改社交媒体信息
      */
     @AutoFill(value = OperationType.UPDATE)

@@ -7,6 +7,8 @@ import cc.feitwnd.vo.MusicVO;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface MusicService {
     /**
      * 添加音乐
@@ -28,10 +30,10 @@ public interface MusicService {
     void updateMusic(Music music);
 
     /**
-     * 删除音乐
-     * @param id
+     * 批量删除音乐
+     * @param ids
      */
-    void deleteMusic(Long id);
+    void batchDelete(List<Long> ids);
 
     /**
      * 根据ID查询音乐

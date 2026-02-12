@@ -41,4 +41,11 @@
         </set>
         where id = #{id}
     </update>
+    
+    <delete id="batchDelete">
+        delete from music where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

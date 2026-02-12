@@ -217,21 +217,21 @@ public class VisitorServiceImpl implements VisitorService {
         return new PageResult(page.getTotal(), page.getResult());
     }
 
-    @Override
-    public void batchBlock(String ids) {
-        List<Long> idList = Arrays.stream(ids.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-        visitorMapper.batchBlock(idList);
+    /**
+     * 批量封禁访客
+     * @param ids
+     */
+    public void batchBlock(List<Long> ids) {
+        visitorMapper.batchBlock(ids);
         log.info("批量封禁访客: {}", ids);
     }
 
-    @Override
-    public void batchUnblock(String ids) {
-        List<Long> idList = Arrays.stream(ids.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-        visitorMapper.batchUnblock(idList);
+    /**
+     * 批量解封访客
+     * @param ids
+     */
+    public void batchUnblock(List<Long> ids) {
+        visitorMapper.batchUnblock(ids);
         log.info("批量解封访客: {}", ids);
     }
 }

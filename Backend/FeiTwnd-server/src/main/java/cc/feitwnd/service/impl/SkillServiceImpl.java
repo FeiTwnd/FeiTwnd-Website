@@ -4,12 +4,14 @@ import cc.feitwnd.entity.Skills;
 import cc.feitwnd.mapper.SkillMapper;
 import cc.feitwnd.service.SkillService;
 import cc.feitwnd.vo.SkillVO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class SkillServiceImpl implements SkillService {
 
     @Autowired
@@ -33,11 +35,11 @@ public class SkillServiceImpl implements SkillService {
     }
 
     /**
-     * 删除技能信息
-     * @param id
+     * 批量删除技能信息
+     * @param ids
      */
-    public void deleteSkill(Long id) {
-        skillMapper.deleteById(id);
+    public void batchDelete(List<Long> ids) {
+        skillMapper.batchDelete(ids);
     }
 
     /**

@@ -31,4 +31,11 @@
         </set>
         where id = #{id}
     </update>
+    
+    <delete id="batchDelete">
+        delete from rss_subscriptions where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

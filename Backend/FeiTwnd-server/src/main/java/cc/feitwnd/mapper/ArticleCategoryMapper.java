@@ -38,4 +38,10 @@ public interface ArticleCategoryMapper {
      */
     @Delete("delete from article_categories where id = #{id}")
     void deleteById(Long id);
+
+    /**
+     * 批量删除文章分类
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
 }

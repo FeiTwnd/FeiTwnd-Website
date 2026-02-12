@@ -23,7 +23,6 @@ public class MusicServiceImpl implements MusicService {
      * 添加音乐
      * @param music
      */
-    @Override
     public void addMusic(Music music) {
         musicMapper.insert(music);
     }
@@ -33,7 +32,6 @@ public class MusicServiceImpl implements MusicService {
      * @param musicPageQueryDTO
      * @return
      */
-    @Override
     public PageResult pageQuery(MusicPageQueryDTO musicPageQueryDTO) {
         PageHelper.startPage(musicPageQueryDTO.getPage(), musicPageQueryDTO.getPageSize());
         Page<Music> page = musicMapper.pageQuery(musicPageQueryDTO);
@@ -46,18 +44,16 @@ public class MusicServiceImpl implements MusicService {
      * 更新音乐
      * @param music
      */
-    @Override
     public void updateMusic(Music music) {
         musicMapper.update(music);
     }
 
     /**
-     * 删除音乐
-     * @param id
+     * 批量删除音乐
+     * @param ids
      */
-    @Override
-    public void deleteMusic(Long id) {
-        musicMapper.deleteById(id);
+    public void batchDelete(List<Long> ids) {
+        musicMapper.batchDelete(ids);
     }
 
     /**
@@ -65,7 +61,6 @@ public class MusicServiceImpl implements MusicService {
      * @param id
      * @return
      */
-    @Override
     public Music getById(Long id) {
         return musicMapper.getById(id);
     }
@@ -74,7 +69,6 @@ public class MusicServiceImpl implements MusicService {
      * 获取所有可见的音乐
      * @return
      */
-    @Override
     public List<MusicVO> getAllVisibleMusic() {
         List<Music> musicList = musicMapper.getAllVisibleMusic();
         if(musicList != null && !musicList.isEmpty()) {

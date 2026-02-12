@@ -42,7 +42,6 @@ public class RssSubscriptionController {
      */
     @GetMapping
     public Result<List<RssSubscriptions>> getAllActiveSubscriptions() {
-        log.info("获取所有激活的RSS订阅");
         List<RssSubscriptions> rssSubscriptionsList = rssSubscriptionService.getAllActiveSubscriptions();
         return Result.success(rssSubscriptionsList);
     }
@@ -73,15 +72,15 @@ public class RssSubscriptionController {
     }
 
     /**
-     * 删除RSS订阅
-     * @param id
+     * 批量删除RSS订阅
+     * @param ids
      * @return
      */
-    @DeleteMapping("/{id}")
-    @OperationLog(value = OperationType.DELETE, target = "rssSubscription", targetId = "#id")
-    public Result deleteSubscription(@PathVariable Long id) {
-        log.info("删除RSS订阅,{}", id);
-        rssSubscriptionService.deleteSubscription(id);
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "rssSubscription", targetId = "#ids")
+    public Result deleteSubscription(@RequestParam List<Long> ids) {
+        log.info("批量删除RSS订阅,{}", ids);
+        rssSubscriptionService.batchDelete(ids);
         return Result.success();
     }
 }

@@ -1,15 +1,19 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.entity.SystemConfig;
 import cc.feitwnd.exception.BaseException;
+import cc.feitwnd.exception.SystemConfigException;
 import cc.feitwnd.mapper.SystemConfigMapper;
 import cc.feitwnd.service.SystemConfigService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@Slf4j
 public class SystemConfigServiceImpl implements SystemConfigService {
 
     @Autowired
@@ -19,7 +23,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 获取所有系统配置
      * @return
      */
-    @Override
     public List<SystemConfig> listAll() {
         return systemConfigMapper.listAll();
     }
@@ -29,7 +32,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * @param configKey
      * @return
      */
-    @Override
     public SystemConfig getByKey(String configKey) {
         return systemConfigMapper.getByKey(configKey);
     }
@@ -39,7 +41,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * @param id
      * @return
      */
-    @Override
     public SystemConfig getById(Long id) {
         return systemConfigMapper.getById(id);
     }
@@ -48,12 +49,11 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 添加系统配置
      * @param systemConfig
      */
-    @Override
     public void addConfig(SystemConfig systemConfig) {
         // 检查配置键是否已存在
         SystemConfig existingConfig = systemConfigMapper.getByKey(systemConfig.getConfigKey());
         if (existingConfig != null) {
-            throw new BaseException("配置键已存在");
+            throw new SystemConfigException(MessageConstant.ConfigKeyExists);
         }
         systemConfigMapper.insert(systemConfig);
     }
@@ -68,11 +68,11 @@ public class SystemConfigServiceImpl implements SystemConfigService {
     }
 
     /**
-     * 删除系统配置
-     * @param id
+     * 批量删除系统配置
+     * @param ids
      */
     @Override
-    public void deleteConfig(Long id) {
-        systemConfigMapper.deleteById(id);
+    public void batchDelete(List<Long> ids) {
+        systemConfigMapper.batchDelete(ids);
     }
 }

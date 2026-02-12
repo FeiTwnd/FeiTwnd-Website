@@ -47,8 +47,10 @@ public class TokenServiceImpl implements TokenService {
 
     /**
      * 验证token有效性
+     * @param userId
+     * @param token
+     * @return
      */
-    @Override
     public boolean isValidToken(Long userId, String token) {
         String key = TOKEN_PREFIX + userId;
         return Boolean.TRUE.equals(redis.opsForSet().isMember(key, token));
@@ -57,7 +59,6 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 退出登录 - 删除token
      */
-    @Override
     public void logout(Long userId, String token) {
         String key = TOKEN_PREFIX + userId;
         redis.opsForSet().remove(key, token);
@@ -66,7 +67,6 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 退出登录 - 删除所有token
      */
-    @Override
     public void logoutAll(Long userId) {
         String key = TOKEN_PREFIX + userId;
         redis.delete(key);

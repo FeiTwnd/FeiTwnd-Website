@@ -37,6 +37,7 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 发送验证码
+     * @param username
      */
     public void sendVerifyCode(String username) {
         // 验证用户是否存在

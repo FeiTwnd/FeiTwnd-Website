@@ -4,6 +4,8 @@ import cc.feitwnd.entity.ArticleCategories;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface ArticleCategoryService {
     /**
      * 获取所有文章分类
@@ -24,8 +26,8 @@ public interface ArticleCategoryService {
     void updateCategory(ArticleCategories articleCategories);
 
     /**
-     * 删除文章分类
-     * @param id
+     * 批量删除文章分类
+     * @param ids
      */
-    void deleteCategory(Long id);
+    void batchDelete(List<Long> ids);
 }

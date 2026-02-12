@@ -1,6 +1,7 @@
 package cc.feitwnd.service.impl;
 
 import cc.feitwnd.constant.MessageConstant;
+import cc.feitwnd.constant.StatusConstant;
 import cc.feitwnd.context.BaseContext;
 import cc.feitwnd.dto.MessageDTO;
 import cc.feitwnd.dto.MessagePageQueryDTO;
@@ -49,7 +50,11 @@ public class MessageServiceImpl implements MessageService {
     // QQ号正则 (5-11位数字)
     private static final Pattern QQ_PATTERN = Pattern.compile("^[1-9][0-9]{4,10}$");
 
-    @Override
+    /**
+     * 访客提交留言
+     * @param messageDTO
+     * @param request
+     */
     public void submitMessage(MessageDTO messageDTO, HttpServletRequest request) {
         // 1. 校验邮箱或QQ号
         validateEmailOrQq(messageDTO.getEmailOrQq());
@@ -135,32 +140,37 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
-    @Override
+    /**
+     * 分页查询留言
+     * @param messagePageQueryDTO
+     * @return
+     */
     public PageResult pageQuery(MessagePageQueryDTO messagePageQueryDTO) {
         PageHelper.startPage(messagePageQueryDTO.getPage(), messagePageQueryDTO.getPageSize());
         Page<Messages> page = (Page<Messages>) messageMapper.pageQuery(messagePageQueryDTO);
         return new PageResult(page.getTotal(), page.getResult());
     }
 
-    @Override
-    public void batchApprove(String ids) {
-        List<Long> idList = Arrays.stream(ids.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-        messageMapper.batchApprove(idList);
-        log.info("批量审核通过留言: {}", ids);
+    /**
+     * 批量审核留言
+     * @param ids
+     */
+    public void batchApprove(List<Long> ids) {
+        messageMapper.batchApprove(ids);
     }
 
-    @Override
-    public void batchDelete(String ids) {
-        List<Long> idList = Arrays.stream(ids.split(","))
-                .map(Long::parseLong)
-                .collect(Collectors.toList());
-        messageMapper.batchDelete(idList);
-        log.info("批量删除留言: {}", ids);
+    /**
+     * 批量删除留言
+     * @param ids
+     */
+    public void batchDelete(List<Long> ids) {
+        messageMapper.batchDelete(ids);
     }
 
-    @Override
+    /**
+     * 管理员回复留言
+     * @param messageReplyDTO
+     */
     public void adminReply(MessageReplyDTO messageReplyDTO) {
         // 1. 创建留言实体
         Messages messages = new Messages();
@@ -175,10 +185,10 @@ public class MessageServiceImpl implements MessageService {
         }
 
         // 3. 设置管理员回复标识
-        messages.setIsAdminReply(1);
-        messages.setIsApproved(1); // 管理员回复自动审核通过
-        messages.setIsEdited(0);
-        messages.setNickname("管理员");
+        messages.setIsAdminReply(StatusConstant.ENABLE);
+        messages.setIsApproved(StatusConstant.ENABLE); // 管理员回复自动审核通过
+        messages.setIsEdited(StatusConstant.DISABLE);
+        messages.setNickname("FeiTwnd");
         messages.setCreateTime(LocalDateTime.now());
         messages.setUpdateTime(LocalDateTime.now());
 

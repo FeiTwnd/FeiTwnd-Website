@@ -42,13 +42,13 @@ public class SkillController {
     }
 
     /**
-     * 删除技能信息
+     * 批量删除技能信息
      */
-    @DeleteMapping("/{id}")
-    @OperationLog(value = OperationType.DELETE, target = "skill", targetId = "#id")
-    public Result<String> deleteSkill(@PathVariable Long id) {
-        log.info("删除技能信息,{}", id);
-        skillService.deleteSkill(id);
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "skill", targetId = "#ids")
+    public Result<String> deleteSkill(@RequestParam List<Long> ids) {
+        log.info("批量删除技能信息,{}", ids);
+        skillService.batchDelete(ids);
         return Result.success();
     }
 

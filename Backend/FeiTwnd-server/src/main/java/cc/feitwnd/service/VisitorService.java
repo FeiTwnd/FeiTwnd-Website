@@ -6,6 +6,8 @@ import cc.feitwnd.result.PageResult;
 import cc.feitwnd.vo.VisitorRecordVO;
 import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.List;
+
 public interface VisitorService {
     /**
      * 记录访客访问信息
@@ -26,11 +28,11 @@ public interface VisitorService {
      * 批量封禁访客
      * @param ids
      */
-    void batchBlock(String ids);
+    void batchBlock(List<Long> ids);
 
     /**
      * 批量解封访客
      * @param ids
      */
-    void batchUnblock(String ids);
+    void batchUnblock(List<Long> ids);
 }

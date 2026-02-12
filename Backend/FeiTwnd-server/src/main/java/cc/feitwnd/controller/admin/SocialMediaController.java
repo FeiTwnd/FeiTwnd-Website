@@ -42,13 +42,13 @@ public class SocialMediaController {
         return Result.success();
     }
     /**
-     * 删除社交媒体信息
+     * 批量删除社交媒体信息
      */
-    @DeleteMapping("/{id}")
-    @OperationLog(value = OperationType.DELETE, target = "socialMedia", targetId = "#id")
-    public Result deleteSocialMedia(@PathVariable Long id) {
-        log.info("删除社交媒体信息: {}", id);
-        socialMediaService.deleteSocialMedia(id);
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "socialMedia", targetId = "#ids")
+    public Result deleteSocialMedia(@RequestParam List<Long> ids) {
+        log.info("批量删除社交媒体信息: {}", ids);
+        socialMediaService.batchDelete(ids);
         return Result.success();
     }
 

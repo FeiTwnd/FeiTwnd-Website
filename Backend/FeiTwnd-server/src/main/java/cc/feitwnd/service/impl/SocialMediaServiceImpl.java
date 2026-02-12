@@ -58,11 +58,11 @@ public class SocialMediaServiceImpl implements SocialMediaService {
     }
 
     /**
-     * 删除社交媒体
-     * @param id
+     * 批量删除社交媒体
+     * @param ids
      */
-    public void deleteSocialMedia(Long id) {
-        socialMediaMapper.deleteById(id);
+    public void batchDelete(List<Long> ids) {
+        socialMediaMapper.batchDelete(ids);
     }
 
     /**

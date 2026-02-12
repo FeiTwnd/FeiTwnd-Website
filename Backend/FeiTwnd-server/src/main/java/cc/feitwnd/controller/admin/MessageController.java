@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * 管理端留言接口
  */
@@ -36,12 +38,12 @@ public class MessageController {
 
     /**
      * 批量审核通过留言
-     * @param ids 逗号分隔的ID字符串
+     * @param ids
      * @return
      */
     @PutMapping("/approve")
-    @OperationLog(type = OperationType.APPROVE, target = "message", targetId = "#ids")
-    public Result<String> batchApprove(@RequestParam String ids) {
+    @OperationLog(value = OperationType.UPDATE, target = "message", targetId = "#ids")
+    public Result<String> batchApprove(@RequestParam List<Long> ids) {
         log.info("批量审核通过留言: {}", ids);
         messageService.batchApprove(ids);
         return Result.success();
@@ -49,12 +51,12 @@ public class MessageController {
 
     /**
      * 批量删除留言
-     * @param ids 逗号分隔的ID字符串
+     * @param ids
      * @return
      */
     @DeleteMapping
-    @OperationLog(type = OperationType.DELETE, target = "message", targetId = "#ids")
-    public Result<String> batchDelete(@RequestParam String ids) {
+    @OperationLog(value = OperationType.UPDATE, target = "message", targetId = "#ids")
+    public Result<String> batchDelete(@RequestParam List<Long> ids) {
         log.info("批量删除留言: {}", ids);
         messageService.batchDelete(ids);
         return Result.success();
@@ -66,7 +68,7 @@ public class MessageController {
      * @return
      */
     @PostMapping("/reply")
-    @OperationLog(type = OperationType.INSERT, target = "message", targetId = "#messageReplyDTO.parentId")
+    @OperationLog(value = OperationType.INSERT, target = "message", targetId = "#messageReplyDTO.parentId")
     public Result<String> adminReply(@RequestBody MessageReplyDTO messageReplyDTO) {
         log.info("管理员回复留言: {}", messageReplyDTO);
         messageService.adminReply(messageReplyDTO);

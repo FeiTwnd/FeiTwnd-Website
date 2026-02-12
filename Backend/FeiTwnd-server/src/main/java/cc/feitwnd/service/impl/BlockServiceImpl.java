@@ -57,7 +57,6 @@ public class BlockServiceImpl implements BlockService {
      * @param fingerprint
      * @param ip
      */
-    @Override
     public void checkRateLimit(String fingerprint, String ip) {
         // IP级别限制：每分钟60次
         String ipKey = RATE_LIMIT_KEY + "ip:" + ip;

@@ -5,6 +5,8 @@ import cc.feitwnd.vo.ExperienceVO;
 
 import java.util.List;
 
+import java.util.List;
+
 public interface ExperienceService {
     /**
      * 根据类型获取经历信息
@@ -26,10 +28,10 @@ public interface ExperienceService {
     void updateExperience(Experiences experiences);
 
     /**
-     * 删除经历信息
-     * @param id
+     * 批量删除经历
+     * @param ids
      */
-    void deleteExperience(Long id);
+    void batchDelete(List<Long> ids);
 
     /**
      * cv端获取全部经历信息

@@ -23,7 +23,6 @@ public class ViewServiceImpl implements ViewService {
      * @param viewPageQueryDTO
      * @return
      */
-    @Override
     public PageResult pageQuery(ViewPageQueryDTO viewPageQueryDTO) {
         PageHelper.startPage(viewPageQueryDTO.getPage(), viewPageQueryDTO.getPageSize());
         Page<Views> page = viewMapper.pageQuery(viewPageQueryDTO);

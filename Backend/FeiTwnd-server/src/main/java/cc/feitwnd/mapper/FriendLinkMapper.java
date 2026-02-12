@@ -34,6 +34,12 @@ public interface FriendLinkMapper {
     @Delete("delete from friend_links where id = #{id}")
     void delete(Long id);
 
+    /**
+     * 批量删除友情链接
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
+
     @AutoFill(value = OperationType.UPDATE)
     void update(FriendLinks friendLink);
 

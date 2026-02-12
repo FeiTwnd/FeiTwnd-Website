@@ -31,7 +31,6 @@ public class operationLogServiceImpl implements operationLogService {
      * @param operationLogPageQueryDTO
      * @return
      */
-    @Override
     public PageResult pageQuery(OperationLogPageQueryDTO operationLogPageQueryDTO) {
         PageHelper.startPage(operationLogPageQueryDTO.getPage(), operationLogPageQueryDTO.getPageSize());
         Page<OperationLogs> page = operationLogMapper.pageQuery(operationLogPageQueryDTO);

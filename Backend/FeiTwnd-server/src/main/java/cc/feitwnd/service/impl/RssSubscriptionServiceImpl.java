@@ -1,9 +1,11 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.dto.RssSubscriptionDTO;
 import cc.feitwnd.dto.RssSubscriptionPageQueryDTO;
 import cc.feitwnd.entity.RssSubscriptions;
 import cc.feitwnd.exception.BaseException;
+import cc.feitwnd.exception.RssSubscriptionException;
 import cc.feitwnd.mapper.RssSubscriptionMapper;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.RssSubscriptionService;
@@ -25,14 +27,13 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
      * 添加RSS订阅
      * @param rssSubscriptionDTO
      */
-    @Override
     public void addSubscription(RssSubscriptionDTO rssSubscriptionDTO) {
         // 检查邮箱是否已存在
         RssSubscriptions existingSubscription = rssSubscriptionMapper.getByEmail(rssSubscriptionDTO.getEmail());
         if (existingSubscription != null) {
             // 如果已存在且激活，抛出异常
             if (existingSubscription.getIsActive() == 1) {
-                throw new BaseException("该邮箱已订阅");
+                throw new RssSubscriptionException(MessageConstant.RssAlreadyExists);
             }
             // 如果已存在但未激活，重新激活
             existingSubscription.setIsActive(1);
@@ -57,7 +58,6 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
      * @param rssSubscriptionPageQueryDTO
      * @return
      */
-    @Override
     public PageResult pageQuery(RssSubscriptionPageQueryDTO rssSubscriptionPageQueryDTO) {
         PageHelper.startPage(rssSubscriptionPageQueryDTO.getPage(), rssSubscriptionPageQueryDTO.getPageSize());
         Page<RssSubscriptions> page = rssSubscriptionMapper.pageQuery(rssSubscriptionPageQueryDTO);
@@ -70,18 +70,16 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
      * 更新RSS订阅
      * @param rssSubscriptions
      */
-    @Override
     public void updateSubscription(RssSubscriptions rssSubscriptions) {
         rssSubscriptionMapper.update(rssSubscriptions);
     }
 
     /**
-     * 删除RSS订阅
-     * @param id
+     * 批量删除RSS订阅
+     * @param ids
      */
-    @Override
-    public void deleteSubscription(Long id) {
-        rssSubscriptionMapper.deleteById(id);
+    public void batchDelete(List<Long> ids) {
+        rssSubscriptionMapper.batchDelete(ids);
     }
 
     /**
@@ -89,7 +87,6 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
      * @param id
      * @return
      */
-    @Override
     public RssSubscriptions getById(Long id) {
         return rssSubscriptionMapper.getById(id);
     }
@@ -98,7 +95,6 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
      * 获取所有激活的订阅
      * @return
      */
-    @Override
     public List<RssSubscriptions> getAllActiveSubscriptions() {
         return rssSubscriptionMapper.getAllActiveSubscriptions();
     }
@@ -107,14 +103,13 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
      * 根据邮箱取消订阅
      * @param email
      */
-    @Override
     public void unsubscribeByEmail(String email) {
         RssSubscriptions subscription = rssSubscriptionMapper.getByEmail(email);
         if (subscription == null) {
-            throw new BaseException("该邮箱未订阅");
+            throw new RssSubscriptionException(MessageConstant.RssNotFound);
         }
         if (subscription.getIsActive() == 0) {
-            throw new BaseException("该邮箱已取消订阅");
+            throw new RssSubscriptionException(MessageConstant.RssNotFound);
         }
         subscription.setIsActive(0);
         subscription.setUnSubscribeTime(LocalDateTime.now());

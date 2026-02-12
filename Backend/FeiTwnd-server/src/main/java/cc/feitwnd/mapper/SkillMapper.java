@@ -31,6 +31,12 @@ public interface SkillMapper {
     void deleteById(Long id);
 
     /**
+     * 批量删除技能
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
+
+    /**
      * 修改技能信息
      */
     @AutoFill(value = OperationType.UPDATE)

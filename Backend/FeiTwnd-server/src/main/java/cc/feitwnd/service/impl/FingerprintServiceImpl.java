@@ -12,7 +12,12 @@ import org.springframework.util.StringUtils;
 @Slf4j
 public class FingerprintServiceImpl implements FingerprintService {
     
-    @Override
+    /**
+     * 生成访客指纹
+     * @param dto
+     * @param request
+     * @return
+     */
     public String generateVisitorFingerprint(VisitorRecordDTO dto, HttpServletRequest request) {
         // 提取更稳定的特征
         String userAgent = request.getHeader("User-Agent");

@@ -54,4 +54,10 @@ public interface SystemConfigMapper {
      */
     @Delete("delete from system_config where id = #{id}")
     void deleteById(Long id);
+
+    /**
+     * 批量删除系统配置
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
 }
