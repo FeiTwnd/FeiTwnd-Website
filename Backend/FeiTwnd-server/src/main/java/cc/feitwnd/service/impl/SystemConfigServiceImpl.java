@@ -62,7 +62,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 更新系统配置
      * @param systemConfig
      */
-    @Override
     public void updateConfig(SystemConfig systemConfig) {
         systemConfigMapper.update(systemConfig);
     }
@@ -71,7 +70,6 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 批量删除系统配置
      * @param ids
      */
-    @Override
     public void batchDelete(List<Long> ids) {
         systemConfigMapper.batchDelete(ids);
     }

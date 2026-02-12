@@ -223,7 +223,6 @@ public class VisitorServiceImpl implements VisitorService {
      */
     public void batchBlock(List<Long> ids) {
         visitorMapper.batchBlock(ids);
-        log.info("批量封禁访客: {}", ids);
     }
 
     /**
@@ -232,6 +231,5 @@ public class VisitorServiceImpl implements VisitorService {
      */
     public void batchUnblock(List<Long> ids) {
         visitorMapper.batchUnblock(ids);
-        log.info("批量解封访客: {}", ids);
     }
 }

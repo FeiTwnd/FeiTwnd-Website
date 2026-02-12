@@ -31,14 +31,12 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
     private RedisTemplate redis;
 
     // 生成验证码
-    @Override
     public String generateCode() {
         Random random = new Random();
         return String.format("%06d", random.nextInt(1_000_000));
     }
 
     // 保存验证码并设置发送频率
-    @Override
     public void saveCode(String code) {
         // 保存验证码
         redis.opsForValue().set(KEY_VERIFY_CODE, code, CODE_TTL_MINUTES, TimeUnit.MINUTES);
@@ -81,7 +79,6 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
     }
 
     // 验证验证码
-    @Override
     public boolean verifyCode(String code) {
         if (code == null || code.trim().isEmpty()) {
             return false;
