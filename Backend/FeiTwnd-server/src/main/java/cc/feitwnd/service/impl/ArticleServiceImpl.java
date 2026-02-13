@@ -10,7 +10,11 @@ import cc.feitwnd.mapper.ArticleMapper;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleService;
 import cc.feitwnd.utils.MarkdownUtil;
+import cc.feitwnd.vo.ArticleArchiveItemVO;
+import cc.feitwnd.vo.ArticleArchiveVO;
 import cc.feitwnd.vo.ArticleVO;
+import cc.feitwnd.vo.BlogArticleDetailVO;
+import cc.feitwnd.vo.BlogArticleVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 文章服务实现
@@ -155,6 +162,60 @@ public class ArticleServiceImpl implements ArticleService {
     public PageResult search(String keyword, int page, int pageSize) {
         PageHelper.startPage(page, pageSize);
         Page<ArticleVO> pageResult = articleMapper.search(keyword);
+        return new PageResult(pageResult.getTotal(), pageResult.getResult());
+    }
+
+    // ===== 博客端方法 =====
+
+    public PageResult getPublishedPage(int page, int pageSize) {
+        PageHelper.startPage(page, pageSize);
+        Page<BlogArticleVO> pageResult = articleMapper.getPublishedPage();
+        return new PageResult(pageResult.getTotal(), pageResult.getResult());
+    }
+
+    public BlogArticleDetailVO getBySlug(String slug) {
+        BlogArticleDetailVO articleDetail = articleMapper.getBySlug(slug);
+        if (articleDetail == null) {
+            throw new ArticleException(MessageConstant.ARTICLE_NOT_FOUND);
+        }
+        // 浏览量+1
+        articleMapper.incrementViewCount(articleDetail.getId());
+        articleDetail.setViewCount(articleDetail.getViewCount() + 1);
+        return articleDetail;
+    }
+
+    public PageResult getPublishedByCategoryId(Long categoryId, int page, int pageSize) {
+        PageHelper.startPage(page, pageSize);
+        Page<BlogArticleVO> pageResult = articleMapper.getPublishedByCategoryId(categoryId);
+        return new PageResult(pageResult.getTotal(), pageResult.getResult());
+    }
+
+    public List<ArticleArchiveVO> getArchive() {
+        List<ArticleArchiveItemVO> allArticles = articleMapper.getArchiveList();
+        // 按年月分组（利用数据库的 publish_year, publish_month 生成列）
+        Map<String, ArticleArchiveVO> archiveMap = new LinkedHashMap<>();
+        for (ArticleArchiveItemVO item : allArticles) {
+            if (item.getPublishTime() == null) {
+                continue;
+            }
+            int year = item.getPublishTime().getYear();
+            int month = item.getPublishTime().getMonthValue();
+            String key = year + "-" + month;
+            ArticleArchiveVO archiveVO = archiveMap.computeIfAbsent(key, k ->
+                    ArticleArchiveVO.builder()
+                            .year(year)
+                            .month(month)
+                            .articles(new ArrayList<>())
+                            .build()
+            );
+            archiveVO.getArticles().add(item);
+        }
+        return new ArrayList<>(archiveMap.values());
+    }
+
+    public PageResult searchPublished(String keyword, int page, int pageSize) {
+        PageHelper.startPage(page, pageSize);
+        Page<BlogArticleVO> pageResult = articleMapper.searchPublished(keyword);
         return new PageResult(pageResult.getTotal(), pageResult.getResult());
     }
 

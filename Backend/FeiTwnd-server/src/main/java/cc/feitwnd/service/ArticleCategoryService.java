@@ -30,4 +30,11 @@ public interface ArticleCategoryService {
      * @param ids
      */
     void batchDelete(List<Long> ids);
+
+    // ===== 博客端方法 =====
+
+    /**
+     * 获取所有有已发布文章的可见分类
+     */
+    List<ArticleCategories> getVisibleCategories();
 }

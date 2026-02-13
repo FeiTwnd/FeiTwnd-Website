@@ -69,4 +69,57 @@
         where match(a.title, a.summary, a.content_markdown) against(#{keyword} in boolean mode)
         order by a.create_time desc
     </select>
+
+    <!-- ===== 博客端查询 ===== -->
+
+    <select id="getPublishedPage" resultType="cc.feitwnd.vo.BlogArticleVO">
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
+               ac.name as category_name,
+               a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
+               a.publish_time
+        from articles a
+        left join article_categories ac on a.category_id = ac.id
+        where a.is_published = 1
+        order by a.publish_time desc
+    </select>
+
+    <select id="getBySlug" resultType="cc.feitwnd.vo.BlogArticleDetailVO">
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.content_html,
+               a.category_id, ac.name as category_name,
+               a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
+               a.publish_time, a.update_time
+        from articles a
+        left join article_categories ac on a.category_id = ac.id
+        where a.slug = #{slug} and a.is_published = 1
+    </select>
+
+    <select id="getPublishedByCategoryId" resultType="cc.feitwnd.vo.BlogArticleVO">
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
+               ac.name as category_name,
+               a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
+               a.publish_time
+        from articles a
+        left join article_categories ac on a.category_id = ac.id
+        where a.is_published = 1 and a.category_id = #{categoryId}
+        order by a.publish_time desc
+    </select>
+
+    <select id="getArchiveList" resultType="cc.feitwnd.vo.ArticleArchiveItemVO">
+        select id, title, slug, publish_day, publish_time
+        from articles
+        where is_published = 1
+        order by publish_time desc
+    </select>
+
+    <select id="searchPublished" resultType="cc.feitwnd.vo.BlogArticleVO">
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
+               ac.name as category_name,
+               a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
+               a.publish_time
+        from articles a
+        left join article_categories ac on a.category_id = ac.id
+        where a.is_published = 1
+          and match(a.title, a.summary, a.content_markdown) against(#{keyword} in boolean mode)
+        order by a.publish_time desc
+    </select>
 </mapper>

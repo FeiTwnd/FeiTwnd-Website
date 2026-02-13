@@ -1,9 +1,12 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.ArticleCommentDTO;
 import cc.feitwnd.dto.ArticleCommentPageQueryDTO;
 import cc.feitwnd.dto.ArticleCommentReplyDTO;
 import cc.feitwnd.entity.ArticleComments;
 import cc.feitwnd.result.PageResult;
+import cc.feitwnd.vo.ArticleCommentVO;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -43,4 +46,16 @@ public interface ArticleCommentService {
      * @param articleCommentReplyDTO
      */
     void adminReply(ArticleCommentReplyDTO articleCommentReplyDTO);
+
+    // ===== 博客端方法 =====
+
+    /**
+     * 根据文章ID获取评论列表（树形结构，仅已审核）
+     */
+    List<ArticleCommentVO> getCommentTree(Long articleId);
+
+    /**
+     * 访客提交评论
+     */
+    void submitComment(ArticleCommentDTO articleCommentDTO, HttpServletRequest request);
 }

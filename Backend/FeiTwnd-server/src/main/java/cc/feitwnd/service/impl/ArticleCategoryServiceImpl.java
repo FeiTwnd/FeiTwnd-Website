@@ -45,4 +45,10 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
     public void batchDelete(List<Long> ids) {
         articleCategoryMapper.batchDelete(ids);
     }
+
+    // ===== 博客端方法 =====
+
+    public List<ArticleCategories> getVisibleCategories() {
+        return articleCategoryMapper.getVisibleCategories();
+    }
 }

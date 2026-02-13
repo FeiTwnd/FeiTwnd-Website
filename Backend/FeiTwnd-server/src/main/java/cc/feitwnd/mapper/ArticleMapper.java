@@ -4,10 +4,14 @@ import cc.feitwnd.annotation.AutoFill;
 import cc.feitwnd.dto.ArticlePageQueryDTO;
 import cc.feitwnd.entity.Articles;
 import cc.feitwnd.enumeration.OperationType;
+import cc.feitwnd.vo.ArticleArchiveItemVO;
 import cc.feitwnd.vo.ArticleVO;
+import cc.feitwnd.vo.BlogArticleDetailVO;
+import cc.feitwnd.vo.BlogArticleVO;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -55,4 +59,49 @@ public interface ArticleMapper {
      * @return
      */
     Page<ArticleVO> search(String keyword);
+
+    // ===== 博客端方法 =====
+
+    /**
+     * 获取已发布文章列表（分页）
+     */
+    Page<BlogArticleVO> getPublishedPage();
+
+    /**
+     * 根据slug获取文章详情
+     */
+    BlogArticleDetailVO getBySlug(String slug);
+
+    /**
+     * 根据分类ID获取已发布文章列表（分页）
+     */
+    Page<BlogArticleVO> getPublishedByCategoryId(Long categoryId);
+
+    /**
+     * 获取文章归档列表
+     */
+    List<ArticleArchiveItemVO> getArchiveList();
+
+    /**
+     * 博客端文章搜索（仅已发布）
+     */
+    Page<BlogArticleVO> searchPublished(String keyword);
+
+    /**
+     * 浏览量+1
+     */
+    @Update("update articles set view_count = view_count + 1 where id = #{id}")
+    void incrementViewCount(Long id);
+
+    /**
+     * 点赞数+1
+     */
+    @Update("update articles set like_count = like_count + 1 where id = #{id}")
+    void incrementLikeCount(Long id);
+
+    /**
+     * 点赞数-1
+     */
+    @Update("update articles set like_count = case when like_count > 0 then like_count - 1 else 0 end where id = #{id}")
+    void decrementLikeCount(Long id);
 }
