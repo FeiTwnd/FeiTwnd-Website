@@ -4,6 +4,7 @@ import cc.feitwnd.dto.MessageDTO;
 import cc.feitwnd.dto.MessagePageQueryDTO;
 import cc.feitwnd.dto.MessageReplyDTO;
 import cc.feitwnd.result.PageResult;
+import cc.feitwnd.vo.MessageVO;
 import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
@@ -44,5 +45,12 @@ public interface MessageService {
      * @param messageReplyDTO
      */
     void adminReply(MessageReplyDTO messageReplyDTO);
+
+    // ===== 博客端方法 =====
+
+    /**
+     * 获取已审核留言列表（树形结构）
+     */
+    List<MessageVO> getMessageTree();
 }
 

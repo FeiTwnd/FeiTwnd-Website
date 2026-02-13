@@ -1,7 +1,6 @@
 package cc.feitwnd.service.impl;
 
 import cc.feitwnd.constant.StatusConstant;
-import cc.feitwnd.context.BaseContext;
 import cc.feitwnd.dto.ArticleCommentDTO;
 import cc.feitwnd.dto.ArticleCommentPageQueryDTO;
 import cc.feitwnd.dto.ArticleCommentReplyDTO;
@@ -10,6 +9,7 @@ import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.ArticleCommentMapper;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleCommentService;
+import cc.feitwnd.service.EmailService;
 import cc.feitwnd.service.UserAgentService;
 import cc.feitwnd.utils.IpUtil;
 import cc.feitwnd.utils.MarkdownUtil;
@@ -41,6 +41,9 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
 
     @Autowired
     private UserAgentService userAgentService;
+
+    @Autowired
+    private EmailService emailService;
 
     /**
      * 分页条件查询评论（时间、是否审核）
@@ -103,10 +106,19 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         articleComments.setUpdateTime(LocalDateTime.now());
 
         articleCommentMapper.save(articleComments);
+
+        // 检查父评论是否开启邮箱通知
+        notifyParentIfNeeded(articleCommentReplyDTO.getParentId(), "FeiTwnd",
+                articleCommentReplyDTO.getContent(), "comment");
     }
 
     // ===== 博客端方法 =====
 
+    /**
+     * 根据文章ID获取评论列表（树形结构）
+     * @param articleId
+     * @return
+     */
     public List<ArticleCommentVO> getCommentTree(Long articleId) {
         List<ArticleCommentVO> allComments = articleCommentMapper.getApprovedByArticleId(articleId);
         // 构建树形结构：根评论（rootId为null或0）作为一级，其余挂到根评论下
@@ -133,6 +145,10 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         return rootComments;
     }
 
+    /**
+     * 提交评论（添加评论/回复评论）
+     * @param articleCommentDTO
+     */
     @Transactional
     public void submitComment(ArticleCommentDTO articleCommentDTO, HttpServletRequest request) {
         // 1. 校验邮箱或QQ号
@@ -152,9 +168,6 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
 
         // 4. 设置访客ID
         Long visitorId = articleCommentDTO.getVisitorId();
-        if (visitorId == null) {
-            visitorId = BaseContext.getCurrentId();
-        }
         articleComments.setVisitorId(visitorId);
 
         // 5. 获取IP地址信息
@@ -187,7 +200,41 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         // 9. 文章评论数+1
         articleCommentMapper.incrementCommentCount(articleCommentDTO.getArticleId());
 
+        // 10. 检查父评论是否开启邮箱通知
+        if (articleCommentDTO.getParentId() != null) {
+            notifyParentIfNeeded(articleCommentDTO.getParentId(),
+                    articleCommentDTO.getNickname(), articleCommentDTO.getContent(), "comment");
+        }
+
         log.info("访客提交文章评论成功: {}", articleComments);
+    }
+
+    /**
+     * 检查父评论是否开启邮箱通知，如果是则发送通知邮件
+     */
+    private void notifyParentIfNeeded(Long parentId, String replyNickname, String replyContent, String type) {
+        if (parentId == null) {
+            return;
+        }
+        try {
+            ArticleComments parentComment = articleCommentMapper.getById(parentId);
+            if (parentComment != null
+                    && parentComment.getIsNotice() != null
+                    && parentComment.getIsNotice() == 1
+                    && parentComment.getEmailOrQq() != null
+                    && parentComment.getEmailOrQq().contains("@")) {
+                emailService.sendReplyNotification(
+                        parentComment.getEmailOrQq(),
+                        parentComment.getNickname(),
+                        parentComment.getContent(),
+                        replyNickname,
+                        replyContent,
+                        type
+                );
+            }
+        } catch (Exception e) {
+            log.error("发送评论回复通知邮件异常: parentId={}, ex={}", parentId, e.getMessage());
+        }
     }
 
     /**

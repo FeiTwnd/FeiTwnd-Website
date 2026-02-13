@@ -2,6 +2,7 @@ package cc.feitwnd.mapper;
 
 import cc.feitwnd.dto.MessagePageQueryDTO;
 import cc.feitwnd.entity.Messages;
+import cc.feitwnd.vo.MessageVO;
 import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
@@ -43,5 +44,12 @@ public interface MessageMapper {
      * @return
      */
     Messages getById(Long id);
+
+    // ===== 博客端方法 =====
+
+    /**
+     * 获取已审核的留言列表（用于构建树形结构）
+     */
+    List<MessageVO> getApprovedList();
 }
 

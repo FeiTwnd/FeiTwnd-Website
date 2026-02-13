@@ -2,7 +2,6 @@ package cc.feitwnd.service.impl;
 
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.constant.StatusConstant;
-import cc.feitwnd.context.BaseContext;
 import cc.feitwnd.dto.MessageDTO;
 import cc.feitwnd.dto.MessagePageQueryDTO;
 import cc.feitwnd.dto.MessageReplyDTO;
@@ -10,10 +9,12 @@ import cc.feitwnd.entity.Messages;
 import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.MessageMapper;
 import cc.feitwnd.result.PageResult;
+import cc.feitwnd.service.EmailService;
 import cc.feitwnd.service.MessageService;
 import cc.feitwnd.service.UserAgentService;
 import cc.feitwnd.utils.IpUtil;
 import cc.feitwnd.utils.MarkdownUtil;
+import cc.feitwnd.vo.MessageVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -23,7 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -41,6 +42,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private UserAgentService userAgentService;
+
+    @Autowired
+    private EmailService emailService;
 
     // 邮箱正则
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
@@ -73,11 +77,8 @@ public class MessageServiceImpl implements MessageService {
             messages.setContentHtml(messageDTO.getContent());
         }
 
-        // 4. 设置访客ID (优先使用前端传来的，如果没有则从BaseContext获取)
+        // 4. 设置访客ID
         Long visitorId = messageDTO.getVisitorId();
-        if (visitorId == null) {
-            visitorId = BaseContext.getCurrentId();
-        }
         messages.setVisitorId(visitorId);
 
         // 5. 获取IP地址信息
@@ -106,7 +107,13 @@ public class MessageServiceImpl implements MessageService {
 
         // 8. 保存到数据库
         messageMapper.save(messages);
-        
+
+        // 9. 检查父留言是否开启邮箱通知
+        if (messageDTO.getParentId() != null) {
+            notifyParentIfNeeded(messageDTO.getParentId(),
+                    messageDTO.getNickname(), messageDTO.getContent(), "message");
+        }
+
         log.info("访客提交留言成功: {}", messages);
     }
 
@@ -194,7 +201,65 @@ public class MessageServiceImpl implements MessageService {
 
         // 4. 保存到数据库
         messageMapper.save(messages);
-        
+
+        // 5. 检查父留言是否开启邮箱通知
+        notifyParentIfNeeded(messageReplyDTO.getParentId(), "FeiTwnd",
+                messageReplyDTO.getContent(), "message");
+
         log.info("管理员回复留言成功: parentId={}, content={}", messageReplyDTO.getParentId(), messageReplyDTO.getContent());
+    }
+
+    // ===== 博客端方法 =====
+
+    public List<MessageVO> getMessageTree() {
+        List<MessageVO> allMessages = messageMapper.getApprovedList();
+        // 构建树形结构：根留言（rootId为null或0）作为一级，其余挂到根留言下
+        List<MessageVO> rootMessages = new ArrayList<>();
+        Map<Long, MessageVO> messageMap = allMessages.stream()
+                .collect(Collectors.toMap(MessageVO::getId, m -> m));
+
+        for (MessageVO msg : allMessages) {
+            if (msg.getRootId() == null || msg.getRootId() == 0) {
+                msg.setChildren(new ArrayList<>());
+                rootMessages.add(msg);
+            } else {
+                MessageVO rootMsg = messageMap.get(msg.getRootId());
+                if (rootMsg != null) {
+                    if (rootMsg.getChildren() == null) {
+                        rootMsg.setChildren(new ArrayList<>());
+                    }
+                    rootMsg.getChildren().add(msg);
+                }
+            }
+        }
+        return rootMessages;
+    }
+
+    /**
+     * 检查父留言是否开启邮箱通知，如果是则发送通知邮件
+     */
+    private void notifyParentIfNeeded(Long parentId, String replyNickname, String replyContent, String type) {
+        if (parentId == null) {
+            return;
+        }
+        try {
+            Messages parentMessage = messageMapper.getById(parentId);
+            if (parentMessage != null
+                    && parentMessage.getIsNotice() != null
+                    && parentMessage.getIsNotice() == 1
+                    && parentMessage.getEmailOrQq() != null
+                    && parentMessage.getEmailOrQq().contains("@")) {
+                emailService.sendReplyNotification(
+                        parentMessage.getEmailOrQq(),
+                        parentMessage.getNickname(),
+                        parentMessage.getContent(),
+                        replyNickname,
+                        replyContent,
+                        type
+                );
+            }
+        } catch (Exception e) {
+            log.error("发送留言回复通知邮件异常: parentId={}, ex={}", parentId, e.getMessage());
+        }
     }
 }

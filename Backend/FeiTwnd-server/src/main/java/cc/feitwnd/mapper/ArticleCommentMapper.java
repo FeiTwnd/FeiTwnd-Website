@@ -4,6 +4,7 @@ import cc.feitwnd.dto.ArticleCommentPageQueryDTO;
 import cc.feitwnd.entity.ArticleComments;
 import cc.feitwnd.vo.ArticleCommentVO;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
@@ -55,4 +56,10 @@ public interface ArticleCommentMapper {
      */
     @Update("update articles set comment_count = comment_count + 1 where id = #{articleId}")
     void incrementCommentCount(Long articleId);
+
+    /**
+     * 根据ID查询评论
+     */
+    @Select("select * from article_comments where id = #{id}")
+    ArticleComments getById(Long id);
 }

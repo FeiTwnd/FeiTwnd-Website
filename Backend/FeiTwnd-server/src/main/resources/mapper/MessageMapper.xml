@@ -53,4 +53,15 @@
         </foreach>
     </delete>
 
+    <!-- ===== 博客端查询 ===== -->
+
+    <select id="getApprovedList" resultType="cc.feitwnd.vo.MessageVO">
+        select id, root_id, parent_id, parent_nickname, content_html,
+               nickname, location, user_agent_os, user_agent_browser,
+               is_secret, is_admin_reply, create_time
+        from messages
+        where is_approved = 1
+        order by create_time asc
+    </select>
+
 </mapper>

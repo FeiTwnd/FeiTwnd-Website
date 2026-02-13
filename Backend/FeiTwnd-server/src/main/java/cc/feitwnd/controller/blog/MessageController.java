@@ -3,10 +3,13 @@ package cc.feitwnd.controller.blog;
 import cc.feitwnd.dto.MessageDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.MessageService;
+import cc.feitwnd.vo.MessageVO;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,5 +36,15 @@ public class MessageController {
         log.info("访客提交留言: {}", messageDTO);
         messageService.submitMessage(messageDTO, request);
         return Result.success();
+    }
+
+    /**
+     * 获取已审核留言列表（树形结构）
+     */
+    @GetMapping
+    public Result<List<MessageVO>> getMessageTree() {
+        log.info("博客端获取留言树");
+        List<MessageVO> messageTree = messageService.getMessageTree();
+        return Result.success(messageTree);
     }
 }
