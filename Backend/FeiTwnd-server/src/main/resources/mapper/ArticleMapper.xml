@@ -122,4 +122,12 @@
           and match(a.title, a.summary, a.content_markdown) against(#{keyword} in boolean mode)
         order by a.publish_time desc
     </select>
+
+    <select id="getViewTop10" resultType="cc.feitwnd.dto.ArticleTitleViewCountDTO">
+        select title, view_count as viewCount
+        from articles
+        where is_published = 1
+        order by view_count desc
+        limit 10
+    </select>
 </mapper>

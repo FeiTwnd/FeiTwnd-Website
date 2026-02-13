@@ -2,6 +2,7 @@ package cc.feitwnd.mapper;
 
 import cc.feitwnd.annotation.AutoFill;
 import cc.feitwnd.dto.ArticlePageQueryDTO;
+import cc.feitwnd.dto.ArticleTitleViewCountDTO;
 import cc.feitwnd.entity.Articles;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.vo.ArticleArchiveItemVO;
@@ -110,4 +111,6 @@ public interface ArticleMapper {
      */
     @Select("select count(*) from articles where is_published = 1")
     Integer countPublished();
+
+    List<ArticleTitleViewCountDTO> getViewTop10();
 }

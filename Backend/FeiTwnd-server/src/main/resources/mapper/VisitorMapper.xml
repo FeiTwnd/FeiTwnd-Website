@@ -57,4 +57,19 @@
             #{id}
         </foreach>
     </update>
+
+    <select id="getDailyNewVisitorStats" resultType="cc.feitwnd.dto.DailyVisitorCountDTO">
+        select date(create_time) as date, count(*) as count
+        from visitors
+        where date(create_time) between #{begin} and #{end}
+        group by date(create_time)
+        order by date
+    </select>
+
+    <select id="getProvinceDistribution" resultType="cc.feitwnd.dto.ProvinceCountDTO">
+        select ifnull(province, '未知') as province, count(*) as count
+        from visitors
+        group by province
+        order by count desc
+    </select>
 </mapper>

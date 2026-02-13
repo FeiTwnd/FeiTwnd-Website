@@ -1,6 +1,8 @@
 package cc.feitwnd.mapper;
 
 import cc.feitwnd.annotation.AutoFill;
+import cc.feitwnd.dto.DailyVisitorCountDTO;
+import cc.feitwnd.dto.ProvinceCountDTO;
 import cc.feitwnd.dto.VisitorPageQueryDTO;
 import cc.feitwnd.entity.Visitors;
 import cc.feitwnd.enumeration.OperationType;
@@ -9,6 +11,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Mapper
@@ -60,4 +63,14 @@ public interface VisitorMapper {
      */
     @Select("select count(*) from visitors")
     Integer countTotal();
+
+    /**
+     * 统计指定日期范围内每日新增访客数
+     */
+    List<DailyVisitorCountDTO> getDailyNewVisitorStats(LocalDate begin, LocalDate end);
+
+    /**
+     * 统计访客省份分布
+     */
+    List<ProvinceCountDTO> getProvinceDistribution();
 }

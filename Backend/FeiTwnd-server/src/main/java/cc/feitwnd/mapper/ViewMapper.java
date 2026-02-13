@@ -1,12 +1,16 @@
 package cc.feitwnd.mapper;
 
 import cc.feitwnd.annotation.AutoFill;
+import cc.feitwnd.dto.DailyViewCountDTO;
 import cc.feitwnd.dto.ViewPageQueryDTO;
 import cc.feitwnd.entity.Views;
 import cc.feitwnd.enumeration.OperationType;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
+
+import java.time.LocalDate;
+import java.util.List;
 
 @Mapper
 public interface ViewMapper {
@@ -34,4 +38,9 @@ public interface ViewMapper {
      */
     @Select("select count(*) from views where date(view_time) = curdate()")
     Integer countToday();
+
+    /**
+     * 统计指定日期范围内每日浏览量
+     */
+    List<DailyViewCountDTO> getDailyViewStats(LocalDate begin, LocalDate end);
 }

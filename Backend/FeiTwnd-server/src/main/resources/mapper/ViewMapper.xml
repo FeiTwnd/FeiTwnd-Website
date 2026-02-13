@@ -23,4 +23,12 @@
         </where>
         order by view_time desc
     </select>
+
+    <select id="getDailyViewStats" resultType="cc.feitwnd.dto.DailyViewCountDTO">
+        select date(view_time) as date, count(*) as count
+        from views
+        where date(view_time) between #{begin} and #{end}
+        group by date(view_time)
+        order by date
+    </select>
 </mapper>
