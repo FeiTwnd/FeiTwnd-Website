@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.feitwnd.mapper.ArticleCommentMapper">
+
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">
+        insert into article_comments
+            (article_id, content, content_html, root_id, parent_id, parent_nickname,
+             visitor_id, nickname, email_or_qq, location, user_agent_os, user_agent_browser,
+             is_approved, is_markdown, is_secret, is_notice, is_edited, is_admin_reply,
+             create_time, update_time)
+        values
+            (#{articleId}, #{content}, #{contentHtml}, #{rootId}, #{parentId}, #{parentNickname},
+             #{visitorId}, #{nickname}, #{emailOrQq}, #{location}, #{userAgentOs}, #{userAgentBrowser},
+             #{isApproved}, #{isMarkdown}, #{isSecret}, #{isNotice}, #{isEdited}, #{isAdminReply},
+             #{createTime}, #{updateTime})
+    </insert>
+
+    <select id="pageQuery" resultType="cc.feitwnd.entity.ArticleComments">
+        select * from article_comments
+        <where>
+            <if test="articleId != null">
+                and article_id = #{articleId}
+            </if>
+            <if test="isApproved != null">
+                and is_approved = #{isApproved}
+            </if>
+            <if test="startTime != null">
+                and create_time &gt;= #{startTime}
+            </if>
+            <if test="endTime != null">
+                and create_time &lt;= #{endTime}
+            </if>
+        </where>
+        order by create_time desc
+    </select>
+
+    <select id="getByArticleId" resultType="cc.feitwnd.entity.ArticleComments">
+        select * from article_comments
+        where article_id = #{articleId}
+        order by create_time desc
+    </select>
+
+    <update id="batchApprove">
+        update article_comments
+        set is_approved = 1, update_time = now()
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </update>
+
+    <delete id="batchDelete">
+        delete from article_comments
+        where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
