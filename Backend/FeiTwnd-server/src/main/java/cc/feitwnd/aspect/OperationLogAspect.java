@@ -67,10 +67,8 @@ public class OperationLogAspect {
             OperationLog operationLog = method.getAnnotation(OperationLog.class); // 获取方法上的注解对象
 
             if (operationLog != null) {
-                if (operationLog.async()) {
-                    // 异步记录操作日志
-                    saveLogAsyncService.saveLogAsync(joinPoint, result, error, operationLog);
-                }
+                // 异步记录操作日志
+                saveLogAsyncService.saveLogAsync(joinPoint, result, error, operationLog);
             }
         }
     }

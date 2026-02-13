@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.feitwnd.mapper.ArticleMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        insert into articles (title, slug, summary, cover_image, content_markdown, content_html,
+                              category_id, word_count, reading_time, is_published, publish_time,
+                              create_time, update_time)
+        values (#{title}, #{slug}, #{summary}, #{coverImage}, #{contentMarkdown}, #{contentHtml},
+                #{categoryId}, #{wordCount}, #{readingTime}, #{isPublished}, #{publishTime},
+                #{createTime}, #{updateTime})
+    </insert>
+
+    <select id="pageQuery" resultType="cc.feitwnd.vo.ArticleVO">
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
+               ac.name as category_name,
+               a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
+               a.is_published, a.publish_time, a.create_time, a.update_time
+        from articles a
+        left join article_categories ac on a.category_id = ac.id
+        <where>
+            <if test="title != null and title != ''">
+                and a.title like concat('%', #{title}, '%')
+            </if>
+            <if test="categoryId != null">
+                and a.category_id = #{categoryId}
+            </if>
+            <if test="isPublished != null">
+                and a.is_published = #{isPublished}
+            </if>
+        </where>
+        order by a.create_time desc
+    </select>
+
+    <update id="update">
+        update articles
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="slug != null">slug = #{slug},</if>
+            <if test="summary != null">summary = #{summary},</if>
+            <if test="coverImage != null">cover_image = #{coverImage},</if>
+            <if test="contentMarkdown != null">content_markdown = #{contentMarkdown},</if>
+            <if test="contentHtml != null">content_html = #{contentHtml},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="wordCount != null">word_count = #{wordCount},</if>
+            <if test="readingTime != null">reading_time = #{readingTime},</if>
+            <if test="isPublished != null">is_published = #{isPublished},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <delete id="batchDelete">
+        delete from articles where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="search" resultType="cc.feitwnd.vo.ArticleVO">
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
+               ac.name as category_name,
+               a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
+               a.is_published, a.publish_time, a.create_time, a.update_time
+        from articles a
+        left join article_categories ac on a.category_id = ac.id
+        where match(a.title, a.summary, a.content_markdown) against(#{keyword} in boolean mode)
+        order by a.create_time desc
+    </select>
+</mapper>

@@ -34,9 +34,4 @@ public @interface OperationLog {
      * 是否记录操作数据
      */
     boolean saveData() default true;
-
-    /**
-     * 是否异步记录
-     */
-    boolean async() default true;
 }
