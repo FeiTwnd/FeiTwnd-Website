@@ -2,6 +2,7 @@ package cc.feitwnd.service;
 
 import cc.feitwnd.dto.ViewPageQueryDTO;
 import cc.feitwnd.result.PageResult;
+import cc.feitwnd.vo.BlogReportVO;
 
 public interface ViewService {
     /**

@@ -54,4 +54,10 @@ public interface VisitorMapper {
      * @param ids
      */
     void batchUnblock(List<Long> ids);
+
+    /**
+     * 统计总访客数
+     */
+    @Select("select count(*) from visitors")
+    Integer countTotal();
 }

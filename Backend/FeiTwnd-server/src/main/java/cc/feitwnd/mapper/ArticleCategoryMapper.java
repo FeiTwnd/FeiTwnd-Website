@@ -55,4 +55,10 @@ public interface ArticleCategoryMapper {
             "where a.is_published = 1 " +
             "order by ac.sort asc, ac.id desc")
     List<ArticleCategories> getVisibleCategories();
+
+    /**
+     * 统计文章分类数
+     */
+    @Select("select count(*) from article_categories")
+    Integer countTotal();
 }

@@ -104,4 +104,10 @@ public interface ArticleMapper {
      */
     @Update("update articles set like_count = case when like_count > 0 then like_count - 1 else 0 end where id = #{id}")
     void decrementLikeCount(Long id);
+
+    /**
+     * 统计已发布文章数
+     */
+    @Select("select count(*) from articles where is_published = 1")
+    Integer countPublished();
 }

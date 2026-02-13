@@ -6,6 +6,7 @@ import cc.feitwnd.entity.Views;
 import cc.feitwnd.enumeration.OperationType;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 @Mapper
 public interface ViewMapper {
@@ -21,4 +22,16 @@ public interface ViewMapper {
      * @return
      */
     Page<Views> pageQuery(ViewPageQueryDTO viewPageQueryDTO);
+
+    /**
+     * 统计总浏览量
+     */
+    @Select("select count(*) from views")
+    Integer countTotal();
+
+    /**
+     * 统计今日浏览量
+     */
+    @Select("select count(*) from views where date(view_time) = curdate()")
+    Integer countToday();
 }
