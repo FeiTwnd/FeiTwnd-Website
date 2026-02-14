@@ -5,7 +5,7 @@ import cc.feitwnd.constant.StatusConstant;
 import cc.feitwnd.context.BaseContext;
 import cc.feitwnd.entity.OperationLogs;
 import cc.feitwnd.service.SaveLogAsyncService;
-import cc.feitwnd.service.operationLogService;
+import cc.feitwnd.service.OperationLogService;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class SaveLogAsyncServiceImpl implements SaveLogAsyncService {
 
     @Autowired
-    private operationLogService operationLogService;
+    private OperationLogService operationLogService;
 
     /**
      * SpEL表达式解析器

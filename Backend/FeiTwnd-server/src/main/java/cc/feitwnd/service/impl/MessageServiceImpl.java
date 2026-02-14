@@ -9,7 +9,7 @@ import cc.feitwnd.entity.Messages;
 import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.MessageMapper;
 import cc.feitwnd.result.PageResult;
-import cc.feitwnd.service.EmailService;
+import cc.feitwnd.service.AsyncEmailService;
 import cc.feitwnd.service.MessageService;
 import cc.feitwnd.service.UserAgentService;
 import cc.feitwnd.utils.IpUtil;
@@ -44,7 +44,7 @@ public class MessageServiceImpl implements MessageService {
     private UserAgentService userAgentService;
 
     @Autowired
-    private EmailService emailService;
+    private AsyncEmailService asyncEmailService;
 
     // 邮箱正则
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
@@ -249,7 +249,7 @@ public class MessageServiceImpl implements MessageService {
                     && parentMessage.getIsNotice() == 1
                     && parentMessage.getEmailOrQq() != null
                     && parentMessage.getEmailOrQq().contains("@")) {
-                emailService.sendReplyNotification(
+                asyncEmailService.sendReplyNotificationAsync(
                         parentMessage.getEmailOrQq(),
                         parentMessage.getNickname(),
                         parentMessage.getContent(),

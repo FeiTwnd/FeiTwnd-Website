@@ -9,7 +9,7 @@ import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.ArticleCommentMapper;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleCommentService;
-import cc.feitwnd.service.EmailService;
+import cc.feitwnd.service.AsyncEmailService;
 import cc.feitwnd.service.UserAgentService;
 import cc.feitwnd.utils.IpUtil;
 import cc.feitwnd.utils.MarkdownUtil;
@@ -43,7 +43,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     private UserAgentService userAgentService;
 
     @Autowired
-    private EmailService emailService;
+    private AsyncEmailService asyncEmailService;
 
     /**
      * 分页条件查询评论（时间、是否审核）
@@ -223,7 +223,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
                     && parentComment.getIsNotice() == 1
                     && parentComment.getEmailOrQq() != null
                     && parentComment.getEmailOrQq().contains("@")) {
-                emailService.sendReplyNotification(
+                asyncEmailService.sendReplyNotificationAsync(
                         parentComment.getEmailOrQq(),
                         parentComment.getNickname(),
                         parentComment.getContent(),

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
-<mapper namespace="cc.feitwnd.mapper.operationLogMapper">
+<mapper namespace="cc.feitwnd.mapper.OperationLogMapper">
     <insert id="save">
         insert into operation_logs (admin_id, operation_type, operation_target, target_id, operate_data, result, error_message, operation_time)
         values (#{adminId}, #{operationType}, #{operationTarget}, #{targetId}, #{operateData}, #{result}, #{errorMessage}, #{operationTime})

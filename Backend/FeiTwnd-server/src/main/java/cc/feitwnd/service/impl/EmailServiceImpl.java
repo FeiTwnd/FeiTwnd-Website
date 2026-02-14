@@ -9,7 +9,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -142,9 +141,8 @@ public class EmailServiceImpl implements EmailService {
     }
 
     /**
-     * 发送评论/留言回复通知邮件（异步）
+     * 发送评论/留言回复通知邮件
      */
-    @Async
     public void sendReplyNotification(String toEmail, String parentNickname, String parentContent,
                                       String replyNickname, String replyContent, String type) {
         try {

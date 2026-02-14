@@ -40,7 +40,7 @@ public class CommonServiceImpl implements CommonService {
             byte[] bytes = file.getBytes();
 
             // 如果是图片，先压缩再上传
-            if(aliOssUtil.getFileCategory(extension)=="image"){
+            if(aliOssUtil.getFileCategory(extension).equals("image")){
                 bytes = imageCompressUtil.compress(file);
                 extension = imageProperties.getOutPutFormat();
             }

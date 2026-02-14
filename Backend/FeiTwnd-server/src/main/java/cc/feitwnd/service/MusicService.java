@@ -7,8 +7,6 @@ import cc.feitwnd.vo.MusicVO;
 
 import java.util.List;
 
-import java.util.List;
-
 public interface MusicService {
     /**
      * 添加音乐

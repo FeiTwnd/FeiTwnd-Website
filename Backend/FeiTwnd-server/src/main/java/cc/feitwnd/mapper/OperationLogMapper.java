@@ -6,7 +6,7 @@ import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 
 @Mapper
-public interface operationLogMapper {
+public interface OperationLogMapper {
     /**
      * 保存操作日志
      * @param operationLogs

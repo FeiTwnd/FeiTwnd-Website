@@ -4,7 +4,7 @@ import cc.feitwnd.dto.OperationLogPageQueryDTO;
 import cc.feitwnd.entity.OperationLogs;
 import cc.feitwnd.result.PageResult;
 
-public interface operationLogService {
+public interface OperationLogService {
     /**
      * 保存操作日志
      * @param operationLogs

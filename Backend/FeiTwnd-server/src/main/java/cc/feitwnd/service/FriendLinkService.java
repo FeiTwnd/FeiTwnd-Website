@@ -5,8 +5,6 @@ import cc.feitwnd.vo.FriendLinkVO;
 
 import java.util.List;
 
-import java.util.List;
-
 public interface FriendLinkService {
     /**
      * 管理端获取所有友情链接

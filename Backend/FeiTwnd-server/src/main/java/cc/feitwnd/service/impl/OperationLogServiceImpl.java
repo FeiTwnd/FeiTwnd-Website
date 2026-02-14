@@ -2,9 +2,9 @@ package cc.feitwnd.service.impl;
 
 import cc.feitwnd.dto.OperationLogPageQueryDTO;
 import cc.feitwnd.entity.OperationLogs;
-import cc.feitwnd.mapper.operationLogMapper;
+import cc.feitwnd.mapper.OperationLogMapper;
 import cc.feitwnd.result.PageResult;
-import cc.feitwnd.service.operationLogService;
+import cc.feitwnd.service.OperationLogService;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class operationLogServiceImpl implements operationLogService {
+public class OperationLogServiceImpl implements OperationLogService {
 
     @Autowired
-    private operationLogMapper operationLogMapper;
+    private OperationLogMapper operationLogMapper;
 
     /**
      * 保存操作日志

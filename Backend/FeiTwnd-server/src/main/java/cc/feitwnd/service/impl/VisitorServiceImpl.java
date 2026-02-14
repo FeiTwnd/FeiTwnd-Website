@@ -1,15 +1,12 @@
 package cc.feitwnd.service.impl;
 
-import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.constant.StatusConstant;
 import cc.feitwnd.dto.VisitorPageQueryDTO;
 import cc.feitwnd.dto.VisitorRecordDTO;
-import cc.feitwnd.entity.Views;
 import cc.feitwnd.entity.Visitors;
-import cc.feitwnd.exception.BlockedException;
-import cc.feitwnd.mapper.ViewMapper;
 import cc.feitwnd.mapper.VisitorMapper;
 import cc.feitwnd.result.PageResult;
+import cc.feitwnd.service.AsyncVisitorService;
 import cc.feitwnd.service.BlockService;
 import cc.feitwnd.service.FingerprintService;
 import cc.feitwnd.service.VisitorService;
@@ -23,13 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -38,7 +31,7 @@ public class VisitorServiceImpl implements VisitorService {
     @Autowired
     private VisitorMapper visitorMapper;
     @Autowired
-    private ViewMapper viewMapper;
+    private AsyncVisitorService asyncVisitorService;
     @Autowired
     private RedisTemplate redisTemplate;
     @Autowired
@@ -55,7 +48,6 @@ public class VisitorServiceImpl implements VisitorService {
      * @param request
      * @return
      */
-    @Transactional
     public VisitorRecordVO recordVisitorViewInfo(VisitorRecordDTO visitorRecordDTO, HttpServletRequest request) {
 
         // 生成/获取会话Id
@@ -64,9 +56,9 @@ public class VisitorServiceImpl implements VisitorService {
         // 生成设备指纹
         String fingerprint = fingerprintService.generateVisitorFingerprint(visitorRecordDTO,request);
 
-        // 获取IP和地理位置信息
+        // 获取IP（轻量操作，同步执行）
         String ip = IpUtil.getClientIp(request);
-        Map<String, String> geoInfo = IpUtil.getGeoInfo(ip);
+        String userAgent = request.getHeader("User-Agent");
 
         // 检查访客是否在缓存中有封禁记录
         blockService.checkIfBlocked(fingerprint);
@@ -74,13 +66,18 @@ public class VisitorServiceImpl implements VisitorService {
         // 检查请求频率
         blockService.checkRateLimit(fingerprint,ip);
 
-        // 查找或创建访客记录
-        Visitors visitor = findOrCreateVisitor(fingerprint,sessionId,request,ip,geoInfo);
+        // 查找或创建访客记录（不含地理位置，地理位置异步填充）
+        Visitors visitor = findOrCreateVisitor(fingerprint, sessionId, userAgent, ip);
 
-        // 记录本次浏览
-        recordView(visitor, visitorRecordDTO, ip, request);
+        // 异步处理：IP地理位置查询 + 访客地理信息更新 + 浏览记录写入
+        asyncVisitorService.processGeoAndRecordViewAsync(
+                visitor, ip, userAgent,
+                visitorRecordDTO.getPagePath(),
+                visitorRecordDTO.getReferer(),
+                visitorRecordDTO.getPageTitle()
+        );
 
-        // 封装VO
+        // 封装VO（立即返回，不等待异步操作完成）
         VisitorRecordVO visitorRecordVO = VisitorRecordVO.builder()
                 .visitorFingerprint(fingerprint)
                 .sessionId(sessionId)
@@ -107,30 +104,25 @@ public class VisitorServiceImpl implements VisitorService {
 
 
     /**
-     * 查找或创建访客记录
+     * 查找或创建访客记录（不含地理位置，地理位置由异步服务填充）
      * @param fingerprint
      * @param sessionId
-     * @param request
+     * @param userAgent
      * @param ip
-     * @param geoInfo
      * @return
      */
     private Visitors findOrCreateVisitor(String fingerprint, String sessionId,
-                                         HttpServletRequest request, String ip,
-                                         Map<String, String> geoInfo){
+                                         String userAgent, String ip){
         // 尝试从Redis中获取访客信息
         String cacheKey = VISITOR_KEY + fingerprint;
         Visitors visitor = (Visitors) redisTemplate.opsForValue().get(cacheKey);
 
         if(visitor!=null){
-            // 缓存命中,更新信息
+            // 缓存命中,更新基本信息
             visitor.setSessionId(sessionId);
             visitor.setIp(ip);
-            visitor.setLongitude(geoInfo.get("longitude"));
-            visitor.setLatitude(geoInfo.get("latitude"));
-            visitor.setCountry(geoInfo.get("country"));
-            visitor.setProvince(geoInfo.get("province"));
-            visitor.setCity(geoInfo.get("city"));
+            visitor.setLastVisitTime(LocalDateTime.now());
+            visitor.setTotalViews(visitor.getTotalViews() + 1);
             visitorMapper.updateById(visitor);
             return visitor;
         }
@@ -139,26 +131,20 @@ public class VisitorServiceImpl implements VisitorService {
         visitor = visitorMapper.findVisitorByFingerprint(fingerprint);
 
         if(visitor==null){
-            // 新访客：创建记录
+            // 新访客：创建记录（地理位置字段由异步任务填充）
             visitor = Visitors.builder()
                     .fingerprint(fingerprint)
                     .sessionId(sessionId)
                     .ip(ip)
-                    .userAgent(request.getHeader("User-Agent"))
-                    .country(geoInfo.get("country"))
-                    .province(geoInfo.get("province"))
-                    .city(geoInfo.get("city"))
-                    .longitude(geoInfo.get("longitude"))
-                    .latitude(geoInfo.get("latitude"))
+                    .userAgent(userAgent)
                     .firstVisitTime(LocalDateTime.now())
                     .lastVisitTime(LocalDateTime.now())
                     .totalViews(1L)
                     .isBlocked(StatusConstant.DISABLE)
                     .build();
             visitorMapper.insertVisitor(visitor);
-            visitor.setId(visitor.getId());
         }else{
-            // 老访客：更新信息
+            // 老访客：更新基本信息
             visitor.setLastVisitTime(LocalDateTime.now());
             visitor.setTotalViews(visitor.getTotalViews() + 1);
 
@@ -168,40 +154,10 @@ public class VisitorServiceImpl implements VisitorService {
                 visitor.setSessionId(sessionId);
             }
 
-            // 如果IP变化，更新地理位置
-            if (!ip.equals(visitor.getIp())) {
-                visitor.setIp(ip);
-                visitor.setLongitude(geoInfo.get("longitude"));
-                visitor.setLatitude(geoInfo.get("latitude"));
-                visitor.setCountry(geoInfo.get("country"));
-                visitor.setProvince(geoInfo.get("province"));
-                visitor.setCity(geoInfo.get("city"));
-            }
-
+            visitor.setIp(ip);
             visitorMapper.updateById(visitor);
         }
         return visitor;
-    }
-
-    /**
-     * 记录本次浏览
-     * @param visitor
-     * @param dto
-     * @param ip
-     * @param request
-     */
-    private void recordView(Visitors visitor, VisitorRecordDTO dto,
-                            String ip, HttpServletRequest request) {
-        Views view = Views.builder()
-                .visitorId(visitor.getId())
-                .pagePath(dto.getPagePath())
-                .referer(dto.getReferer())
-                .pageTitle(dto.getPageTitle())
-                .ipAddress(ip)
-                .userAgent(request.getHeader("User-Agent"))
-                .viewTime(LocalDateTime.now())
-                .build();
-        viewMapper.insert(view);
     }
 
     /**
