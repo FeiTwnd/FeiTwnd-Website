@@ -31,4 +31,11 @@
         group by date(view_time)
         order by date
     </select>
+
+    <delete id="batchDelete">
+        delete from views where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

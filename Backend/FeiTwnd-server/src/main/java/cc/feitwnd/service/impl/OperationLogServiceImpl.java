@@ -38,4 +38,12 @@ public class OperationLogServiceImpl implements OperationLogService {
         List<OperationLogs> records = page.getResult();
         return new PageResult(total, records);
     }
+
+    /**
+     * 批量删除操作日志
+     * @param ids
+     */
+    public void batchDelete(List<Long> ids) {
+        operationLogMapper.batchDelete(ids);
+    }
 }

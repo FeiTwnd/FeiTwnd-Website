@@ -25,4 +25,11 @@
         </where>
         order by operation_time desc
     </select>
+
+    <delete id="batchDelete">
+        delete from operation_logs where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

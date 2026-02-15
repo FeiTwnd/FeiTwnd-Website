@@ -2,7 +2,8 @@ package cc.feitwnd.service;
 
 import cc.feitwnd.dto.ViewPageQueryDTO;
 import cc.feitwnd.result.PageResult;
-import cc.feitwnd.vo.BlogReportVO;
+
+import java.util.List;
 
 public interface ViewService {
     /**
@@ -11,4 +12,10 @@ public interface ViewService {
      * @return
      */
     PageResult pageQuery(ViewPageQueryDTO viewPageQueryDTO);
+
+    /**
+     * 批量删除浏览记录
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
 }

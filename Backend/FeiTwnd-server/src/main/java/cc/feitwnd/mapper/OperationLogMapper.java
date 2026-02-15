@@ -5,6 +5,8 @@ import cc.feitwnd.entity.OperationLogs;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
 
+import java.util.List;
+
 @Mapper
 public interface OperationLogMapper {
     /**
@@ -19,4 +21,10 @@ public interface OperationLogMapper {
      * @return
      */
     Page<OperationLogs> pageQuery(OperationLogPageQueryDTO operationLogPageQueryDTO);
+
+    /**
+     * 批量删除操作日志
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
 }

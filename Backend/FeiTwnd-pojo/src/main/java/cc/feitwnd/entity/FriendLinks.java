@@ -34,6 +34,9 @@ public class FriendLinks implements Serializable {
     // 网站描述
     private String description;
 
+    // 排序，越小越靠前
+    private Integer sort;
+
     // 是否可见
     private Integer isVisible;
 

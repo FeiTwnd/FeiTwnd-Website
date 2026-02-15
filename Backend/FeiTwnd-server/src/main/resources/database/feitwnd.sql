@@ -288,6 +288,7 @@ create table friend_links(
     url varchar(100) not null comment '网站地址',
     avatar_url varchar(255) comment '头像url',
     description varchar(255) comment '网站描述',
+    sort int default 0 comment '排序，越小越靠前',
     is_visible tinyint default 1 comment '是否可见',
     create_time datetime comment '创建时间',
     update_time datetime comment '更新时间'

@@ -30,4 +30,12 @@ public class ViewServiceImpl implements ViewService {
         List<Views> records = page.getResult();
         return new PageResult(total, records);
     }
+
+    /**
+     * 批量删除浏览记录
+     * @param ids
+     */
+    public void batchDelete(List<Long> ids) {
+        viewMapper.batchDelete(ids);
+    }
 }

@@ -68,6 +68,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
                     .url(friendLink.getUrl())
                     .avatarUrl(friendLink.getAvatarUrl())
                     .description(friendLink.getDescription())
+                    .sort(friendLink.getSort())
                     .build()).toList();
             return friendLinkVOList;
         }

@@ -6,9 +6,9 @@ import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ViewService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * 管理端浏览记录接口
@@ -33,4 +33,15 @@ public class ViewController {
         return Result.success(pageResult);
     }
 
+    /**
+     * 批量删除浏览记录
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public Result batchDelete(@RequestParam List<Long> ids) {
+        log.info("批量删除浏览记录,{}", ids);
+        viewService.batchDelete(ids);
+        return Result.success();
+    }
 }

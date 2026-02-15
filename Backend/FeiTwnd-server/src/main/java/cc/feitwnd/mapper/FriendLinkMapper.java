@@ -17,7 +17,7 @@ public interface FriendLinkMapper {
      * 获取所有友情链接
      * @return
      */
-    @Select("select * from friend_links")
+    @Select("select * from friend_links order by sort asc, id asc")
     List<FriendLinks> getAllFriendLink();
 
     /**
@@ -47,6 +47,6 @@ public interface FriendLinkMapper {
      * 获取可见友情链接
      * @return
      */
-    @Select("select * from friend_links where is_visible = 1")
+    @Select("select * from friend_links where is_visible = 1 order by sort asc, id asc")
     List<FriendLinks> getVisibleFriendLink();
 }

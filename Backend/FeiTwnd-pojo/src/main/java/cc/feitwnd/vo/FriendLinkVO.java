@@ -25,4 +25,7 @@ public class FriendLinkVO implements Serializable {
 
     // 网站描述
     private String description;
+
+    // 排序
+    private Integer sort;
 }

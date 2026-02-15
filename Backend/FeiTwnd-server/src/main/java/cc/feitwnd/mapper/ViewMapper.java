@@ -43,4 +43,10 @@ public interface ViewMapper {
      * 统计指定日期范围内每日浏览量
      */
     List<DailyViewCountDTO> getDailyViewStats(LocalDate begin, LocalDate end);
+
+    /**
+     * 批量删除浏览记录
+     * @param ids
+     */
+    void batchDelete(List<Long> ids);
 }
