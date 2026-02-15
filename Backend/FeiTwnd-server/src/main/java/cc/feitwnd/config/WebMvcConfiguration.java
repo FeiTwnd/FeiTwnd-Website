@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
@@ -34,6 +35,24 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/admin/admin/sendCode");
     }
 
+    /**
+     * 配置跨域支持
+     * @param registry
+     */
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/api/**")
+                .allowedOriginPatterns("*")  // 允许所有源，或指定域名
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "FETCH", "OPTIONS")  // 允许的HTTP方法
+                .allowedHeaders("*")
+                .allowCredentials(true)
+                .maxAge(3600);  // 预检请求缓存时间
+    }
+
+    /**
+     * 扩展消息转换器, 将Java对象转换为JSON格式的响应数据
+     * @param converters
+     */
     @Override
     protected void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
         log.info("扩展消息转换器...");
