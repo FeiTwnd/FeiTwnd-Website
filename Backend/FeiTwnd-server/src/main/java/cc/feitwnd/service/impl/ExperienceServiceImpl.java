@@ -7,6 +7,7 @@ import cc.feitwnd.vo.ExperienceVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -70,6 +71,6 @@ public class ExperienceServiceImpl implements ExperienceService {
             ).toList();
             return experienceVOList;
         }
-        return null;
+        return Collections.emptyList();
     }
 }

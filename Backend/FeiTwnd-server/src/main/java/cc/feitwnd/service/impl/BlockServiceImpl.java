@@ -40,7 +40,7 @@ public class BlockServiceImpl implements BlockService {
         // 检查数据库
         Visitors visitor = visitorMapper.findVisitorByFingerprint(fingerprint);
         if (visitor != null && visitor.getIsBlocked() == 1) {
-            if (visitor.getExpiresAt() == null || visitor.getExpiresAt().isBefore(LocalDateTime.now())) {
+            if (visitor.getExpiresAt() == null || visitor.getExpiresAt().isAfter(LocalDateTime.now())) {
                 // 封禁有效，更新Redis缓存
                 redisTemplate.opsForValue().set(blockedKey, "1", 1, TimeUnit.DAYS);
                 throw new BlockedException(MessageConstant.VISITOR_BLOCKED);

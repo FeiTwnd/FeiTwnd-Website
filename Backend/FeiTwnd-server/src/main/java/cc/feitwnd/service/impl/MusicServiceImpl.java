@@ -11,6 +11,7 @@ import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -87,6 +88,6 @@ public class MusicServiceImpl implements MusicService {
             ).toList();
             return musicVOList;
         }
-        return null;
+        return Collections.emptyList();
     }
 }

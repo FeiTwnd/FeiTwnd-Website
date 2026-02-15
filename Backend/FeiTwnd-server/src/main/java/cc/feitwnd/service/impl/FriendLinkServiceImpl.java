@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -26,7 +28,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
         if(friendLinkList != null && friendLinkList.size() > 0){
             return friendLinkList;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**
@@ -69,6 +71,6 @@ public class FriendLinkServiceImpl implements FriendLinkService {
                     .build()).toList();
             return friendLinkVOList;
         }
-        return null;
+        return Collections.emptyList();
     }
 }

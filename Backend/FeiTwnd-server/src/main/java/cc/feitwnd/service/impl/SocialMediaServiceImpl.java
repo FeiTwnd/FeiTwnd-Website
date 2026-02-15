@@ -7,6 +7,7 @@ import cc.feitwnd.vo.SocialMediaVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -32,7 +33,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
                     .sort(socialMedia.getSort())
                     .build()).toList();
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**
@@ -45,7 +46,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
         if (socialMediaList != null && socialMediaList.size() > 0) {
             return socialMediaList;
         }
-        return null;
+        return Collections.emptyList();
     }
 
     /**

@@ -40,7 +40,8 @@ public class TokenServiceImpl implements TokenService {
 
         // 将token存储至Redis,用set可以多端登录
         String tokenKey = TOKEN_PREFIX + userId;
-        redis.opsForSet().add(tokenKey,token,jwtProperties.getTtl(), TimeUnit.MILLISECONDS);
+        redis.opsForSet().add(tokenKey, token);
+        redis.expire(tokenKey, jwtProperties.getTtl(), TimeUnit.MILLISECONDS);
 
         return token;
     }

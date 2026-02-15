@@ -55,7 +55,7 @@ public class MessageController {
      * @return
      */
     @DeleteMapping
-    @OperationLog(value = OperationType.UPDATE, target = "message", targetId = "#ids")
+    @OperationLog(value = OperationType.DELETE, target = "message", targetId = "#ids")
     public Result<String> batchDelete(@RequestParam List<Long> ids) {
         log.info("批量删除留言: {}", ids);
         messageService.batchDelete(ids);
