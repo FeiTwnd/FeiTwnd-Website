@@ -26,6 +26,10 @@ import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -56,10 +60,20 @@ public class ArticleServiceImpl implements ArticleService {
     @Autowired
     private WebsiteProperties websiteProperties;
 
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    private static final String VIEW_COUNT_KEY = "article:viewCount";
+
     /**
      * 创建文章
      * @param articleDTO
      */
+    @Caching(evict = {
+            @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "articleArchive", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void createArticle(ArticleDTO articleDTO) {
         Articles articles = new Articles();
         BeanUtils.copyProperties(articleDTO, articles);
@@ -121,6 +135,12 @@ public class ArticleServiceImpl implements ArticleService {
      * 更新文章
      * @param articleDTO
      */
+    @Caching(evict = {
+            @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "articleDetail", allEntries = true),
+            @CacheEvict(value = "articleArchive", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void updateArticle(ArticleDTO articleDTO) {
         Articles articles = articleMapper.getById(articleDTO.getId());
         if (articles == null) {
@@ -155,6 +175,12 @@ public class ArticleServiceImpl implements ArticleService {
      * 批量删除文章
      * @param ids
      */
+    @Caching(evict = {
+            @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "articleDetail", allEntries = true),
+            @CacheEvict(value = "articleArchive", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void batchDelete(List<Long> ids) {
         articleTagMapper.batchDeleteRelationsByArticleIds(ids);
         articleMapper.batchDelete(ids);
@@ -165,6 +191,12 @@ public class ArticleServiceImpl implements ArticleService {
      * @param id
      * @param isPublished
      */
+    @Caching(evict = {
+            @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "articleDetail", allEntries = true),
+            @CacheEvict(value = "articleArchive", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void publishOrCancel(Long id, Integer isPublished) {
         Articles articles = articleMapper.getById(id);
         if (articles == null) {
@@ -240,8 +272,8 @@ public class ArticleServiceImpl implements ArticleService {
         if (articleDetail == null) {
             throw new ArticleException(MessageConstant.ARTICLE_NOT_FOUND);
         }
-        // 浏览量+1
-        articleMapper.incrementViewCount(articleDetail.getId());
+        // 浏览量+1（写入Redis，定时同步MySQL）
+        redisTemplate.opsForHash().increment(VIEW_COUNT_KEY, articleDetail.getId().toString(), 1);
         articleDetail.setViewCount(articleDetail.getViewCount() + 1);
 
         // 填充标签名称列表
@@ -269,6 +301,7 @@ public class ArticleServiceImpl implements ArticleService {
         return new PageResult(pageResult.getTotal(), pageResult.getResult());
     }
 
+    @Cacheable(value = "articleArchive", key = "'all'")
     public List<ArticleArchiveVO> getArchive() {
         List<ArticleArchiveItemVO> allArticles = articleMapper.getArchiveList();
         // 按年月分组（利用数据库的 publish_year, publish_month 生成列）

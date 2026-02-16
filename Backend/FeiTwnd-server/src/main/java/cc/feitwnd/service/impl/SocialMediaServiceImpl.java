@@ -5,6 +5,8 @@ import cc.feitwnd.mapper.SocialMediaMapper;
 import cc.feitwnd.service.SocialMediaService;
 import cc.feitwnd.vo.SocialMediaVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -20,6 +22,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
      * 获取可见社交媒体信息
      * @return
      */
+    @Cacheable(value = "socialMedia", key = "'visible'")
     public List<SocialMediaVO> getVisibleSocialMedia() {
         // 获取数据库数据
         List<SocialMedia> socialMediaList = socialMediaMapper.getVisibleSocialMedia();
@@ -40,6 +43,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
      * 获取所有社交媒体信息
      * @return
      */
+    @Cacheable(value = "socialMedia", key = "'all'")
     public List<SocialMedia> getAllSocialMedia() {
         // 获取数据库数据
         List<SocialMedia> socialMediaList = socialMediaMapper.getAllSocialMedia();
@@ -53,6 +57,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
      * 添加社交媒体
      * @param socialMedia
      */
+    @CacheEvict(value = "socialMedia", allEntries = true)
     public void addSocialMedia(SocialMedia socialMedia) {
         // 添加到数据库
         socialMediaMapper.insert(socialMedia);
@@ -62,6 +67,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
      * 批量删除社交媒体
      * @param ids
      */
+    @CacheEvict(value = "socialMedia", allEntries = true)
     public void batchDelete(List<Long> ids) {
         socialMediaMapper.batchDelete(ids);
     }
@@ -70,6 +76,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
      * 修改社交媒体
      * @param socialMedia
      */
+    @CacheEvict(value = "socialMedia", allEntries = true)
     public void updateSocialMedia(SocialMedia socialMedia) {
         // 更新到数据库
         socialMediaMapper.updateById(socialMedia);

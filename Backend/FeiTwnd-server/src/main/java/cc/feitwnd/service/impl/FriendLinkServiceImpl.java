@@ -6,6 +6,8 @@ import cc.feitwnd.service.FriendLinkService;
 import cc.feitwnd.vo.FriendLinkVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -23,6 +25,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
      * 获取所有友链
      * @return
      */
+    @Cacheable(value = "friendLinks", key = "'all'")
     public List<FriendLinks> getAllFriendLink() {
         List<FriendLinks> friendLinkList = friendLinkMapper.getAllFriendLink();
         if(friendLinkList != null && friendLinkList.size() > 0){
@@ -35,6 +38,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
      * 添加友链
      * @param friendLink
      */
+    @CacheEvict(value = "friendLinks", allEntries = true)
     public void addFriendLink(FriendLinks friendLink) {
         friendLinkMapper.insert(friendLink);
     }
@@ -43,6 +47,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
      * 批量删除友链
      * @param ids
      */
+    @CacheEvict(value = "friendLinks", allEntries = true)
     public void batchDelete(List<Long> ids) {
         friendLinkMapper.batchDelete(ids);
     }
@@ -51,6 +56,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
      * 修改友链
      * @param friendLink
      */
+    @CacheEvict(value = "friendLinks", allEntries = true)
     public void updateFriendLink(FriendLinks friendLink) {
         friendLinkMapper.update(friendLink);
     }
@@ -59,6 +65,7 @@ public class FriendLinkServiceImpl implements FriendLinkService {
      * 博客端获取可见的友链
      * @return
      */
+    @Cacheable(value = "friendLinks", key = "'visible'")
     public List<FriendLinkVO> getVisibleFriendLink() {
         List<FriendLinks> friendLinkList = friendLinkMapper.getVisibleFriendLink();
         if(friendLinkList != null && friendLinkList.size() > 0){

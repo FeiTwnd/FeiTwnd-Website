@@ -6,6 +6,8 @@ import cc.feitwnd.service.SkillService;
 import cc.feitwnd.vo.SkillVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -22,6 +24,7 @@ public class SkillServiceImpl implements SkillService {
      * 获取所有技能信息
      * @return
      */
+    @Cacheable(value = "skills", key = "'all'")
     public List<Skills> getAllSkill() {
         List<Skills> skillList = skillMapper.getAllSkill();
         return skillList;
@@ -31,6 +34,7 @@ public class SkillServiceImpl implements SkillService {
      * 添加技能信息
      * @param skills
      */
+    @CacheEvict(value = "skills", allEntries = true)
     public void addSkill(Skills skills) {
         skillMapper.addSkill(skills);
     }
@@ -39,6 +43,7 @@ public class SkillServiceImpl implements SkillService {
      * 批量删除技能信息
      * @param ids
      */
+    @CacheEvict(value = "skills", allEntries = true)
     public void batchDelete(List<Long> ids) {
         skillMapper.batchDelete(ids);
     }
@@ -47,6 +52,7 @@ public class SkillServiceImpl implements SkillService {
      * 修改技能信息
      * @param skills
      */
+    @CacheEvict(value = "skills", allEntries = true)
     public void updateSkill(Skills skills) {
         skillMapper.updateSkill(skills);
     }
@@ -55,6 +61,7 @@ public class SkillServiceImpl implements SkillService {
      * 简历端获取技能信息
      * @return
      */
+    @Cacheable(value = "skills", key = "'visible'")
     public List<SkillVO> getSkillVO() {
         List<Skills> skills = skillMapper.getVisibleSkill();
         if(skills!=null && !skills.isEmpty()){

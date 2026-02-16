@@ -5,6 +5,8 @@ import cc.feitwnd.mapper.ExperienceMapper;
 import cc.feitwnd.service.ExperienceService;
 import cc.feitwnd.vo.ExperienceVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -21,6 +23,7 @@ public class ExperienceServiceImpl implements ExperienceService {
      * @param type
      * @return
      */
+    @Cacheable(value = "experiences", key = "'type_' + #type")
     public List<Experiences> getExperience(Integer type) {
         List<Experiences> experienceList = experienceMapper.getExperienceByType(type);
         return experienceList;
@@ -30,6 +33,7 @@ public class ExperienceServiceImpl implements ExperienceService {
      * 添加经历信息
      * @param experiences
      */
+    @CacheEvict(value = "experiences", allEntries = true)
     public void addExperience(Experiences experiences) {
         experienceMapper.insert(experiences);
     }
@@ -38,6 +42,7 @@ public class ExperienceServiceImpl implements ExperienceService {
      * 修改经历信息
      * @param experiences
      */
+    @CacheEvict(value = "experiences", allEntries = true)
     public void updateExperience(Experiences experiences) {
        experienceMapper.update(experiences);
     }
@@ -46,6 +51,7 @@ public class ExperienceServiceImpl implements ExperienceService {
      * 批量删除经历信息
      * @param ids
      */
+    @CacheEvict(value = "experiences", allEntries = true)
     public void batchDelete(List<Long> ids) {
         experienceMapper.batchDelete(ids);
     }
@@ -54,6 +60,7 @@ public class ExperienceServiceImpl implements ExperienceService {
      * cv端获取全部经历信息
      * @return
      */
+    @Cacheable(value = "experiences", key = "'all'")
     public List<ExperienceVO> getAllExperience() {
         List<Experiences> experienceList = experienceMapper.getAllExperience();
         if(experienceList != null && !experienceList.isEmpty()) {

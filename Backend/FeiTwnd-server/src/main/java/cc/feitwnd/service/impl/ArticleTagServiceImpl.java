@@ -4,6 +4,8 @@ import cc.feitwnd.entity.ArticleTags;
 import cc.feitwnd.mapper.ArticleTagMapper;
 import cc.feitwnd.service.ArticleTagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +22,7 @@ public class ArticleTagServiceImpl implements ArticleTagService {
      * 获取所有标签
      * @return
      */
+    @Cacheable(value = "articleTags", key = "'all'")
     public List<ArticleTags> listAll() {
         List<ArticleTags> list = articleTagMapper.listAll();
         return list != null ? list : Collections.emptyList();
@@ -29,6 +32,7 @@ public class ArticleTagServiceImpl implements ArticleTagService {
      * 添加标签
      * @param articleTag
      */
+    @CacheEvict(value = "articleTags", allEntries = true)
     public void addTag(ArticleTags articleTag) {
         articleTagMapper.insert(articleTag);
     }
@@ -37,6 +41,7 @@ public class ArticleTagServiceImpl implements ArticleTagService {
      * 修改标签
      * @param articleTag
      */
+    @CacheEvict(value = "articleTags", allEntries = true)
     public void updateTag(ArticleTags articleTag) {
         articleTagMapper.update(articleTag);
     }
@@ -45,6 +50,7 @@ public class ArticleTagServiceImpl implements ArticleTagService {
      * 批量删除标签
      * @param ids
      */
+    @CacheEvict(value = "articleTags", allEntries = true)
     @Transactional
     public void batchDelete(List<Long> ids) {
         // 先删除关联关系中涉及这些标签的记录
@@ -55,6 +61,7 @@ public class ArticleTagServiceImpl implements ArticleTagService {
      * 获取标签
      * @return
      */
+    @Cacheable(value = "articleTags", key = "'visible'")
     public List<ArticleTags> getVisibleTags() {
         List<ArticleTags> list = articleTagMapper.getVisibleTags();
         return list != null ? list : Collections.emptyList();

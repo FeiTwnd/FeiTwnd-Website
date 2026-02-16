@@ -6,6 +6,8 @@ import cc.feitwnd.mapper.PersonalInfoMapper;
 import cc.feitwnd.service.PersonalInfoService;
 import cc.feitwnd.vo.PersonalInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,6 +20,7 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
      * 管理端获取所有个人信息
      * @return
      */
+    @Cacheable(value = "personalInfo", key = "'all'")
     public PersonalInfo getAllPersonalInfo() {
         PersonalInfo personalInfo = personalInfoMapper.getPersonalInfo();
         return personalInfo;
@@ -27,6 +30,7 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
      * 管理端更新个人信息
      * @param personalInfo
      */
+    @CacheEvict(value = "personalInfo", allEntries = true)
     public void updatePersonalInfo(PersonalInfo personalInfo) {
         // 更新个人信息
         personalInfoMapper.updateById(personalInfo);
@@ -36,6 +40,7 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
      * 其他端获取个人信息
      * @return
      */
+    @Cacheable(value = "personalInfo", key = "'vo'")
     public PersonalInfoVO getPersonalInfo() {
         PersonalInfo personalInfo = personalInfoMapper.getPersonalInfo();
         PersonalInfoVO personalInfoVO = PersonalInfoVO.builder()

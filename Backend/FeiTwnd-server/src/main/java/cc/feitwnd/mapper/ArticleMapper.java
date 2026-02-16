@@ -11,6 +11,7 @@ import cc.feitwnd.vo.BlogArticleDetailVO;
 import cc.feitwnd.vo.BlogArticleVO;
 import com.github.pagehelper.Page;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -93,6 +94,12 @@ public interface ArticleMapper {
      */
     @Update("update articles set view_count = view_count + 1 where id = #{id}")
     void incrementViewCount(Long id);
+
+    /**
+     * 浏览量批量累加（定时同步Redis增量）
+     */
+    @Update("update articles set view_count = view_count + #{increment} where id = #{id}")
+    void addViewCount(@Param("id") Long id, @Param("increment") int increment);
 
     /**
      * 点赞数+1

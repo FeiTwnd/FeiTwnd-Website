@@ -9,6 +9,7 @@ import cc.feitwnd.service.ReportService;
 import cc.feitwnd.vo.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -39,6 +40,7 @@ public class ReportServiceImpl implements ReportService {
     /**
      * 获取博客统计数据
      */
+    @Cacheable(value = "blogReport", key = "'stats'")
     public BlogReportVO getBlogReport() {
         return BlogReportVO.builder()
                 .viewTotalCount(viewMapper.countTotal())
