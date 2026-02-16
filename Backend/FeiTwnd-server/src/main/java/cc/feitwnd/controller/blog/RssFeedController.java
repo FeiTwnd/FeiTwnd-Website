@@ -1,5 +1,6 @@
 package cc.feitwnd.controller.blog;
 
+import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.service.ArticleService;
 import cc.feitwnd.service.PersonalInfoService;
 import cc.feitwnd.vo.BlogArticleVO;
@@ -30,7 +31,9 @@ public class RssFeedController {
     @Autowired
     private PersonalInfoService personalInfoService;
 
-    private static final String BLOG_BASE_URL = "https://blog.feitwnd.cc";
+    @Autowired
+    private WebsiteProperties websiteProperties;
+
     private static final DateTimeFormatter RSS_DATE_FMT =
             DateTimeFormatter.ofPattern("EEE, dd MMM yyyy HH:mm:ss '+0800'", java.util.Locale.ENGLISH);
 
@@ -40,6 +43,8 @@ public class RssFeedController {
     @GetMapping(value = "/rss", produces = MediaType.APPLICATION_XML_VALUE)
     public String rssFeed() {
         log.info("生成RSS Feed");
+
+        String BLOG_BASE_URL = websiteProperties.getBlog();
 
         // 获取个人信息作为站点信息
         PersonalInfoVO info = personalInfoService.getPersonalInfo();

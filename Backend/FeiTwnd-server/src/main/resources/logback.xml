@@ -12,7 +12,7 @@
 <!--	<appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">-->
 <!--		<rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">-->
 <!--			&lt;!&ndash; 日志文件输出的文件名, %i表示序号 &ndash;&gt;-->
-<!--			<FileNamePattern>/home/feitwnd/下载/tlias-%d{yyyy-MM-dd}-%i.log</FileNamePattern>-->
+<!--			<FileNamePattern>/home/feitwnd/下载/FeiTwnd-%d{yyyy-MM-dd}-%i.log</FileNamePattern>-->
 <!--			&lt;!&ndash; 最多保留的历史日志文件数量 &ndash;&gt;-->
 <!--			<MaxHistory>30</MaxHistory>-->
 <!--			&lt;!&ndash; 最大文件大小，超过这个大小会触发滚动到新文件，默认为 10MB &ndash;&gt;-->

@@ -11,6 +11,7 @@ import cc.feitwnd.exception.ArticleException;
 import cc.feitwnd.mapper.ArticleMapper;
 import cc.feitwnd.mapper.ArticleTagMapper;
 import cc.feitwnd.mapper.RssSubscriptionMapper;
+import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleService;
 import cc.feitwnd.service.AsyncEmailService;
@@ -51,6 +52,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private RssSubscriptionMapper rssSubscriptionMapper;
+
+    @Autowired
+    private WebsiteProperties websiteProperties;
 
     /**
      * 创建文章
@@ -194,7 +198,7 @@ public class ArticleServiceImpl implements ArticleService {
             if (subscribers == null || subscribers.isEmpty()) {
                 return;
             }
-            String articleUrl = "https://blog.feitwnd.cc/article/" + article.getSlug();
+            String articleUrl = websiteProperties.getBlog() + "/article/" + article.getSlug();
             for (RssSubscriptions subscriber : subscribers) {
                 asyncEmailService.sendNewArticleNotificationAsync(
                         subscriber.getEmail(),

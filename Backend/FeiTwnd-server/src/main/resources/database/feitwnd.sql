@@ -228,7 +228,7 @@ create table article_tags(
     unique index uk_tag_slug(slug)
 ) comment '文章标签表';
 
--- 文章-标签关联表(多对多)
+-- 文章-标签关联表
 create table article_tag_relations(
     id int primary key auto_increment,
     article_id int not null comment '文章ID',

@@ -8,6 +8,7 @@ import cc.feitwnd.dto.ArticleCommentReplyDTO;
 import cc.feitwnd.entity.ArticleComments;
 import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.ArticleCommentMapper;
+import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleCommentService;
 import cc.feitwnd.service.AsyncEmailService;
@@ -45,6 +46,9 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
 
     @Autowired
     private AsyncEmailService asyncEmailService;
+
+    @Autowired
+    private WebsiteProperties websiteProperties;
 
     /**
      * 分页条件查询评论（时间、是否审核）
@@ -102,7 +106,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         articleComments.setIsAdminReply(StatusConstant.ENABLE);
         articleComments.setIsApproved(StatusConstant.ENABLE);
         articleComments.setIsEdited(StatusConstant.DISABLE);
-        articleComments.setNickname("FeiTwnd");
+        articleComments.setNickname(websiteProperties.getTitle());
         articleComments.setCreateTime(LocalDateTime.now());
         articleComments.setUpdateTime(LocalDateTime.now());
 

@@ -9,6 +9,7 @@ import cc.feitwnd.dto.MessageReplyDTO;
 import cc.feitwnd.entity.Messages;
 import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.MessageMapper;
+import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.AsyncEmailService;
 import cc.feitwnd.service.MessageService;
@@ -46,6 +47,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private AsyncEmailService asyncEmailService;
+
+    @Autowired
+    private WebsiteProperties websiteProperties;
 
     // 邮箱正则
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
@@ -196,7 +200,7 @@ public class MessageServiceImpl implements MessageService {
         messages.setIsAdminReply(StatusConstant.ENABLE);
         messages.setIsApproved(StatusConstant.ENABLE); // 管理员回复自动审核通过
         messages.setIsEdited(StatusConstant.DISABLE);
-        messages.setNickname("FeiTwnd");
+        messages.setNickname(websiteProperties.getTitle());
         messages.setCreateTime(LocalDateTime.now());
         messages.setUpdateTime(LocalDateTime.now());
 
@@ -204,7 +208,7 @@ public class MessageServiceImpl implements MessageService {
         messageMapper.save(messages);
 
         // 5. 检查父留言是否开启邮箱通知
-        notifyParentIfNeeded(messageReplyDTO.getParentId(), "FeiTwnd",
+        notifyParentIfNeeded(messageReplyDTO.getParentId(), websiteProperties.getTitle(),
                 messageReplyDTO.getContent(), "message");
 
         log.info("管理员回复留言成功: parentId={}, content={}", messageReplyDTO.getParentId(), messageReplyDTO.getContent());

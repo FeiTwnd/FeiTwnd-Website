@@ -71,7 +71,19 @@ feitwnd:
     access-key-secret: your-alioss-access-key-secret
     bucket-name: your-bucket-name
   email:
-    personal: # 发件人昵称
-    from: # 发件人邮箱
+    personal:      #邮件发送者昵称
+    from:          #邮件发送者邮箱
   visitor:
-    verify-code: # 游客验证码
+    verify-code:   #游客验证码
+  image:
+    compress:
+      enabled: true           # 是否启用图片压缩
+      max-size-kb: 500          # 最大500KB
+      quality: 0.9              # 压缩质量(0-1)
+      output-format: webp       # 输出格式: webp
+  website:
+    title:       # 网站标题(或你的昵称)
+    home:        # 首页地址
+    admin:       # 后台管理地址
+    cv:          # 个人简历地址
+    blog:        # 博客地址

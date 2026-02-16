@@ -24,6 +24,7 @@ public class ArticleTagController {
 
     /**
      * 获取所有标签
+     * @return
      */
     @GetMapping
     public Result<List<ArticleTags>> listAll() {
@@ -33,6 +34,8 @@ public class ArticleTagController {
 
     /**
      * 添加标签
+     * @param articleTag
+     * @return
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "articleTag")
@@ -44,6 +47,8 @@ public class ArticleTagController {
 
     /**
      * 修改标签
+     * @param articleTag
+     * @return
      */
     @PutMapping
     @OperationLog(value = OperationType.UPDATE, target = "articleTag", targetId = "#articleTag.id")
@@ -55,6 +60,8 @@ public class ArticleTagController {
 
     /**
      * 批量删除标签
+     * @param ids
+     * @return
      */
     @DeleteMapping
     @OperationLog(value = OperationType.DELETE, target = "articleTag", targetId = "#ids")

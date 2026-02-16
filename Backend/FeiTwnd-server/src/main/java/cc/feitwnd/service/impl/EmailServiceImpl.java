@@ -3,6 +3,7 @@ package cc.feitwnd.service.impl;
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.exception.EmailSendErrorException;
 import cc.feitwnd.properties.EmailProperties;
+import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.service.EmailService;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ public class EmailServiceImpl implements EmailService {
     private JavaMailSender mailSender;
     @Autowired
     private EmailProperties emailProperties;
+    @Autowired
+    private WebsiteProperties websiteProperties;
 
     /**
      * 发送验证码邮件
@@ -36,7 +39,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(emailProperties.getFrom(), emailProperties.getPersonal());
             helper.setTo(toEmail);
-            helper.setSubject("FeiTwnd管理端 - 验证码");
+            helper.setSubject(websiteProperties.getTitle() + "管理端 - 验证码");
             helper.setText(buildSendVerifyCodeEmailContent(code), true);
             mailSender.send(message);
         } catch (Exception e) {
@@ -57,7 +60,7 @@ public class EmailServiceImpl implements EmailService {
                 "<head>" +
                 "    <meta charset='UTF-8'>" +
                 "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
-                "    <title>FeiTwnd验证码</title>" +
+                "    <title>"+ websiteProperties.getTitle() +"验证码</title>" +
                 "    <style>" +
                 "        body {" +
                 "            margin: 0;" +
@@ -110,7 +113,7 @@ public class EmailServiceImpl implements EmailService {
                 "<body>" +
                 "    <div class='email-container'>" +
                 "        <div class='email-header'>" +
-                "            <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 500;'>FeiTwnd</h1>" +
+                "            <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 500;'>"+websiteProperties.getTitle()+"</h1>" +
                 "            <p style='color: #bbb; margin: 8px 0 0; font-size: 14px;'>—— 邮箱验证 ——</p>" +
                 "        </div>" +
                 "        " +
@@ -132,7 +135,7 @@ public class EmailServiceImpl implements EmailService {
                 "        <div class='footer'>" +
                 "            <p style='margin: 0; line-height: 1.5;'>" +
                 "                此为系统自动发送的邮件，请勿直接回复<br>" +
-                "                © "+ year +" FeiTwnd - 保留所有权利" +
+                "                © "+ year +" "+ websiteProperties.getTitle() +" - 保留所有权利" +
                 "            </p>" +
                 "        </div>" +
                 "    </div>" +
@@ -151,7 +154,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setFrom(emailProperties.getFrom(), emailProperties.getPersonal());
             helper.setTo(toEmail);
             String typeText = "comment".equals(type) ? "文章评论" : "留言";
-            helper.setSubject("FeiTwnd - 您的" + typeText + "收到了新回复");
+            helper.setSubject(websiteProperties.getTitle() + " - 您的" + typeText + "收到了新回复");
             helper.setText(buildReplyNotificationEmailContent(parentNickname, parentContent,
                     replyNickname, replyContent, typeText), true);
             mailSender.send(message);
@@ -172,7 +175,7 @@ public class EmailServiceImpl implements EmailService {
                 "<head>" +
                 "    <meta charset='UTF-8'>" +
                 "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
-                "    <title>FeiTwnd回复通知</title>" +
+                "    <title>"+ websiteProperties.getTitle() +"回复通知</title>" +
                 "    <style>" +
                 "        body { margin: 0; padding: 0; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #f5f5f5; }" +
                 "        .email-container { max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }" +
@@ -186,7 +189,7 @@ public class EmailServiceImpl implements EmailService {
                 "<body>" +
                 "    <div class='email-container'>" +
                 "        <div class='email-header'>" +
-                "            <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 500;'>FeiTwnd</h1>" +
+                "            <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 500;'>"+websiteProperties.getTitle()+"</h1>" +
                 "            <p style='color: #bbb; margin: 8px 0 0; font-size: 14px;'>—— " + typeText + "回复通知 ——</p>" +
                 "        </div>" +
                 "        <div class='email-content'>" +
@@ -202,7 +205,7 @@ public class EmailServiceImpl implements EmailService {
                 "            </div>" +
                 "        </div>" +
                 "        <div class='footer'>" +
-                "            <p style='margin: 0; line-height: 1.5;'>此为系统自动发送的邮件，请勿直接回复<br>© " + year + " FeiTwnd - 保留所有权利</p>" +
+                "            <p style='margin: 0; line-height: 1.5;'>此为系统自动发送的邮件，请勿直接回复<br>© " + year + " "+websiteProperties.getTitle()+" - 保留所有权利</p>" +
                 "        </div>" +
                 "    </div>" +
                 "</body>" +
@@ -219,7 +222,7 @@ public class EmailServiceImpl implements EmailService {
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
             helper.setFrom(emailProperties.getFrom(), emailProperties.getPersonal());
             helper.setTo(toEmail);
-            helper.setSubject("FeiTwnd - 新文章发布：" + articleTitle);
+            helper.setSubject(websiteProperties.getTitle() + " - 新文章发布：" + articleTitle);
             helper.setText(buildNewArticleNotificationEmailContent(nickname, articleTitle, articleSummary, articleUrl), true);
             mailSender.send(message);
             log.info("发送新文章通知邮件成功: to={}, title={}", toEmail, articleTitle);
@@ -239,7 +242,7 @@ public class EmailServiceImpl implements EmailService {
                 "<head>" +
                 "    <meta charset='UTF-8'>" +
                 "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
-                "    <title>FeiTwnd新文章通知</title>" +
+                "    <title>"+websiteProperties.getTitle()+"新文章通知</title>" +
                 "    <style>" +
                 "        body { margin: 0; padding: 0; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #f5f5f5; }" +
                 "        .email-container { max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }" +
@@ -253,7 +256,7 @@ public class EmailServiceImpl implements EmailService {
                 "<body>" +
                 "    <div class='email-container'>" +
                 "        <div class='email-header'>" +
-                "            <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 500;'>FeiTwnd</h1>" +
+                "            <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 500;'>"+websiteProperties.getTitle()+"</h1>" +
                 "            <p style='color: #bbb; margin: 8px 0 0; font-size: 14px;'>—— 新文章发布通知 ——</p>" +
                 "        </div>" +
                 "        <div class='email-content'>" +
@@ -266,7 +269,7 @@ public class EmailServiceImpl implements EmailService {
                 "            </div>" +
                 "        </div>" +
                 "        <div class='footer'>" +
-                "            <p style='margin: 0; line-height: 1.5;'>此为系统自动发送的邮件，请勿直接回复<br>© " + year + " FeiTwnd - 保留所有权利</p>" +
+                "            <p style='margin: 0; line-height: 1.5;'>此为系统自动发送的邮件，请勿直接回复<br>© " + year + " "+websiteProperties.getTitle()+" - 保留所有权利</p>" +
                 "        </div>" +
                 "    </div>" +
                 "</body>" +

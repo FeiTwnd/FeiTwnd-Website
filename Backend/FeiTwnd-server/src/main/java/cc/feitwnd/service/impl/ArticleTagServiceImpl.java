@@ -16,25 +16,45 @@ public class ArticleTagServiceImpl implements ArticleTagService {
     @Autowired
     private ArticleTagMapper articleTagMapper;
 
+    /**
+     * 获取所有标签
+     * @return
+     */
     public List<ArticleTags> listAll() {
         List<ArticleTags> list = articleTagMapper.listAll();
         return list != null ? list : Collections.emptyList();
     }
 
+    /**
+     * 添加标签
+     * @param articleTag
+     */
     public void addTag(ArticleTags articleTag) {
         articleTagMapper.insert(articleTag);
     }
 
+    /**
+     * 修改标签
+     * @param articleTag
+     */
     public void updateTag(ArticleTags articleTag) {
         articleTagMapper.update(articleTag);
     }
 
+    /**
+     * 批量删除标签
+     * @param ids
+     */
     @Transactional
     public void batchDelete(List<Long> ids) {
         // 先删除关联关系中涉及这些标签的记录
         articleTagMapper.batchDelete(ids);
     }
 
+    /**
+     * 获取标签
+     * @return
+     */
     public List<ArticleTags> getVisibleTags() {
         List<ArticleTags> list = articleTagMapper.getVisibleTags();
         return list != null ? list : Collections.emptyList();

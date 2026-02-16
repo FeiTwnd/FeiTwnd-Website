@@ -1,5 +1,6 @@
 package cc.feitwnd.controller.blog;
 
+import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleService;
 import cc.feitwnd.vo.BlogArticleVO;
@@ -24,8 +25,9 @@ public class SitemapController {
 
     @Autowired
     private ArticleService articleService;
+    @Autowired
+    private WebsiteProperties websiteProperties;
 
-    private static final String BLOG_BASE_URL = "https://blog.feitwnd.cc";
     private static final DateTimeFormatter W3C_DATE_FMT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     /**
@@ -34,6 +36,8 @@ public class SitemapController {
     @GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)
     public String sitemap() {
         log.info("生成Sitemap");
+
+        String BLOG_BASE_URL = websiteProperties.getBlog();
 
         // 获取所有已发布文章（取足够多，最多500条）
         PageResult pageResult = articleService.getPublishedPage(1, 500);
