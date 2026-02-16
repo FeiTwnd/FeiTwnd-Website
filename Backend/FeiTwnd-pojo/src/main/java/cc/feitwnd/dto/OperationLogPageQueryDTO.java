@@ -25,6 +25,9 @@ public class OperationLogPageQueryDTO {
     // 操作类型
     private String operationType;
 
+    // 操作对象
+    private String operationTarget;
+
     // 开始时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime startTime;

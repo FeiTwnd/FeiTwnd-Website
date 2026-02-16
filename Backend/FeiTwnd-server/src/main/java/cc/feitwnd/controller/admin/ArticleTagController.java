@@ -1,0 +1,66 @@
+package cc.feitwnd.controller.admin;
+
+import cc.feitwnd.annotation.OperationLog;
+import cc.feitwnd.entity.ArticleTags;
+import cc.feitwnd.enumeration.OperationType;
+import cc.feitwnd.result.Result;
+import cc.feitwnd.service.ArticleTagService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+/**
+ * 管理端文章标签接口
+ */
+@Slf4j
+@RestController("adminArticleTagController")
+@RequestMapping("/admin/article/tag")
+public class ArticleTagController {
+
+    @Autowired
+    private ArticleTagService articleTagService;
+
+    /**
+     * 获取所有标签
+     */
+    @GetMapping
+    public Result<List<ArticleTags>> listAll() {
+        List<ArticleTags> list = articleTagService.listAll();
+        return Result.success(list);
+    }
+
+    /**
+     * 添加标签
+     */
+    @PostMapping
+    @OperationLog(value = OperationType.INSERT, target = "articleTag")
+    public Result addTag(@RequestBody ArticleTags articleTag) {
+        log.info("添加文章标签: {}", articleTag);
+        articleTagService.addTag(articleTag);
+        return Result.success();
+    }
+
+    /**
+     * 修改标签
+     */
+    @PutMapping
+    @OperationLog(value = OperationType.UPDATE, target = "articleTag", targetId = "#articleTag.id")
+    public Result updateTag(@RequestBody ArticleTags articleTag) {
+        log.info("修改文章标签: {}", articleTag);
+        articleTagService.updateTag(articleTag);
+        return Result.success();
+    }
+
+    /**
+     * 批量删除标签
+     */
+    @DeleteMapping
+    @OperationLog(value = OperationType.DELETE, target = "articleTag", targetId = "#ids")
+    public Result batchDelete(@RequestParam List<Long> ids) {
+        log.info("批量删除文章标签: {}", ids);
+        articleTagService.batchDelete(ids);
+        return Result.success();
+    }
+}

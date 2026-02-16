@@ -1,6 +1,7 @@
 package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.dto.ArticleCommentDTO;
+import cc.feitwnd.dto.ArticleCommentEditDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleCommentService;
 import cc.feitwnd.vo.ArticleCommentVO;
@@ -40,6 +41,26 @@ public class ArticleCommentController {
                                         HttpServletRequest request) {
         log.info("访客提交文章评论: {}", articleCommentDTO);
         articleCommentService.submitComment(articleCommentDTO, request);
+        return Result.success();
+    }
+
+    /**
+     * 访客编辑评论
+     */
+    @PutMapping("/edit")
+    public Result<String> editComment(@RequestBody ArticleCommentEditDTO editDTO) {
+        log.info("访客编辑评论: {}", editDTO);
+        articleCommentService.editComment(editDTO);
+        return Result.success();
+    }
+
+    /**
+     * 访客删除评论
+     */
+    @DeleteMapping("/{id}")
+    public Result<String> deleteComment(@PathVariable Long id, @RequestParam Long visitorId) {
+        log.info("访客删除评论: id={}, visitorId={}", id, visitorId);
+        articleCommentService.visitorDeleteComment(id, visitorId);
         return Result.success();
     }
 }

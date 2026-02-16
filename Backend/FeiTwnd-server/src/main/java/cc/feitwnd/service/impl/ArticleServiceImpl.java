@@ -5,10 +5,15 @@ import cc.feitwnd.constant.StatusConstant;
 import cc.feitwnd.dto.ArticleDTO;
 import cc.feitwnd.dto.ArticlePageQueryDTO;
 import cc.feitwnd.entity.Articles;
+import cc.feitwnd.entity.ArticleTags;
+import cc.feitwnd.entity.RssSubscriptions;
 import cc.feitwnd.exception.ArticleException;
 import cc.feitwnd.mapper.ArticleMapper;
+import cc.feitwnd.mapper.ArticleTagMapper;
+import cc.feitwnd.mapper.RssSubscriptionMapper;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleService;
+import cc.feitwnd.service.AsyncEmailService;
 import cc.feitwnd.utils.MarkdownUtil;
 import cc.feitwnd.vo.ArticleArchiveItemVO;
 import cc.feitwnd.vo.ArticleArchiveVO;
@@ -37,6 +42,15 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private ArticleMapper articleMapper;
+
+    @Autowired
+    private ArticleTagMapper articleTagMapper;
+
+    @Autowired
+    private AsyncEmailService asyncEmailService;
+
+    @Autowired
+    private RssSubscriptionMapper rssSubscriptionMapper;
 
     /**
      * 创建文章
@@ -68,6 +82,11 @@ public class ArticleServiceImpl implements ArticleService {
         articles.setCommentCount(0L);
 
         articleMapper.insert(articles);
+
+        // 保存文章-标签关联
+        if (articleDTO.getTagIds() != null && !articleDTO.getTagIds().isEmpty()) {
+            articleTagMapper.batchInsertRelations(articles.getId(), articleDTO.getTagIds());
+        }
     }
 
     /**
@@ -118,6 +137,14 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         articleMapper.update(articles);
+
+        // 更新文章-标签关联
+        if (articleDTO.getTagIds() != null) {
+            articleTagMapper.deleteRelationsByArticleId(articleDTO.getId());
+            if (!articleDTO.getTagIds().isEmpty()) {
+                articleTagMapper.batchInsertRelations(articleDTO.getId(), articleDTO.getTagIds());
+            }
+        }
     }
 
     /**
@@ -125,6 +152,7 @@ public class ArticleServiceImpl implements ArticleService {
      * @param ids
      */
     public void batchDelete(List<Long> ids) {
+        articleTagMapper.batchDeleteRelationsByArticleIds(ids);
         articleMapper.batchDelete(ids);
     }
 
@@ -150,6 +178,36 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         articleMapper.update(updateArticle);
+
+        // 发布时通知RSS订阅者
+        if (isPublished.equals(StatusConstant.ENABLE)) {
+            notifyRssSubscribers(articles);
+        }
+    }
+
+    /**
+     * 通知RSS订阅者新文章发布
+     */
+    private void notifyRssSubscribers(Articles article) {
+        try {
+            List<RssSubscriptions> subscribers = rssSubscriptionMapper.getAllActiveSubscriptions();
+            if (subscribers == null || subscribers.isEmpty()) {
+                return;
+            }
+            String articleUrl = "https://blog.feitwnd.cc/article/" + article.getSlug();
+            for (RssSubscriptions subscriber : subscribers) {
+                asyncEmailService.sendNewArticleNotificationAsync(
+                        subscriber.getEmail(),
+                        subscriber.getNickname() != null ? subscriber.getNickname() : "订阅者",
+                        article.getTitle(),
+                        article.getSummary(),
+                        articleUrl
+                );
+            }
+            log.info("已向 {} 个RSS订阅者发送新文章通知: title={}", subscribers.size(), article.getTitle());
+        } catch (Exception e) {
+            log.error("通知RSS订阅者异常: title={}, ex={}", article.getTitle(), e.getMessage());
+        }
     }
 
     /**
@@ -181,6 +239,23 @@ public class ArticleServiceImpl implements ArticleService {
         // 浏览量+1
         articleMapper.incrementViewCount(articleDetail.getId());
         articleDetail.setViewCount(articleDetail.getViewCount() + 1);
+
+        // 填充标签名称列表
+        List<ArticleTags> tags = articleTagMapper.getTagsByArticleId(articleDetail.getId());
+        if (tags != null && !tags.isEmpty()) {
+            articleDetail.setTagNames(tags.stream().map(ArticleTags::getName).toList());
+        }
+
+        // 填充上一篇/下一篇导航
+        articleDetail.setPrevArticle(articleMapper.getPrevArticle(articleDetail.getId()));
+        articleDetail.setNextArticle(articleMapper.getNextArticle(articleDetail.getId()));
+
+        // 填充相关文章推荐（同分类，排除当前文章，最多6篇）
+        if (articleDetail.getCategoryId() != null) {
+            articleDetail.setRelatedArticles(
+                    articleMapper.getRelatedArticles(articleDetail.getId(), articleDetail.getCategoryId()));
+        }
+
         return articleDetail;
     }
 
@@ -216,6 +291,12 @@ public class ArticleServiceImpl implements ArticleService {
     public PageResult searchPublished(String keyword, int page, int pageSize) {
         PageHelper.startPage(page, pageSize);
         Page<BlogArticleVO> pageResult = articleMapper.searchPublished(keyword);
+        return new PageResult(pageResult.getTotal(), pageResult.getResult());
+    }
+
+    public PageResult getPublishedByTagId(Long tagId, int page, int pageSize) {
+        PageHelper.startPage(page, pageSize);
+        Page<BlogArticleVO> pageResult = articleMapper.getPublishedByTagId(tagId);
         return new PageResult(pageResult.getTotal(), pageResult.getResult());
     }
 

@@ -64,4 +64,11 @@
         order by create_time asc
     </select>
 
+    <update id="updateContent">
+        update messages
+        set content = #{content}, content_html = #{contentHtml},
+            is_edited = 1, update_time = now()
+        where id = #{id}
+    </update>
+
 </mapper>

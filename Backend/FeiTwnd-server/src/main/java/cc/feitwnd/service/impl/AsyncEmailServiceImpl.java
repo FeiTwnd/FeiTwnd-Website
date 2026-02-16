@@ -30,4 +30,17 @@ public class AsyncEmailServiceImpl implements AsyncEmailService {
             log.error("异步发送回复通知邮件失败: to={}, type={}, ex={}", toEmail, type, e.getMessage());
         }
     }
+
+    /**
+     * 异步发送新文章通知邮件
+     */
+    @Async("taskExecutor")
+    public void sendNewArticleNotificationAsync(String toEmail, String nickname, String articleTitle,
+                                                String articleSummary, String articleUrl) {
+        try {
+            emailService.sendNewArticleNotification(toEmail, nickname, articleTitle, articleSummary, articleUrl);
+        } catch (Exception e) {
+            log.error("异步发送新文章通知邮件失败: to={}, title={}, ex={}", toEmail, articleTitle, e.getMessage());
+        }
+    }
 }

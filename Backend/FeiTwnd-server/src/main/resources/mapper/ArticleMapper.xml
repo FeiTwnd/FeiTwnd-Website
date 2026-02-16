@@ -130,4 +130,44 @@
         order by view_count desc
         limit 10
     </select>
+
+    <select id="getPublishedByTagId" resultType="cc.feitwnd.vo.BlogArticleVO">
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
+               ac.name as category_name,
+               a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
+               a.publish_time
+        from articles a
+        left join article_categories ac on a.category_id = ac.id
+        inner join article_tag_relations atr on a.id = atr.article_id
+        where a.is_published = 1 and atr.tag_id = #{tagId}
+        order by a.publish_time desc
+    </select>
+
+    <select id="getPrevArticle" resultType="cc.feitwnd.vo.BlogArticleVO">
+        select id, title, slug
+        from articles
+        where is_published = 1 and publish_time &gt; (select publish_time from articles where id = #{id})
+        order by publish_time asc
+        limit 1
+    </select>
+
+    <select id="getNextArticle" resultType="cc.feitwnd.vo.BlogArticleVO">
+        select id, title, slug
+        from articles
+        where is_published = 1 and publish_time &lt; (select publish_time from articles where id = #{id})
+        order by publish_time desc
+        limit 1
+    </select>
+
+    <select id="getRelatedArticles" resultType="cc.feitwnd.vo.BlogArticleVO">
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
+               ac.name as category_name,
+               a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
+               a.publish_time
+        from articles a
+        left join article_categories ac on a.category_id = ac.id
+        where a.is_published = 1 and a.id != #{articleId} and a.category_id = #{categoryId}
+        order by a.publish_time desc
+        limit 6
+    </select>
 </mapper>

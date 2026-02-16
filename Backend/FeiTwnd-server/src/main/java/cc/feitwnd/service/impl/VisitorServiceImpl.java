@@ -56,7 +56,7 @@ public class VisitorServiceImpl implements VisitorService {
         // 生成设备指纹
         String fingerprint = fingerprintService.generateVisitorFingerprint(visitorRecordDTO,request);
 
-        // 获取IP（轻量操作，同步执行）
+        // 获取IP
         String ip = IpUtil.getClientIp(request);
         String userAgent = request.getHeader("User-Agent");
 
@@ -66,7 +66,7 @@ public class VisitorServiceImpl implements VisitorService {
         // 检查请求频率
         blockService.checkRateLimit(fingerprint,ip);
 
-        // 查找或创建访客记录（不含地理位置，地理位置异步填充）
+        // 查找或创建访客记录
         Visitors visitor = findOrCreateVisitor(fingerprint, sessionId, userAgent, ip);
 
         // 异步处理：IP地理位置查询 + 访客地理信息更新 + 浏览记录写入

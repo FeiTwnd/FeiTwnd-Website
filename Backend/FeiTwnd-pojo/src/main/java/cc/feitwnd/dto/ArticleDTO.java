@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 /**
  * 文章创建/更新DTO
  */
@@ -37,4 +39,7 @@ public class ArticleDTO {
 
     // 是否发布,0-否（草稿），1-是
     private Integer isPublished;
+
+    // 标签ID列表
+    private List<Long> tagIds;
 }

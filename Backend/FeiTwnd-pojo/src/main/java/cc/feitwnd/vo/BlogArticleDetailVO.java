@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 博客端文章详情VO（含HTML内容）
@@ -35,4 +36,14 @@ public class BlogArticleDetailVO implements Serializable {
     private LocalDateTime publishTime;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
+
+    // 文章标签名称列表
+    private List<String> tagNames;
+
+    // 上一篇/下一篇导航
+    private BlogArticleVO prevArticle;
+    private BlogArticleVO nextArticle;
+
+    // 相关文章推荐
+    private List<BlogArticleVO> relatedArticles;
 }

@@ -52,5 +52,15 @@ public interface MessageService {
      * 获取已审核留言列表（树形结构）
      */
     List<MessageVO> getMessageTree();
+
+    /**
+     * 访客编辑留言
+     */
+    void editMessage(cc.feitwnd.dto.MessageEditDTO editDTO);
+
+    /**
+     * 访客删除留言
+     */
+    void visitorDeleteMessage(Long id, Long visitorId);
 }
 

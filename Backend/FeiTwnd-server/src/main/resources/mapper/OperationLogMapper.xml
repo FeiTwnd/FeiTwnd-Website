@@ -16,6 +16,9 @@
             <if test="operationType != null and operationType != ''">
                 and operation_type = #{operationType}
             </if>
+            <if test="operationTarget != null and operationTarget != ''">
+                and operation_target like concat('%', #{operationTarget}, '%')
+            </if>
             <if test="startTime != null">
                 and operation_time &gt;= #{startTime}
             </if>

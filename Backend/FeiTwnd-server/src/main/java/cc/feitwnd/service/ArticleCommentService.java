@@ -58,4 +58,14 @@ public interface ArticleCommentService {
      * 访客提交评论
      */
     void submitComment(ArticleCommentDTO articleCommentDTO, HttpServletRequest request);
+
+    /**
+     * 访客编辑评论
+     */
+    void editComment(cc.feitwnd.dto.ArticleCommentEditDTO editDTO);
+
+    /**
+     * 访客删除评论
+     */
+    void visitorDeleteComment(Long id, Long visitorId);
 }

@@ -10,4 +10,10 @@ public interface AsyncEmailService {
      */
     void sendReplyNotificationAsync(String toEmail, String parentNickname, String parentContent,
                                     String replyNickname, String replyContent, String type);
+
+    /**
+     * 异步发送新文章通知邮件
+     */
+    void sendNewArticleNotificationAsync(String toEmail, String nickname, String articleTitle,
+                                         String articleSummary, String articleUrl);
 }

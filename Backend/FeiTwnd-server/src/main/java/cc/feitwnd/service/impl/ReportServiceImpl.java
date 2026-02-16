@@ -5,7 +5,9 @@ import cc.feitwnd.dto.DailyViewCountDTO;
 import cc.feitwnd.dto.DailyVisitorCountDTO;
 import cc.feitwnd.dto.ProvinceCountDTO;
 import cc.feitwnd.mapper.ArticleCategoryMapper;
+import cc.feitwnd.mapper.ArticleCommentMapper;
 import cc.feitwnd.mapper.ArticleMapper;
+import cc.feitwnd.mapper.MessageMapper;
 import cc.feitwnd.mapper.ViewMapper;
 import cc.feitwnd.mapper.VisitorMapper;
 import cc.feitwnd.service.ReportService;
@@ -32,6 +34,10 @@ public class ReportServiceImpl implements ReportService {
     private ArticleMapper articleMapper;
     @Autowired
     private ArticleCategoryMapper articleCategoryMapper;
+    @Autowired
+    private ArticleCommentMapper articleCommentMapper;
+    @Autowired
+    private MessageMapper messageMapper;
 
     /**
      * 获取博客统计数据
@@ -142,6 +148,13 @@ public class ReportServiceImpl implements ReportService {
         return AdminOverviewVO.builder()
                 .totalViewCount(viewMapper.countTotal())
                 .totalVisitorCount(visitorMapper.countTotal())
+                .todayViewCount(viewMapper.countToday())
+                .todayNewVisitorCount(visitorMapper.countToday())
+                .totalArticleCount(articleMapper.countPublished())
+                .totalCommentCount(articleCommentMapper.countTotal())
+                .totalMessageCount(messageMapper.countTotal())
+                .pendingCommentCount(articleCommentMapper.countPending())
+                .pendingMessageCount(messageMapper.countPending())
                 .build();
     }
 

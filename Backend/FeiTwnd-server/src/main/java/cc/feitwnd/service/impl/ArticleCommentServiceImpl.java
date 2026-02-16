@@ -2,6 +2,7 @@ package cc.feitwnd.service.impl;
 
 import cc.feitwnd.constant.StatusConstant;
 import cc.feitwnd.dto.ArticleCommentDTO;
+import cc.feitwnd.dto.ArticleCommentEditDTO;
 import cc.feitwnd.dto.ArticleCommentPageQueryDTO;
 import cc.feitwnd.dto.ArticleCommentReplyDTO;
 import cc.feitwnd.entity.ArticleComments;
@@ -207,6 +208,48 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         }
 
         log.info("访客提交文章评论成功: {}", articleComments);
+    }
+
+    /**
+     * 访客编辑评论
+     */
+    public void editComment(ArticleCommentEditDTO editDTO) {
+        ArticleComments comment = articleCommentMapper.getById(editDTO.getId());
+        if (comment == null) {
+            throw new ValidationException("评论不存在");
+        }
+        if (!comment.getVisitorId().equals(editDTO.getVisitorId())) {
+            throw new ValidationException("无权编辑此评论");
+        }
+
+        ArticleComments updateComment = new ArticleComments();
+        updateComment.setId(editDTO.getId());
+        updateComment.setContent(editDTO.getContent());
+
+        if (editDTO.getIsMarkdown() != null && editDTO.getIsMarkdown() == 1) {
+            updateComment.setContentHtml(MarkdownUtil.toHtml(editDTO.getContent()));
+        } else {
+            updateComment.setContentHtml(editDTO.getContent());
+        }
+
+        articleCommentMapper.updateContent(updateComment);
+        log.info("访客编辑评论成功: id={}, visitorId={}", editDTO.getId(), editDTO.getVisitorId());
+    }
+
+    /**
+     * 访客删除评论
+     */
+    public void visitorDeleteComment(Long id, Long visitorId) {
+        ArticleComments comment = articleCommentMapper.getById(id);
+        if (comment == null) {
+            throw new ValidationException("评论不存在");
+        }
+        if (!comment.getVisitorId().equals(visitorId)) {
+            throw new ValidationException("无权删除此评论");
+        }
+
+        articleCommentMapper.deleteById(id);
+        log.info("访客删除评论成功: id={}, visitorId={}", id, visitorId);
     }
 
     /**

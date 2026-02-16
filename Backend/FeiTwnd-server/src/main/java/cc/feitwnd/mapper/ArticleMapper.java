@@ -113,4 +113,24 @@ public interface ArticleMapper {
     Integer countPublished();
 
     List<ArticleTitleViewCountDTO> getViewTop10();
+
+    /**
+     * 根据标签ID获取已发布文章列表（分页）
+     */
+    Page<BlogArticleVO> getPublishedByTagId(Long tagId);
+
+    /**
+     * 获取当前文章的上一篇(按发布时间)
+     */
+    BlogArticleVO getPrevArticle(Long id);
+
+    /**
+     * 获取当前文章的下一篇(按发布时间)
+     */
+    BlogArticleVO getNextArticle(Long id);
+
+    /**
+     * 获取相关文章(同分类,排除当前文章,最多6篇)
+     */
+    List<BlogArticleVO> getRelatedArticles(Long articleId, Long categoryId);
 }

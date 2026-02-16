@@ -209,4 +209,68 @@ public class EmailServiceImpl implements EmailService {
                 "</html>";
     }
 
+    /**
+     * 发送新文章通知邮件
+     */
+    public void sendNewArticleNotification(String toEmail, String nickname, String articleTitle,
+                                           String articleSummary, String articleUrl) {
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            helper.setFrom(emailProperties.getFrom(), emailProperties.getPersonal());
+            helper.setTo(toEmail);
+            helper.setSubject("FeiTwnd - 新文章发布：" + articleTitle);
+            helper.setText(buildNewArticleNotificationEmailContent(nickname, articleTitle, articleSummary, articleUrl), true);
+            mailSender.send(message);
+            log.info("发送新文章通知邮件成功: to={}, title={}", toEmail, articleTitle);
+        } catch (Exception e) {
+            log.error("发送新文章通知邮件失败 to={}, title={}, ex={}", toEmail, articleTitle, e.getMessage());
+        }
+    }
+
+    /**
+     * 构建新文章通知邮件内容
+     */
+    private String buildNewArticleNotificationEmailContent(String nickname, String articleTitle,
+                                                           String articleSummary, String articleUrl) {
+        String year = String.valueOf(LocalDate.now().getYear());
+        return "<!DOCTYPE html>" +
+                "<html lang='zh-CN'>" +
+                "<head>" +
+                "    <meta charset='UTF-8'>" +
+                "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+                "    <title>FeiTwnd新文章通知</title>" +
+                "    <style>" +
+                "        body { margin: 0; padding: 0; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #f5f5f5; }" +
+                "        .email-container { max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }" +
+                "        .email-header { background: #333; padding: 24px 0; text-align: center; border-bottom: 1px solid #222; }" +
+                "        .email-content { padding: 36px 30px; }" +
+                "        .article-card { background: #f9f9f9; border-radius: 8px; padding: 20px 24px; margin: 20px 0; border: 1px solid #eee; }" +
+                "        .read-btn { display: inline-block; background: #333; color: white; padding: 12px 28px; border-radius: 6px; text-decoration: none; font-size: 15px; font-weight: 500; margin-top: 10px; }" +
+                "        .footer { background: #222; padding: 16px; text-align: center; color: #aaa; font-size: 12px; }" +
+                "    </style>" +
+                "</head>" +
+                "<body>" +
+                "    <div class='email-container'>" +
+                "        <div class='email-header'>" +
+                "            <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 500;'>FeiTwnd</h1>" +
+                "            <p style='color: #bbb; margin: 8px 0 0; font-size: 14px;'>—— 新文章发布通知 ——</p>" +
+                "        </div>" +
+                "        <div class='email-content'>" +
+                "            <h2 style='color: #333; margin: 0 0 20px; font-size: 20px; font-weight: 500;'>" + nickname + "，您好！</h2>" +
+                "            <p style='color: #555; font-size: 15px; line-height: 1.6; margin: 0 0 16px;'>您订阅的博客有新文章发布了：</p>" +
+                "            <div class='article-card'>" +
+                "                <h3 style='color: #333; margin: 0 0 12px; font-size: 18px; font-weight: 600;'>" + articleTitle + "</h3>" +
+                "                <p style='color: #666; margin: 0 0 16px; font-size: 14px; line-height: 1.6;'>" + (articleSummary != null ? articleSummary : "") + "</p>" +
+                "                <a href='" + articleUrl + "' class='read-btn' style='color: white;'>阅读全文 →</a>" +
+                "            </div>" +
+                "        </div>" +
+                "        <div class='footer'>" +
+                "            <p style='margin: 0; line-height: 1.5;'>此为系统自动发送的邮件，请勿直接回复<br>© " + year + " FeiTwnd - 保留所有权利</p>" +
+                "        </div>" +
+                "    </div>" +
+                "</body>" +
+                "</html>";
+    }
+
 }

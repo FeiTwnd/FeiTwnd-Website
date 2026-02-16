@@ -3,6 +3,7 @@ package cc.feitwnd.mapper;
 import cc.feitwnd.dto.ArticleCommentPageQueryDTO;
 import cc.feitwnd.entity.ArticleComments;
 import cc.feitwnd.vo.ArticleCommentVO;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -62,4 +63,27 @@ public interface ArticleCommentMapper {
      */
     @Select("select * from article_comments where id = #{id}")
     ArticleComments getById(Long id);
+
+    /**
+     * 更新评论内容（访客编辑）
+     */
+    void updateContent(ArticleComments articleComments);
+
+    /**
+     * 删除单条评论
+     */
+    @Delete("delete from article_comments where id = #{id}")
+    void deleteById(Long id);
+
+    /**
+     * 统计总评论数
+     */
+    @Select("select count(*) from article_comments")
+    Integer countTotal();
+
+    /**
+     * 统计待审核评论数
+     */
+    @Select("select count(*) from article_comments where is_approved = 0")
+    Integer countPending();
 }

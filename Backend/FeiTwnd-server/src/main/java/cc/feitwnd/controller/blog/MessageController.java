@@ -1,6 +1,7 @@
 package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.dto.MessageDTO;
+import cc.feitwnd.dto.MessageEditDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.MessageService;
 import cc.feitwnd.vo.MessageVO;
@@ -46,5 +47,25 @@ public class MessageController {
         log.info("博客端获取留言树");
         List<MessageVO> messageTree = messageService.getMessageTree();
         return Result.success(messageTree);
+    }
+
+    /**
+     * 访客编辑留言
+     */
+    @PutMapping("/edit")
+    public Result<String> editMessage(@RequestBody MessageEditDTO editDTO) {
+        log.info("访客编辑留言: {}", editDTO);
+        messageService.editMessage(editDTO);
+        return Result.success();
+    }
+
+    /**
+     * 访客删除留言
+     */
+    @DeleteMapping("/{id}")
+    public Result<String> deleteMessage(@PathVariable Long id, @RequestParam Long visitorId) {
+        log.info("访客删除留言: id={}, visitorId={}", id, visitorId);
+        messageService.visitorDeleteMessage(id, visitorId);
+        return Result.success();
     }
 }

@@ -65,6 +65,12 @@ public interface VisitorMapper {
     Integer countTotal();
 
     /**
+     * 统计今日新增访客数
+     */
+    @Select("select count(*) from visitors where date(create_time) = curdate()")
+    Integer countToday();
+
+    /**
      * 统计指定日期范围内每日新增访客数
      */
     List<DailyVisitorCountDTO> getDailyNewVisitorStats(LocalDate begin, LocalDate end);

@@ -23,4 +23,15 @@ public interface EmailService {
      */
     void sendReplyNotification(String toEmail, String parentNickname, String parentContent,
                                String replyNickname, String replyContent, String type);
+
+    /**
+     * 发送新文章通知邮件
+     * @param toEmail 收件人邮箱
+     * @param nickname 订阅者昵称
+     * @param articleTitle 文章标题
+     * @param articleSummary 文章摘要
+     * @param articleUrl 文章链接
+     */
+    void sendNewArticleNotification(String toEmail, String nickname, String articleTitle,
+                                    String articleSummary, String articleUrl);
 }

@@ -216,6 +216,27 @@ create table articles(
     fulltext idx_fulltext(title,summary,content_markdown(500))
 ) comment '文章表';
 
+-- 文章标签表
+create table article_tags(
+    id int primary key auto_increment,
+    name varchar(20) not null comment '标签名称',
+    slug varchar(30) not null comment 'URL标识',
+    color varchar(20) comment '标签颜色(如#FF5722)',
+    create_time datetime comment '创建时间',
+    update_time datetime comment '更新时间',
+    unique index uk_tag_name(name),
+    unique index uk_tag_slug(slug)
+) comment '文章标签表';
+
+-- 文章-标签关联表(多对多)
+create table article_tag_relations(
+    id int primary key auto_increment,
+    article_id int not null comment '文章ID',
+    tag_id int not null comment '标签ID',
+    unique index uk_article_tag(article_id, tag_id),
+    index idx_tag_id(tag_id)
+) comment '文章标签关联表';
+
 -- 文章评论表
 create table article_comments(
     id int primary key auto_increment,

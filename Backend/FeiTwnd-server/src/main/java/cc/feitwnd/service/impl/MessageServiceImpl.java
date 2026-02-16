@@ -3,6 +3,7 @@ package cc.feitwnd.service.impl;
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.constant.StatusConstant;
 import cc.feitwnd.dto.MessageDTO;
+import cc.feitwnd.dto.MessageEditDTO;
 import cc.feitwnd.dto.MessagePageQueryDTO;
 import cc.feitwnd.dto.MessageReplyDTO;
 import cc.feitwnd.entity.Messages;
@@ -233,6 +234,48 @@ public class MessageServiceImpl implements MessageService {
             }
         }
         return rootMessages;
+    }
+
+    /**
+     * 访客编辑留言
+     */
+    public void editMessage(MessageEditDTO editDTO) {
+        Messages message = messageMapper.getById(editDTO.getId());
+        if (message == null) {
+            throw new ValidationException("留言不存在");
+        }
+        if (!message.getVisitorId().equals(editDTO.getVisitorId())) {
+            throw new ValidationException("无权编辑此留言");
+        }
+
+        Messages updateMessage = new Messages();
+        updateMessage.setId(editDTO.getId());
+        updateMessage.setContent(editDTO.getContent());
+
+        if (editDTO.getIsMarkdown() != null && editDTO.getIsMarkdown() == 1) {
+            updateMessage.setContentHtml(MarkdownUtil.toHtml(editDTO.getContent()));
+        } else {
+            updateMessage.setContentHtml(editDTO.getContent());
+        }
+
+        messageMapper.updateContent(updateMessage);
+        log.info("访客编辑留言成功: id={}, visitorId={}", editDTO.getId(), editDTO.getVisitorId());
+    }
+
+    /**
+     * 访客删除留言
+     */
+    public void visitorDeleteMessage(Long id, Long visitorId) {
+        Messages message = messageMapper.getById(id);
+        if (message == null) {
+            throw new ValidationException("留言不存在");
+        }
+        if (!message.getVisitorId().equals(visitorId)) {
+            throw new ValidationException("无权删除此留言");
+        }
+
+        messageMapper.deleteById(id);
+        log.info("访客删除留言成功: id={}, visitorId={}", id, visitorId);
     }
 
     /**
