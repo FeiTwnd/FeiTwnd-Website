@@ -28,9 +28,6 @@ public class ArticleTags implements Serializable {
     // URL标识
     private String slug;
 
-    // 标签颜色
-    private String color;
-
     // 创建时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

@@ -23,6 +23,9 @@ public class BlogReportVO {
     // 总文章分类数
     private Integer categoryTotalCount;
 
+    // 总文章标签数
+    private Integer tagTotalCount;
+
     // 总文章数
     private Integer articleTotalCount;
 }

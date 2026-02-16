@@ -4,12 +4,7 @@ import cc.feitwnd.dto.ArticleTitleViewCountDTO;
 import cc.feitwnd.dto.DailyViewCountDTO;
 import cc.feitwnd.dto.DailyVisitorCountDTO;
 import cc.feitwnd.dto.ProvinceCountDTO;
-import cc.feitwnd.mapper.ArticleCategoryMapper;
-import cc.feitwnd.mapper.ArticleCommentMapper;
-import cc.feitwnd.mapper.ArticleMapper;
-import cc.feitwnd.mapper.MessageMapper;
-import cc.feitwnd.mapper.ViewMapper;
-import cc.feitwnd.mapper.VisitorMapper;
+import cc.feitwnd.mapper.*;
 import cc.feitwnd.service.ReportService;
 import cc.feitwnd.vo.*;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +33,8 @@ public class ReportServiceImpl implements ReportService {
     private ArticleCommentMapper articleCommentMapper;
     @Autowired
     private MessageMapper messageMapper;
+    @Autowired
+    private ArticleTagMapper articleTagMapper;
 
     /**
      * 获取博客统计数据
@@ -49,6 +46,7 @@ public class ReportServiceImpl implements ReportService {
                 .visitorTotalCount(visitorMapper.countTotal())
                 .categoryTotalCount(articleCategoryMapper.countTotal())
                 .articleTotalCount(articleMapper.countPublished())
+                .tagTotalCount(articleTagMapper.countTotal())
                 .build();
     }
 

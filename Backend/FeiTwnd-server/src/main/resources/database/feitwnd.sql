@@ -221,7 +221,6 @@ create table article_tags(
     id int primary key auto_increment,
     name varchar(20) not null comment '标签名称',
     slug varchar(30) not null comment 'URL标识',
-    color varchar(20) comment '标签颜色(如#FF5722)',
     create_time datetime comment '创建时间',
     update_time datetime comment '更新时间',
     unique index uk_tag_name(name),

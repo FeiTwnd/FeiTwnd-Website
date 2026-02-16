@@ -4,8 +4,8 @@
 <mapper namespace="cc.feitwnd.mapper.ArticleTagMapper">
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        insert into article_tags (name, slug, color, create_time, update_time)
-        values (#{name}, #{slug}, #{color}, #{createTime}, #{updateTime})
+        insert into article_tags (name, slug, create_time, update_time)
+        values (#{name}, #{slug}, #{createTime}, #{updateTime})
     </insert>
 
     <update id="update">
@@ -13,7 +13,6 @@
         <set>
             <if test="name != null">name = #{name},</if>
             <if test="slug != null">slug = #{slug},</if>
-            <if test="color != null">color = #{color},</if>
             <if test="updateTime != null">update_time = #{updateTime}</if>
         </set>
         where id = #{id}

@@ -66,4 +66,10 @@ public interface ArticleTagMapper {
      * 获取有已发布文章的标签列表（博客端）
      */
     List<ArticleTags> getVisibleTags();
+
+    /**
+     * 获取标签总数
+     */
+    @Select("select count(*) from article_tags")
+    Integer countTotal();
 }
