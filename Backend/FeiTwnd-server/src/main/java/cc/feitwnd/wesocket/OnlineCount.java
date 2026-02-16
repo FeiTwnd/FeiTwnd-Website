@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 @Component
 @ServerEndpoint("/ws/online")
-public class OnlineCountWebSocket {
+public class OnlineCount {
 
     // 存放所有连接的会话
     private static final ConcurrentHashMap<String, Session> sessions = new ConcurrentHashMap<>();

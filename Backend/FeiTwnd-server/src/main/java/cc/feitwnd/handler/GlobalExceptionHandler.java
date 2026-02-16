@@ -7,11 +7,13 @@ import cc.feitwnd.exception.TokenException;
 import cc.feitwnd.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.stream.Collectors;
 
 /**
  * 全局异常处理器，处理项目中抛出的业务异常
@@ -43,6 +45,19 @@ public class GlobalExceptionHandler {
     public Result exceptionHandler(BlockedException ex){
         log.error("封禁异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
+    }
+
+    /**
+     * 捕获参数校验异常（@Valid校验失败）
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result exceptionHandler(MethodArgumentNotValidException ex){
+        String errorMsg = ex.getBindingResult().getFieldErrors().stream()
+                .map(error -> error.getField() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining("; "));
+        log.error("参数校验异常：{}", errorMsg);
+        return Result.error(errorMsg);
     }
 
     @ExceptionHandler

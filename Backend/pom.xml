@@ -39,6 +39,9 @@
         <webp-imageio>0.1.6</webp-imageio>
         <commonmark.version>0.21.0</commonmark.version>
         <jsoup.version>1.16.1</jsoup.version>
+        <bucket4j-core>8.3.0</bucket4j-core>
+        <bucket4j-jcache>8.3.0</bucket4j-jcache>
+        <cache-api>1.1.1</cache-api>
     </properties>
 
     <dependencyManagement>
@@ -200,6 +203,26 @@
                 <groupId>org.jsoup</groupId>
                 <artifactId>jsoup</artifactId>
                 <version>${jsoup.version}</version>
+            </dependency>
+
+            <!-- 令牌桶限流 -->
+            <dependency>
+                <groupId>com.bucket4j</groupId>
+                <artifactId>bucket4j-core</artifactId>
+                <version>${bucket4j-core}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.bucket4j</groupId>
+                <artifactId>bucket4j-jcache</artifactId>
+                <version>${bucket4j-jcache}</version>
+            </dependency>
+
+            <!-- JCache API -->
+            <dependency>
+                <groupId>javax.cache</groupId>
+                <artifactId>cache-api</artifactId>
+                <version>${cache-api}</version>
             </dependency>
 
         </dependencies>

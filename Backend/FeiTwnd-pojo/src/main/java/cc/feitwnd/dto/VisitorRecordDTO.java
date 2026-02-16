@@ -1,10 +1,15 @@
 package cc.feitwnd.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * 访客访问记录DTO
+ */
 @Data
 @Builder
 @AllArgsConstructor
@@ -12,10 +17,16 @@ import lombok.NoArgsConstructor;
 public class VisitorRecordDTO {
 
     // 访问路径
+    @NotBlank(message = "访问路径不能为空")
+    @Size(max = 500, message = "访问路径过长")
     private String pagePath;
+
     // 页面标题
+    @Size(max = 200, message = "页面标题过长")
     private String pageTitle;
+
     // 来源页面
+    @Size(max = 500, message = "来源页面过长")
     private String referer;
 
     // 前端收集浏览器信息,用于制作访客指纹

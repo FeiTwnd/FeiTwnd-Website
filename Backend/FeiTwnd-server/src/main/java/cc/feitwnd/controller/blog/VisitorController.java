@@ -1,10 +1,12 @@
 package cc.feitwnd.controller.blog;
 
+import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.dto.VisitorRecordDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.VisitorService;
 import cc.feitwnd.vo.VisitorRecordVO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

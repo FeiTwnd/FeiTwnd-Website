@@ -1,19 +1,18 @@
 package cc.feitwnd.controller.blog;
 
+import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.dto.MessageDTO;
 import cc.feitwnd.dto.MessageEditDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.MessageService;
 import cc.feitwnd.vo.MessageVO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * 博客端留言接口
@@ -33,7 +32,9 @@ public class MessageController {
      * @return
      */
     @PostMapping
-    public Result<String> submitMessage(@RequestBody MessageDTO messageDTO, HttpServletRequest request) {
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+              timeWindow = 60, message = "留言过于频繁，请稍后再试")
+    public Result<String> submitMessage(@Valid @RequestBody MessageDTO messageDTO, HttpServletRequest request) {
         log.info("访客提交留言: {}", messageDTO);
         messageService.submitMessage(messageDTO, request);
         return Result.success();
@@ -53,7 +54,9 @@ public class MessageController {
      * 访客编辑留言
      */
     @PutMapping("/edit")
-    public Result<String> editMessage(@RequestBody MessageEditDTO editDTO) {
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+              timeWindow = 60, message = "操作过于频繁，请稍后再试")
+    public Result<String> editMessage(@Valid @RequestBody MessageEditDTO editDTO) {
         log.info("访客编辑留言: {}", editDTO);
         messageService.editMessage(editDTO);
         return Result.success();
@@ -63,6 +66,8 @@ public class MessageController {
      * 访客删除留言
      */
     @DeleteMapping("/{id}")
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+              timeWindow = 60, message = "操作过于频繁，请稍后再试")
     public Result<String> deleteMessage(@PathVariable Long id, @RequestParam Long visitorId) {
         log.info("访客删除留言: id={}, visitorId={}", id, visitorId);
         messageService.visitorDeleteMessage(id, visitorId);

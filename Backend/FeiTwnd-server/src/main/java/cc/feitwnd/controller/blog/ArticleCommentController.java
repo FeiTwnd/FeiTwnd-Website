@@ -1,11 +1,13 @@
 package cc.feitwnd.controller.blog;
 
+import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.dto.ArticleCommentDTO;
 import cc.feitwnd.dto.ArticleCommentEditDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleCommentService;
 import cc.feitwnd.vo.ArticleCommentVO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +39,9 @@ public class ArticleCommentController {
      * 提交评论（添加评论/回复评论）
      */
     @PostMapping
-    public Result<String> submitComment(@RequestBody ArticleCommentDTO articleCommentDTO,
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+              timeWindow = 60, message = "评论过于频繁，请稍后再试")
+    public Result<String> submitComment(@Valid @RequestBody ArticleCommentDTO articleCommentDTO,
                                         HttpServletRequest request) {
         log.info("访客提交文章评论: {}", articleCommentDTO);
         articleCommentService.submitComment(articleCommentDTO, request);
@@ -48,7 +52,9 @@ public class ArticleCommentController {
      * 访客编辑评论
      */
     @PutMapping("/edit")
-    public Result<String> editComment(@RequestBody ArticleCommentEditDTO editDTO) {
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+              timeWindow = 60, message = "操作过于频繁，请稍后再试")
+    public Result<String> editComment(@Valid @RequestBody ArticleCommentEditDTO editDTO) {
         log.info("访客编辑评论: {}", editDTO);
         articleCommentService.editComment(editDTO);
         return Result.success();
@@ -58,6 +64,8 @@ public class ArticleCommentController {
      * 访客删除评论
      */
     @DeleteMapping("/{id}")
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+              timeWindow = 60, message = "操作过于频繁，请稍后再试")
     public Result<String> deleteComment(@PathVariable Long id, @RequestParam Long visitorId) {
         log.info("访客删除评论: id={}, visitorId={}", id, visitorId);
         articleCommentService.visitorDeleteComment(id, visitorId);
