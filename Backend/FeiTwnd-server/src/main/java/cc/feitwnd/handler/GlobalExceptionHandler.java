@@ -3,6 +3,7 @@ package cc.feitwnd.handler;
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.exception.BaseException;
 import cc.feitwnd.exception.BlockedException;
+import cc.feitwnd.exception.GuestReadOnlyException;
 import cc.feitwnd.exception.TokenException;
 import cc.feitwnd.result.Result;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,13 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result exceptionHandler(BlockedException ex){
         log.error("封禁异常：{}", ex.getMessage());
+        return Result.error(ex.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public Result exceptionHandler(GuestReadOnlyException ex){
+        log.error("游客只读异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 

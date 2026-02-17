@@ -29,10 +29,11 @@ public class TokenServiceImpl implements TokenService {
     /**
      * 创建并保存token
      */
-    public String createAndStoreToken(Long userId) {
+    public String createAndStoreToken(Long userId, Integer role) {
         // 生成token
         Map<String, Object> claims = new HashMap<>();
         claims.put(JwtClaimsConstant.ADMIN_ID,userId);
+        claims.put(JwtClaimsConstant.ADMIN_ROLE,role);
         String token = JwtUtil.createJWT(
                 jwtProperties.getSecretKey(),
                 jwtProperties.getTtl(),

@@ -8,7 +8,7 @@ public interface TokenService {
     /**
      * 创建并保存token
      */
-    String createAndStoreToken(Long userId);
+    String createAndStoreToken(Long userId, Integer role);
     
     /**
      * 验证token有效性

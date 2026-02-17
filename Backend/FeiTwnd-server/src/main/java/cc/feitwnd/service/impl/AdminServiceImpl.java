@@ -112,7 +112,7 @@ public class AdminServiceImpl implements AdminService {
         }
 
         // 生成并存储token
-        String token = tokenService.createAndStoreToken(admin.getId());
+        String token = tokenService.createAndStoreToken(admin.getId(), admin.getRole());
 
         return AdminLoginVO.builder()
                 .id(admin.getId())

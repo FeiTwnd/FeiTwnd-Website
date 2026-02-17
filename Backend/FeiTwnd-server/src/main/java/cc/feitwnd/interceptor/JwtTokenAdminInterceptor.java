@@ -2,7 +2,9 @@ package cc.feitwnd.interceptor;
 
 import cc.feitwnd.constant.JwtClaimsConstant;
 import cc.feitwnd.constant.MessageConstant;
+import cc.feitwnd.constant.StatusConstant;
 import cc.feitwnd.context.BaseContext;
+import cc.feitwnd.exception.GuestReadOnlyException;
 import cc.feitwnd.exception.NotLoginException;
 import cc.feitwnd.exception.UnauthorizedException;
 import cc.feitwnd.properties.JwtProperties;
@@ -57,14 +59,21 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         try {
             Claims claims = JwtUtil.parseJWT(jwtProperties.getSecretKey(), token);
             Long adminId = Long.valueOf(claims.get(JwtClaimsConstant.ADMIN_ID).toString());
-            log.info("jwt校验,当前管理员id：{}", adminId);
+            Integer role = Integer.valueOf(claims.get(JwtClaimsConstant.ADMIN_ROLE).toString());
+            log.info("jwt校验,当前管理员id：{}, role: {}", adminId, role);
 
             // 检测令牌是否在服务端存在
             if(!tokenService.isValidToken(adminId, token)){
                 throw new UnauthorizedException(MessageConstant.NOT_AUTHORIZED);
             }
 
+            // 游客账号(role=0)只允许GET查询操作，禁止增删改
+            if(role.equals(StatusConstant.DISABLE) && !"GET".equalsIgnoreCase(request.getMethod())){
+                throw new GuestReadOnlyException(MessageConstant.GUEST_READ_ONLY);
+            }
+
             BaseContext.setCurrentId(adminId);
+            BaseContext.setCurrentRole(role);
             // 通过，放行
             return true;
         } catch (Exception ex) {
@@ -86,6 +95,7 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
         try {
             // 清理ThreadLocal，防止虚拟线程复用导致adminId串用
             BaseContext.removeCurrentId();
+            BaseContext.removeCurrentRole();
         } catch (Exception e) {
             log.error("清理ThreadLocal失败", e);
         }
