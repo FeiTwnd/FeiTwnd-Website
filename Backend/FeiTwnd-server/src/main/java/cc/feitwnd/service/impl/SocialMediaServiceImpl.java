@@ -57,7 +57,7 @@ public class SocialMediaServiceImpl implements SocialMediaService {
 
     /**
      * 添加社交媒体
-     * @param socialMedia
+     * @param socialMediaDTO
      */
     @CacheEvict(value = "socialMedia", allEntries = true)
     public void addSocialMedia(SocialMediaDTO socialMediaDTO) {

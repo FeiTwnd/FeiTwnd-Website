@@ -1,95 +1,159 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch, nextTick } from 'vue'
+import { getSocialMediaAPI } from '@/api/socialMedia'
+import { getPersonalInfoAPI } from '@/api/personalInfo'
+import { recordVisitorAPI } from '@/api/visitor'
 
 const startYear = 2025
 const currentYear = ref(2025)
 
-onMounted(() => {
+// 个人信息
+const personalInfo = ref({})
+// 社交媒体信息
+const socialMedia = ref([])
+// 数据加载状态
+const isDataLoaded = ref(false)
+
+onMounted(async () => {
+  // 获取当前年份
   currentYear.value = new Date().getFullYear()
 
-  document.querySelectorAll('.link').forEach((link, index) => {
-    link.style.setProperty('--link-index', index + 1)
+  // 初始化主题检测
+  initTheme()
+
+  // 获取数据
+  await fetchData()
+
+  // 记录访客（异步，不阻塞页面渲染）
+  recordVisitorAPI().catch((err) => {
+    console.error('访客记录失败:', err)
   })
+
+  // 数据加载完成后设置链接动画
+  await nextTick()
+  setupLinkAnimations()
+})
+
+// 主题状态
+const isDarkMode = ref(false)
+
+// 初始化主题检测
+const initTheme = () => {
+  // 检测系统主题偏好
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+  isDarkMode.value = prefersDark
+
+  console.log('系统主题检测结果:', prefersDark ? '黑暗模式' : '亮色模式')
+
+  // 立即应用主题
+  applyTheme()
+
+  // 监听系统主题变化
+  window
+    .matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', (e) => {
+      isDarkMode.value = e.matches
+      console.log('主题已切换:', e.matches ? '黑暗模式' : '亮色模式')
+      applyTheme()
+    })
+}
+
+// 应用主题样式
+const applyTheme = () => {
+  const root = document.documentElement
+
+  console.log('应用主题:', isDarkMode.value ? '黑暗' : '亮色')
+
+  if (isDarkMode.value) {
+    // 黑暗模式
+    root.style.setProperty('--bg-light', '#1a1a1a')
+    root.style.setProperty('--card-light', '#242424')
+    root.style.setProperty('--border-light', '#333333')
+    root.style.setProperty('--text-light', '#f0f0f0')
+    root.style.setProperty('--muted-light', '#9e9e9e')
+    root.style.setProperty('--hover-light', '#333333')
+  } else {
+    // 亮色模式
+    root.style.setProperty('--bg-light', '#fafafa')
+    root.style.setProperty('--card-light', '#ffffff')
+    root.style.setProperty('--border-light', '#e0e0e0')
+    root.style.setProperty('--text-light', '#121212')
+    root.style.setProperty('--muted-light', '#666666')
+    root.style.setProperty('--hover-light', '#f0f0f0')
+  }
+}
+
+// 获取数据
+const fetchData = async () => {
+  try {
+    // 并行请求数据
+    const [personalRes, socialRes] = await Promise.all([
+      getPersonalInfoAPI(),
+      getSocialMediaAPI()
+    ])
+
+    personalInfo.value = personalRes.data.data || {}
+    socialMedia.value = socialRes.data.data || []
+    isDataLoaded.value = true
+  } catch (error) {
+    console.error('数据获取失败:', error)
+    socialMedia.value = []
+    isDataLoaded.value = true
+  }
+}
+
+// 设置链接动画延迟
+const setupLinkAnimations = () => {
+  // 等待DOM更新完成
+  nextTick(() => {
+    const links = document.querySelectorAll('.link')
+    links.forEach((link, index) => {
+      link.style.setProperty('--link-index', index + 1)
+    })
+  })
+}
+
+// 监听数据变化，重新设置动画
+watch([() => socialMedia.value, isDataLoaded], () => {
+  if (isDataLoaded.value && socialMedia.value.length > 0) {
+    setupLinkAnimations()
+  }
 })
 </script>
 
 <template>
   <div class="home-container">
     <main class="card" role="main">
+      <!-- 头像 -->
       <div class="avatar-container">
-        <img src="@/assets/images/avatar.png" alt="FeiTwnd的头像" />
+        <img
+          :src="personalInfo.avatar"
+          :alt="`${personalInfo.nickname || 'FeiTwnd'}的头像`"
+        />
       </div>
-      <h1 data-name>FeiTwnd</h1>
-      <p class="tagline">
-        初出茅庐 &nbsp | &nbsp 科班码农 &nbsp | &nbsp 拾枝者 · 欢迎来到我的主页
-      </p>
 
-      <nav class="links" aria-label="站点导航">
+      <!-- 昵称 -->
+      <h1 data-name>{{ personalInfo.nickname || 'FeiTwnd' }}</h1>
+
+      <!-- 标签 -->
+      <p class="tagline">{{ personalInfo.tag }} · 欢迎来到我的主页</p>
+
+      <!-- 社交媒体链接 -->
+      <nav class="links" aria-label="站点导航" v-if="socialMedia.length > 0">
         <a
+          v-for="item in socialMedia"
+          :key="item.id"
           class="link"
-          href="https://blog.feitwnd.cc"
+          :href="item.link"
           target="_blank"
-          rel="noopener noreferrer"
+          :title="item.name"
         >
-          <span class="iconfont icon-boke"></span>
-          博客
-        </a>
-        <a
-          class="link"
-          href="https://cv.feitwnd.cc"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="iconfont icon-jianli"></span>
-          简历
-        </a>
-        <a
-          class="link"
-          href="mailto:kiwoba@qq.com"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="iconfont icon-youxiang"></span>
-          邮箱
-        </a>
-        <a
-          class="link"
-          href="https://github.com/FeiTwnd"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="iconfont icon-github"></span>
-          GitHub
-        </a>
-        <a
-          class="link"
-          href="https://space.bilibili.com/502786603"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="iconfont icon-bilibili-line"></span>
-          Bilibili
-        </a>
-        <!-- <a
-          class="link"
-          href="https://blog.csdn.net/FeiTwnd"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="iconfont icon-csdn1"></span>
-          CSDN
-        </a> -->
-        <a
-          class="link"
-          href="https://leetcode.cn/u/competent-maxwellmll/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <span class="iconfont icon-code"></span>
-          LeetCode
+          <span :class="`iconfont icon-${item.icon}`"></span>
+          {{ item.name }}
         </a>
       </nav>
 
+      <!-- 页脚 -->
       <footer>
         <div class="beian-info">
           <span>豫公网安备41132702000130号</span>
@@ -116,25 +180,19 @@ onMounted(() => {
   padding: 0;
 }
 
-:root {
-  --bg-light: #fafafa;
-  --bg-dark: #1a1a1a;
-  --card-light: #ffffff;
-  --card-dark: #242424;
-  --border-light: #e0e0e0;
-  --border-dark: #333333;
-  --text-light: #121212;
-  --text-dark: #f0f0f0;
-  --muted-light: #666666;
-  --muted-dark: #9e9e9e;
-  --hover-light: #f0f0f0;
-  --hover-dark: #333333;
-}
-
 html,
 body {
   height: 100%;
   width: 100%;
+}
+
+:root {
+  --bg-light: #fafafa;
+  --card-light: #ffffff;
+  --border-light: #e0e0e0;
+  --text-light: #121212;
+  --muted-light: #666666;
+  --hover-light: #f0f0f0;
 }
 
 body {
@@ -148,14 +206,9 @@ body {
     Helvetica,
     Arial,
     sans-serif;
-  transition: background-color 0.3s ease;
-}
-
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: var(--bg-dark);
-    color: var(--text-dark);
-  }
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 .home-container {
@@ -164,6 +217,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background-color 0.3s ease;
 }
 
 /* 卡片容器样式 */
@@ -181,14 +235,6 @@ body {
   max-height: 95vh;
   overflow-y: auto;
   animation: fadeIn 0.6s ease-out forwards;
-}
-
-@media (prefers-color-scheme: dark) {
-  .card {
-    background-color: var(--card-dark);
-    border-color: var(--border-dark);
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.25);
-  }
 }
 
 /* 头像容器 */
@@ -217,15 +263,7 @@ body {
   object-fit: cover;
   display: block;
   filter: contrast(1.1) brightness(1.05);
-}
-
-@media (prefers-color-scheme: dark) {
-  .avatar-container {
-    border-color: var(--border-dark);
-  }
-  .avatar-container img {
-    filter: contrast(1.15) brightness(0.95);
-  }
+  transition: filter 0.3s ease;
 }
 
 /* 标题 */
@@ -245,12 +283,6 @@ h1 {
   font-weight: 400;
   animation: fadeIn 0.5s ease-out 0.4s forwards;
   opacity: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-  .tagline {
-    color: var(--muted-dark);
-  }
 }
 
 /* 图标字体 */
@@ -294,15 +326,6 @@ h1 {
   transform: translateY(-2px);
 }
 
-@media (prefers-color-scheme: dark) {
-  .link {
-    border-color: var(--border-dark);
-  }
-  .link:hover {
-    background-color: var(--hover-dark);
-  }
-}
-
 /* 页脚 */
 footer {
   margin-top: 3.2rem;
@@ -311,12 +334,6 @@ footer {
   line-height: 1.6;
   animation: fadeIn 0.6s ease-out 0.8s forwards;
   opacity: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-  footer {
-    color: var(--muted-dark);
-  }
 }
 
 .beian-info {
