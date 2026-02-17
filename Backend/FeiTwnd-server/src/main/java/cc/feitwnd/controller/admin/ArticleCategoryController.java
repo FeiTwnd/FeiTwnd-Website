@@ -1,10 +1,12 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.annotation.OperationLog;
+import cc.feitwnd.dto.ArticleCategoryDTO;
 import cc.feitwnd.entity.ArticleCategories;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleCategoryService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +41,9 @@ public class ArticleCategoryController {
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "articleCategory")
-    public Result addCategory(@RequestBody ArticleCategories articleCategories) {
-        log.info("添加文章分类,{}", articleCategories);
-        articleCategoryService.addCategory(articleCategories);
+    public Result addCategory(@Valid @RequestBody ArticleCategoryDTO articleCategoryDTO) {
+        log.info("添加文章分类,{}", articleCategoryDTO);
+        articleCategoryService.addCategory(articleCategoryDTO);
         return Result.success();
     }
 
@@ -51,10 +53,10 @@ public class ArticleCategoryController {
      * @return
      */
     @PutMapping
-    @OperationLog(value = OperationType.UPDATE, target = "articleCategory", targetId = "#articleCategories.id")
-    public Result updateCategory(@RequestBody ArticleCategories articleCategories) {
-        log.info("更新文章分类,{}", articleCategories);
-        articleCategoryService.updateCategory(articleCategories);
+    @OperationLog(value = OperationType.UPDATE, target = "articleCategory", targetId = "#articleCategoryDTO.id")
+    public Result updateCategory(@Valid @RequestBody ArticleCategoryDTO articleCategoryDTO) {
+        log.info("更新文章分类,{}", articleCategoryDTO);
+        articleCategoryService.updateCategory(articleCategoryDTO);
         return Result.success();
     }
 

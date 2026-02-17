@@ -1,10 +1,12 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.annotation.OperationLog;
+import cc.feitwnd.dto.SystemConfigDTO;
 import cc.feitwnd.entity.SystemConfig;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.SystemConfigService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -63,9 +65,9 @@ public class SystemConfigController {
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "systemConfig")
-    public Result addConfig(@RequestBody SystemConfig systemConfig) {
-        log.info("添加系统配置,{}", systemConfig);
-        systemConfigService.addConfig(systemConfig);
+    public Result addConfig(@Valid @RequestBody SystemConfigDTO systemConfigDTO) {
+        log.info("添加系统配置,{}", systemConfigDTO);
+        systemConfigService.addConfig(systemConfigDTO);
         return Result.success();
     }
 
@@ -75,10 +77,10 @@ public class SystemConfigController {
      * @return
      */
     @PutMapping
-    @OperationLog(value = OperationType.UPDATE, target = "systemConfig", targetId = "#systemConfig.id")
-    public Result updateConfig(@RequestBody SystemConfig systemConfig) {
-        log.info("更新系统配置,{}", systemConfig);
-        systemConfigService.updateConfig(systemConfig);
+    @OperationLog(value = OperationType.UPDATE, target = "systemConfig", targetId = "#systemConfigDTO.id")
+    public Result updateConfig(@Valid @RequestBody SystemConfigDTO systemConfigDTO) {
+        log.info("更新系统配置,{}", systemConfigDTO);
+        systemConfigService.updateConfig(systemConfigDTO);
         return Result.success();
     }
 

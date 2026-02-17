@@ -1,9 +1,11 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.dto.ArticleCategoryDTO;
 import cc.feitwnd.entity.ArticleCategories;
 import cc.feitwnd.mapper.ArticleCategoryMapper;
 import cc.feitwnd.mapper.ArticleMapper;
 import cc.feitwnd.service.ArticleCategoryService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,7 +41,9 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
             @CacheEvict(value = "articleList", allEntries = true),
             @CacheEvict(value = "blogReport", allEntries = true)
     })
-    public void addCategory(ArticleCategories articleCategories) {
+    public void addCategory(ArticleCategoryDTO articleCategoryDTO) {
+        ArticleCategories articleCategories = new ArticleCategories();
+        BeanUtils.copyProperties(articleCategoryDTO, articleCategories);
         articleCategoryMapper.insert(articleCategories);
     }
 
@@ -52,7 +56,9 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
             @CacheEvict(value = "articleList", allEntries = true),
             @CacheEvict(value = "blogReport", allEntries = true)
     })
-    public void updateCategory(ArticleCategories articleCategories) {
+    public void updateCategory(ArticleCategoryDTO articleCategoryDTO) {
+        ArticleCategories articleCategories = new ArticleCategories();
+        BeanUtils.copyProperties(articleCategoryDTO, articleCategories);
         articleCategoryMapper.update(articleCategories);
     }
 

@@ -1,10 +1,12 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.dto.FriendLinkDTO;
 import cc.feitwnd.entity.FriendLinks;
 import cc.feitwnd.mapper.FriendLinkMapper;
 import cc.feitwnd.service.FriendLinkService;
 import cc.feitwnd.vo.FriendLinkVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -39,7 +41,9 @@ public class FriendLinkServiceImpl implements FriendLinkService {
      * @param friendLink
      */
     @CacheEvict(value = "friendLinks", allEntries = true)
-    public void addFriendLink(FriendLinks friendLink) {
+    public void addFriendLink(FriendLinkDTO friendLinkDTO) {
+        FriendLinks friendLink = new FriendLinks();
+        BeanUtils.copyProperties(friendLinkDTO, friendLink);
         friendLinkMapper.insert(friendLink);
     }
 
@@ -57,7 +61,9 @@ public class FriendLinkServiceImpl implements FriendLinkService {
      * @param friendLink
      */
     @CacheEvict(value = "friendLinks", allEntries = true)
-    public void updateFriendLink(FriendLinks friendLink) {
+    public void updateFriendLink(FriendLinkDTO friendLinkDTO) {
+        FriendLinks friendLink = new FriendLinks();
+        BeanUtils.copyProperties(friendLinkDTO, friendLink);
         friendLinkMapper.update(friendLink);
     }
 

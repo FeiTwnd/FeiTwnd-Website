@@ -1,9 +1,11 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.dto.ExperienceDTO;
 import cc.feitwnd.entity.Experiences;
 import cc.feitwnd.mapper.ExperienceMapper;
 import cc.feitwnd.service.ExperienceService;
 import cc.feitwnd.vo.ExperienceVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -34,7 +36,9 @@ public class ExperienceServiceImpl implements ExperienceService {
      * @param experiences
      */
     @CacheEvict(value = "experiences", allEntries = true)
-    public void addExperience(Experiences experiences) {
+    public void addExperience(ExperienceDTO experienceDTO) {
+        Experiences experiences = new Experiences();
+        BeanUtils.copyProperties(experienceDTO, experiences);
         experienceMapper.insert(experiences);
     }
 
@@ -43,7 +47,9 @@ public class ExperienceServiceImpl implements ExperienceService {
      * @param experiences
      */
     @CacheEvict(value = "experiences", allEntries = true)
-    public void updateExperience(Experiences experiences) {
+    public void updateExperience(ExperienceDTO experienceDTO) {
+        Experiences experiences = new Experiences();
+        BeanUtils.copyProperties(experienceDTO, experiences);
        experienceMapper.update(experiences);
     }
 

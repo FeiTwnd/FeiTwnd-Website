@@ -1,12 +1,14 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.annotation.OperationLog;
+import cc.feitwnd.dto.MusicDTO;
 import cc.feitwnd.dto.MusicPageQueryDTO;
 import cc.feitwnd.entity.Music;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.MusicService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -55,9 +57,9 @@ public class MusicController {
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "music")
-    public Result addMusic(@RequestBody Music music) {
-        log.info("添加音乐,{}", music);
-        musicService.addMusic(music);
+    public Result addMusic(@Valid @RequestBody MusicDTO musicDTO) {
+        log.info("添加音乐,{}", musicDTO);
+        musicService.addMusic(musicDTO);
         return Result.success();
     }
 
@@ -67,10 +69,10 @@ public class MusicController {
      * @return
      */
     @PutMapping
-    @OperationLog(value = OperationType.UPDATE, target = "music", targetId = "#music.id")
-    public Result updateMusic(@RequestBody Music music) {
-        log.info("更新音乐,{}", music);
-        musicService.updateMusic(music);
+    @OperationLog(value = OperationType.UPDATE, target = "music", targetId = "#musicDTO.id")
+    public Result updateMusic(@Valid @RequestBody MusicDTO musicDTO) {
+        log.info("更新音乐,{}", musicDTO);
+        musicService.updateMusic(musicDTO);
         return Result.success();
     }
 

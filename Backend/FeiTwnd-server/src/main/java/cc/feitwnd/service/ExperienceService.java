@@ -1,9 +1,8 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.ExperienceDTO;
 import cc.feitwnd.entity.Experiences;
 import cc.feitwnd.vo.ExperienceVO;
-
-import java.util.List;
 
 import java.util.List;
 
@@ -17,15 +16,15 @@ public interface ExperienceService {
 
     /**
      * 添加经历信息
-     * @param experiences
+     * @param experienceDTO
      */
-    void addExperience(Experiences experiences);
+    void addExperience(ExperienceDTO experienceDTO);
 
     /**
      * 修改经历信息
-     * @param experiences
+     * @param experienceDTO
      */
-    void updateExperience(Experiences experiences);
+    void updateExperience(ExperienceDTO experienceDTO);
 
     /**
      * 批量删除经历

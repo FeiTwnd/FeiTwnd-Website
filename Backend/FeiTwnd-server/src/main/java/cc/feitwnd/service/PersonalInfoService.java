@@ -1,5 +1,6 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.PersonalInfoDTO;
 import cc.feitwnd.entity.PersonalInfo;
 import cc.feitwnd.vo.PersonalInfoVO;
 
@@ -12,9 +13,9 @@ public interface PersonalInfoService {
 
     /**
      * 更新个人信息
-     * @param personalInfo
+     * @param personalInfoDTO
      */
-    void updatePersonalInfo(PersonalInfo personalInfo);
+    void updatePersonalInfo(PersonalInfoDTO personalInfoDTO);
 
     /**
      * 其他端获取个人信息

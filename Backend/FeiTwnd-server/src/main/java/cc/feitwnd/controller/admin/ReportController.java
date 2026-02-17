@@ -3,6 +3,7 @@ package cc.feitwnd.controller.admin;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ReportService;
 import cc.feitwnd.vo.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -28,8 +29,8 @@ public class ReportController {
      */
     @GetMapping("/viewStatistics")
     public Result<ViewReportVO> getViewStatistics(
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+            @NotNull(message = "开始日期不能为空") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+            @NotNull(message = "结束日期不能为空") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         log.info("浏览量统计: {} - {}", begin, end);
         ViewReportVO viewReportVO = reportService.getViewStatistics(begin, end);
         return Result.success(viewReportVO);
@@ -40,8 +41,8 @@ public class ReportController {
      */
     @GetMapping("/visitorStatistics")
     public Result<VisitorReportVO> getVisitorStatistics(
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
-            @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
+            @NotNull(message = "开始日期不能为空") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate begin,
+            @NotNull(message = "结束日期不能为空") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end) {
         log.info("访客统计: {} - {}", begin, end);
         VisitorReportVO visitorReportVO = reportService.getVisitorStatistics(begin, end);
         return Result.success(visitorReportVO);

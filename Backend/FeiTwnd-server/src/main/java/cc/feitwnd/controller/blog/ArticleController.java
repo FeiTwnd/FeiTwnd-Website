@@ -1,5 +1,6 @@
 package cc.feitwnd.controller.blog;
 
+import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleService;
@@ -71,6 +72,8 @@ public class ArticleController {
      * 文章搜索（仅已发布）
      */
     @GetMapping("/search")
+    @RateLimit(type = RateLimit.Type.IP, tokens = 10, burstCapacity = 15,
+            timeWindow = 60, message = "搜索过于频繁，请稍后再试")
     public Result<PageResult> search(@RequestParam String keyword,
                                      @RequestParam(defaultValue = "1") int page,
                                      @RequestParam(defaultValue = "10") int pageSize) {

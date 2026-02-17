@@ -6,6 +6,7 @@ import cc.feitwnd.service.ArticleService;
 import cc.feitwnd.vo.BlogArticleVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,7 @@ public class SitemapController {
      * 动态生成站点地图 XML
      */
     @GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)
+    @Cacheable(value = "sitemap", key = "'xml'")
     public String sitemap() {
         log.info("生成Sitemap");
 

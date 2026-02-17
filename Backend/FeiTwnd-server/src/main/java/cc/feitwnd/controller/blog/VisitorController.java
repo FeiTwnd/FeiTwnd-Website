@@ -32,7 +32,9 @@ public class VisitorController {
      * @return
      */
     @PostMapping("/record")
-    public Result<VisitorRecordVO> recordVisitorViewInfo(@RequestBody VisitorRecordDTO visitorRecordDTO,
+    @RateLimit(type = RateLimit.Type.IP, tokens = 10, burstCapacity = 15,
+            timeWindow = 60, message = "请求过于频繁，请稍后再试")
+    public Result<VisitorRecordVO> recordVisitorViewInfo(@Valid @RequestBody VisitorRecordDTO visitorRecordDTO,
                                                          HttpServletRequest httpRequest) {
         log.info("记录访客访问信息：{}", visitorRecordDTO);
         VisitorRecordVO visitorRecordVO = visitorService.recordVisitorViewInfo(visitorRecordDTO, httpRequest);

@@ -1,9 +1,11 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.dto.SocialMediaDTO;
 import cc.feitwnd.entity.SocialMedia;
 import cc.feitwnd.mapper.SocialMediaMapper;
 import cc.feitwnd.service.SocialMediaService;
 import cc.feitwnd.vo.SocialMediaVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -58,7 +60,9 @@ public class SocialMediaServiceImpl implements SocialMediaService {
      * @param socialMedia
      */
     @CacheEvict(value = "socialMedia", allEntries = true)
-    public void addSocialMedia(SocialMedia socialMedia) {
+    public void addSocialMedia(SocialMediaDTO socialMediaDTO) {
+        SocialMedia socialMedia = new SocialMedia();
+        BeanUtils.copyProperties(socialMediaDTO, socialMedia);
         // 添加到数据库
         socialMediaMapper.insert(socialMedia);
     }
@@ -77,7 +81,9 @@ public class SocialMediaServiceImpl implements SocialMediaService {
      * @param socialMedia
      */
     @CacheEvict(value = "socialMedia", allEntries = true)
-    public void updateSocialMedia(SocialMedia socialMedia) {
+    public void updateSocialMedia(SocialMediaDTO socialMediaDTO) {
+        SocialMedia socialMedia = new SocialMedia();
+        BeanUtils.copyProperties(socialMediaDTO, socialMedia);
         // 更新到数据库
         socialMediaMapper.updateById(socialMedia);
     }

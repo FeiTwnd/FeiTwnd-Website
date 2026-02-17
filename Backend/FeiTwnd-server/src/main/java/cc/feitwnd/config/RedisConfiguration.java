@@ -78,6 +78,10 @@ public class RedisConfiguration {
         // 统计数据：变化频繁，短时间缓存
         cacheConfigurations.put("blogReport", defaultConfig.entryTtl(Duration.ofMinutes(5)));
 
+        // Sitemap/RSS Feed：缓存30分钟
+        cacheConfigurations.put("sitemap", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+        cacheConfigurations.put("rssFeed", defaultConfig.entryTtl(Duration.ofMinutes(30)));
+
         return RedisCacheManager.builder(redisConnectionFactory)
                 .cacheDefaults(defaultConfig)
                 .withInitialCacheConfigurations(cacheConfigurations)

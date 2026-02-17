@@ -1,10 +1,12 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.annotation.OperationLog;
+import cc.feitwnd.dto.SocialMediaDTO;
 import cc.feitwnd.entity.SocialMedia;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.SocialMediaService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +38,9 @@ public class SocialMediaController {
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "socialMedia")
-    public Result addSocialMedia(@RequestBody SocialMedia socialMedia) {
-        log.info("添加社交媒体信息: {}", socialMedia);
-        socialMediaService.addSocialMedia(socialMedia);
+    public Result addSocialMedia(@Valid @RequestBody SocialMediaDTO socialMediaDTO) {
+        log.info("添加社交媒体信息: {}", socialMediaDTO);
+        socialMediaService.addSocialMedia(socialMediaDTO);
         return Result.success();
     }
     /**
@@ -56,10 +58,10 @@ public class SocialMediaController {
      * 修改社交媒体信息
      */
     @PutMapping
-    @OperationLog(value = OperationType.UPDATE, target = "socialMedia", targetId = "#socialMedia.id")
-    public Result updateSocialMedia(@RequestBody SocialMedia socialMedia) {
-        log.info("修改社交媒体信息: {}", socialMedia);
-        socialMediaService.updateSocialMedia(socialMedia);
+    @OperationLog(value = OperationType.UPDATE, target = "socialMedia", targetId = "#socialMediaDTO.id")
+    public Result updateSocialMedia(@Valid @RequestBody SocialMediaDTO socialMediaDTO) {
+        log.info("修改社交媒体信息: {}", socialMediaDTO);
+        socialMediaService.updateSocialMedia(socialMediaDTO);
         return Result.success();
     }
 }

@@ -1,5 +1,6 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.dto.MusicDTO;
 import cc.feitwnd.dto.MusicPageQueryDTO;
 import cc.feitwnd.entity.Music;
 import cc.feitwnd.mapper.MusicMapper;
@@ -8,6 +9,7 @@ import cc.feitwnd.service.MusicService;
 import cc.feitwnd.vo.MusicVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +26,9 @@ public class MusicServiceImpl implements MusicService {
      * 添加音乐
      * @param music
      */
-    public void addMusic(Music music) {
+    public void addMusic(MusicDTO musicDTO) {
+        Music music = new Music();
+        BeanUtils.copyProperties(musicDTO, music);
         musicMapper.insert(music);
     }
 
@@ -45,7 +49,9 @@ public class MusicServiceImpl implements MusicService {
      * 更新音乐
      * @param music
      */
-    public void updateMusic(Music music) {
+    public void updateMusic(MusicDTO musicDTO) {
+        Music music = new Music();
+        BeanUtils.copyProperties(musicDTO, music);
         musicMapper.update(music);
     }
 

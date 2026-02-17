@@ -1,5 +1,6 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.ArticleTagDTO;
 import cc.feitwnd.entity.ArticleTags;
 
 import java.util.List;
@@ -14,17 +15,17 @@ public interface ArticleTagService {
 
     /**
      * 添加标签
-     * @param articleTag
+     * @param articleTagDTO
      * @return
      */
-    void addTag(ArticleTags articleTag);
+    void addTag(ArticleTagDTO articleTagDTO);
 
     /**
      * 修改标签
-     * @param articleTag
+     * @param articleTagDTO
      * @return
      */
-    void updateTag(ArticleTags articleTag);
+    void updateTag(ArticleTagDTO articleTagDTO);
 
     /**
      * 批量删除标签

@@ -1,10 +1,12 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.annotation.OperationLog;
+import cc.feitwnd.dto.ExperienceDTO;
 import cc.feitwnd.entity.Experiences;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ExperienceService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -37,9 +39,9 @@ public class ExperienceController {
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "experience")
-    public Result addExperience(@RequestBody Experiences experiences) {
-        log.info("添加经历信息,{}", experiences);
-        experienceService.addExperience(experiences);
+    public Result addExperience(@Valid @RequestBody ExperienceDTO experienceDTO) {
+        log.info("添加经历信息,{}", experienceDTO);
+        experienceService.addExperience(experienceDTO);
         return Result.success();
     }
 
@@ -47,10 +49,10 @@ public class ExperienceController {
      * 修改经历信息
      */
     @PutMapping
-    @OperationLog(value = OperationType.UPDATE, target = "experience", targetId = "#experiences.id")
-    public Result updateExperience(@RequestBody Experiences experiences) {
-        log.info("修改经历信息,{}", experiences);
-        experienceService.updateExperience(experiences);
+    @OperationLog(value = OperationType.UPDATE, target = "experience", targetId = "#experienceDTO.id")
+    public Result updateExperience(@Valid @RequestBody ExperienceDTO experienceDTO) {
+        log.info("修改经历信息,{}", experienceDTO);
+        experienceService.updateExperience(experienceDTO);
         return Result.success();
     }
 

@@ -176,6 +176,16 @@ public class MessageServiceImpl implements MessageService {
      * @param ids
      */
     public void batchDelete(List<Long> ids) {
+        // 如果是根留言，级联删除所有子留言
+        for (Long id : ids) {
+            Messages message = messageMapper.getById(id);
+            if (message != null && (message.getRootId() == null || message.getRootId() == 0)) {
+                Integer childCount = messageMapper.countByRootId(id);
+                if (childCount != null && childCount > 0) {
+                    messageMapper.deleteByRootId(id);
+                }
+            }
+        }
         messageMapper.batchDelete(ids);
     }
 
@@ -276,6 +286,14 @@ public class MessageServiceImpl implements MessageService {
         }
         if (!message.getVisitorId().equals(visitorId)) {
             throw new ValidationException("无权删除此留言");
+        }
+
+        // 如果是根留言，级联删除所有子留言
+        if (message.getRootId() == null || message.getRootId() == 0) {
+            Integer childCount = messageMapper.countByRootId(id);
+            if (childCount != null && childCount > 0) {
+                messageMapper.deleteByRootId(id);
+            }
         }
 
         messageMapper.deleteById(id);

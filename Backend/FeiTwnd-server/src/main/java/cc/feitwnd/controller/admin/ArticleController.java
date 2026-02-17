@@ -8,6 +8,7 @@ import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,7 @@ public class ArticleController {
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "article")
-    public Result createArticle(@RequestBody ArticleDTO articleDTO) {
+    public Result createArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         log.info("创建文章: {}", articleDTO);
         articleService.createArticle(articleDTO);
         return Result.success();
@@ -69,7 +70,7 @@ public class ArticleController {
      */
     @PutMapping
     @OperationLog(value = OperationType.UPDATE, target = "article", targetId = "#articleDTO.id")
-    public Result updateArticle(@RequestBody ArticleDTO articleDTO) {
+    public Result updateArticle(@Valid @RequestBody ArticleDTO articleDTO) {
         log.info("更新文章: {}", articleDTO);
         articleService.updateArticle(articleDTO);
         return Result.success();

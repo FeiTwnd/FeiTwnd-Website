@@ -23,7 +23,7 @@ public class RssSubscriptionDTO {
     private Long visitorId;
 
     // 昵称
-    @Size(max = 30, message = "昵称不能超过30字")
+    @Size(max = 15, message = "昵称不能超过15字")
     private String nickname;
 
     // 邮箱

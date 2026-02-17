@@ -7,10 +7,13 @@ import cc.feitwnd.exception.TokenException;
 import cc.feitwnd.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.stream.Collectors;
@@ -71,6 +74,46 @@ public class GlobalExceptionHandler {
         }else{
             return Result.error(MessageConstant.UNKNOWN_ERROR);
         }
+    }
+
+    /**
+     * 请求方法不支持异常
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    public Result exceptionHandler(HttpRequestMethodNotSupportedException ex){
+        log.error("请求方法不支持：{}", ex.getMessage());
+        return Result.error("不支持的请求方法：" + ex.getMethod());
+    }
+
+    /**
+     * 缺少请求参数异常
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result exceptionHandler(MissingServletRequestParameterException ex){
+        log.error("缺少请求参数：{}", ex.getMessage());
+        return Result.error("缺少必要参数：" + ex.getParameterName());
+    }
+
+    /**
+     * 文件上传大小超限异常
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result exceptionHandler(MaxUploadSizeExceededException ex){
+        log.error("文件上传大小超限：{}", ex.getMessage());
+        return Result.error("上传文件大小超过限制");
+    }
+
+    /**
+     * 兜底异常处理
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Result exceptionHandler(Exception ex){
+        log.error("未知异常：", ex);
+        return Result.error(MessageConstant.UNKNOWN_ERROR);
     }
 
 }

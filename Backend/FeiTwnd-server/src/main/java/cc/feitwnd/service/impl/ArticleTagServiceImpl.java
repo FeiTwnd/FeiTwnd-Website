@@ -1,8 +1,10 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.dto.ArticleTagDTO;
 import cc.feitwnd.entity.ArticleTags;
 import cc.feitwnd.mapper.ArticleTagMapper;
 import cc.feitwnd.service.ArticleTagService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,7 +39,9 @@ public class ArticleTagServiceImpl implements ArticleTagService {
             @CacheEvict(value = "articleTags", allEntries = true),
             @CacheEvict(value = "blogReport", allEntries = true)
     })
-    public void addTag(ArticleTags articleTag) {
+    public void addTag(ArticleTagDTO articleTagDTO) {
+        ArticleTags articleTag = new ArticleTags();
+        BeanUtils.copyProperties(articleTagDTO, articleTag);
         articleTagMapper.insert(articleTag);
     }
 
@@ -49,7 +53,9 @@ public class ArticleTagServiceImpl implements ArticleTagService {
             @CacheEvict(value = "articleTags", allEntries = true),
             @CacheEvict(value = "blogReport", allEntries = true)
     })
-    public void updateTag(ArticleTags articleTag) {
+    public void updateTag(ArticleTagDTO articleTagDTO) {
+        ArticleTags articleTag = new ArticleTags();
+        BeanUtils.copyProperties(articleTagDTO, articleTag);
         articleTagMapper.update(articleTag);
     }
 

@@ -92,4 +92,16 @@ public interface ArticleCommentMapper {
      */
     @Select("select count(*) from article_comments where is_approved = 0")
     Integer countPending();
+
+    /**
+     * 根据根评论ID删除所有子评论
+     */
+    @Delete("delete from article_comments where root_id = #{rootId}")
+    void deleteByRootId(Long rootId);
+
+    /**
+     * 统计某根评论下的子评论数
+     */
+    @Select("select count(*) from article_comments where root_id = #{rootId}")
+    Integer countByRootId(Long rootId);
 }

@@ -1,9 +1,8 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.SocialMediaDTO;
 import cc.feitwnd.entity.SocialMedia;
 import cc.feitwnd.vo.SocialMediaVO;
-
-import java.util.List;
 
 import java.util.List;
 
@@ -22,9 +21,9 @@ public interface SocialMediaService {
 
     /**
      * 添加社交媒体信息
-     * @param socialMedia
+     * @param socialMediaDTO
      */
-    void addSocialMedia(SocialMedia socialMedia);
+    void addSocialMedia(SocialMediaDTO socialMediaDTO);
 
     /**
      * 批量删除社交媒体
@@ -34,7 +33,7 @@ public interface SocialMediaService {
 
     /**
      * 修改社交媒体信息
-     * @param socialMedia
+     * @param socialMediaDTO
      */
-    void updateSocialMedia(SocialMedia socialMedia);
+    void updateSocialMedia(SocialMediaDTO socialMediaDTO);
 }

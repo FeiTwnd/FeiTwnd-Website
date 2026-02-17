@@ -1,10 +1,12 @@
 package cc.feitwnd.service.impl;
 
 
+import cc.feitwnd.dto.PersonalInfoDTO;
 import cc.feitwnd.entity.PersonalInfo;
 import cc.feitwnd.mapper.PersonalInfoMapper;
 import cc.feitwnd.service.PersonalInfoService;
 import cc.feitwnd.vo.PersonalInfoVO;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -31,7 +33,9 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
      * @param personalInfo
      */
     @CacheEvict(value = "personalInfo", allEntries = true)
-    public void updatePersonalInfo(PersonalInfo personalInfo) {
+    public void updatePersonalInfo(PersonalInfoDTO personalInfoDTO) {
+        PersonalInfo personalInfo = new PersonalInfo();
+        BeanUtils.copyProperties(personalInfoDTO, personalInfo);
         // 更新个人信息
         personalInfoMapper.updateById(personalInfo);
     }

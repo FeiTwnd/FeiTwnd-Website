@@ -1,9 +1,8 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.SkillDTO;
 import cc.feitwnd.entity.Skills;
 import cc.feitwnd.vo.SkillVO;
-
-import java.util.List;
 
 import java.util.List;
 
@@ -16,9 +15,9 @@ public interface SkillService {
 
     /**
      * 添加技能
-     * @param skills
+     * @param skillDTO
      */
-    void addSkill(Skills skills);
+    void addSkill(SkillDTO skillDTO);
 
     /**
      * 批量删除技能
@@ -28,9 +27,9 @@ public interface SkillService {
 
     /**
      * 修改技能
-     * @param skills
+     * @param skillDTO
      */
-    void updateSkill(Skills skills);
+    void updateSkill(SkillDTO skillDTO);
 
     /**
      * 简历端获取技能信息

@@ -31,7 +31,7 @@ public class MessageDTO implements Serializable {
     private Long parentId;
 
     // 父留言昵称
-    @Size(max = 50, message = "父留言昵称不能超过50字")
+    @Size(max = 15, message = "父留言昵称不能超过15字")
     private String parentNickname;
 
     // 访客ID
@@ -40,11 +40,11 @@ public class MessageDTO implements Serializable {
 
     // 昵称
     @NotBlank(message = "昵称不能为空")
-    @Size(max = 30, message = "昵称不能超过30字")
+    @Size(max = 15, message = "昵称不能超过15字")
     private String nickname;
 
     // 邮箱或qq
-    @Size(max = 100, message = "邮箱或QQ号格式不正确")
+    @Size(max = 50, message = "邮箱或QQ号不能超过50字")
     private String emailOrQq;
 
     // 是否使用markdown，0-否，1-是

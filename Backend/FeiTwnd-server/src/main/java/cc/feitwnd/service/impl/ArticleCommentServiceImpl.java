@@ -82,11 +82,22 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      * 批量删除评论
      * @param ids
      */
+    @Transactional
     public void batchDelete(List<Long> ids) {
         // 先查询每条评论的articleId，用于减少对应文章的评论数
         for (Long id : ids) {
             ArticleComments comment = articleCommentMapper.getById(id);
             if (comment != null && comment.getArticleId() != null) {
+                // 如果是根评论，级联删除所有子评论
+                if (comment.getRootId() == null || comment.getRootId() == 0) {
+                    Integer childCount = articleCommentMapper.countByRootId(id);
+                    if (childCount != null && childCount > 0) {
+                        articleCommentMapper.deleteByRootId(id);
+                        for (int i = 0; i < childCount; i++) {
+                            articleCommentMapper.decrementCommentCount(comment.getArticleId());
+                        }
+                    }
+                }
                 articleCommentMapper.decrementCommentCount(comment.getArticleId());
             }
         }
@@ -250,6 +261,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     /**
      * 访客删除评论
      */
+    @Transactional
     public void visitorDeleteComment(Long id, Long visitorId) {
         ArticleComments comment = articleCommentMapper.getById(id);
         if (comment == null) {
@@ -257,6 +269,18 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         }
         if (!comment.getVisitorId().equals(visitorId)) {
             throw new ValidationException("无权删除此评论");
+        }
+
+        // 如果是根评论，级联删除所有子评论
+        if (comment.getRootId() == null || comment.getRootId() == 0) {
+            Integer childCount = articleCommentMapper.countByRootId(id);
+            if (childCount != null && childCount > 0) {
+                articleCommentMapper.deleteByRootId(id);
+                // 评论数减去子评论数
+                for (int i = 0; i < childCount; i++) {
+                    articleCommentMapper.decrementCommentCount(comment.getArticleId());
+                }
+            }
         }
 
         articleCommentMapper.deleteById(id);

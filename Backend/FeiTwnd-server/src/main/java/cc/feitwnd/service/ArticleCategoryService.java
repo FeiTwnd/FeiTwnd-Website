@@ -1,8 +1,7 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.ArticleCategoryDTO;
 import cc.feitwnd.entity.ArticleCategories;
-
-import java.util.List;
 
 import java.util.List;
 
@@ -15,15 +14,15 @@ public interface ArticleCategoryService {
 
     /**
      * 添加文章分类
-     * @param articleCategories
+     * @param articleCategoryDTO
      */
-    void addCategory(ArticleCategories articleCategories);
+    void addCategory(ArticleCategoryDTO articleCategoryDTO);
 
     /**
      * 更新文章分类（含排序）
-     * @param articleCategories
+     * @param articleCategoryDTO
      */
-    void updateCategory(ArticleCategories articleCategories);
+    void updateCategory(ArticleCategoryDTO articleCategoryDTO);
 
     /**
      * 批量删除文章分类

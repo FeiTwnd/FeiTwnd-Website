@@ -1,8 +1,7 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.SystemConfigDTO;
 import cc.feitwnd.entity.SystemConfig;
-
-import java.util.List;
 
 import java.util.List;
 
@@ -29,15 +28,15 @@ public interface SystemConfigService {
 
     /**
      * 添加系统配置
-     * @param systemConfig
+     * @param systemConfigDTO
      */
-    void addConfig(SystemConfig systemConfig);
+    void addConfig(SystemConfigDTO systemConfigDTO);
 
     /**
      * 更新系统配置
-     * @param systemConfig
+     * @param systemConfigDTO
      */
-    void updateConfig(SystemConfig systemConfig);
+    void updateConfig(SystemConfigDTO systemConfigDTO);
 
     /**
      * 批量删除系统配置

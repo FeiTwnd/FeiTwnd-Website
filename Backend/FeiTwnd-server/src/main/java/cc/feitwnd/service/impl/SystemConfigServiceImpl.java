@@ -1,12 +1,14 @@
 package cc.feitwnd.service.impl;
 
 import cc.feitwnd.constant.MessageConstant;
+import cc.feitwnd.dto.SystemConfigDTO;
 import cc.feitwnd.entity.SystemConfig;
 import cc.feitwnd.exception.BaseException;
 import cc.feitwnd.exception.SystemConfigException;
 import cc.feitwnd.mapper.SystemConfigMapper;
 import cc.feitwnd.service.SystemConfigService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,12 +51,14 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 添加系统配置
      * @param systemConfig
      */
-    public void addConfig(SystemConfig systemConfig) {
+    public void addConfig(SystemConfigDTO systemConfigDTO) {
         // 检查配置键是否已存在
-        SystemConfig existingConfig = systemConfigMapper.getByKey(systemConfig.getConfigKey());
+        SystemConfig existingConfig = systemConfigMapper.getByKey(systemConfigDTO.getConfigKey());
         if (existingConfig != null) {
             throw new SystemConfigException(MessageConstant.ConfigKeyExists);
         }
+        SystemConfig systemConfig = new SystemConfig();
+        BeanUtils.copyProperties(systemConfigDTO, systemConfig);
         systemConfigMapper.insert(systemConfig);
     }
 
@@ -62,7 +66,9 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 更新系统配置
      * @param systemConfig
      */
-    public void updateConfig(SystemConfig systemConfig) {
+    public void updateConfig(SystemConfigDTO systemConfigDTO) {
+        SystemConfig systemConfig = new SystemConfig();
+        BeanUtils.copyProperties(systemConfigDTO, systemConfig);
         systemConfigMapper.update(systemConfig);
     }
 

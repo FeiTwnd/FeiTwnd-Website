@@ -1,10 +1,12 @@
 package cc.feitwnd.service.impl;
 
+import cc.feitwnd.dto.SkillDTO;
 import cc.feitwnd.entity.Skills;
 import cc.feitwnd.mapper.SkillMapper;
 import cc.feitwnd.service.SkillService;
 import cc.feitwnd.vo.SkillVO;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -35,7 +37,9 @@ public class SkillServiceImpl implements SkillService {
      * @param skills
      */
     @CacheEvict(value = "skills", allEntries = true)
-    public void addSkill(Skills skills) {
+    public void addSkill(SkillDTO skillDTO) {
+        Skills skills = new Skills();
+        BeanUtils.copyProperties(skillDTO, skills);
         skillMapper.addSkill(skills);
     }
 
@@ -53,7 +57,9 @@ public class SkillServiceImpl implements SkillService {
      * @param skills
      */
     @CacheEvict(value = "skills", allEntries = true)
-    public void updateSkill(Skills skills) {
+    public void updateSkill(SkillDTO skillDTO) {
+        Skills skills = new Skills();
+        BeanUtils.copyProperties(skillDTO, skills);
         skillMapper.updateSkill(skills);
     }
 

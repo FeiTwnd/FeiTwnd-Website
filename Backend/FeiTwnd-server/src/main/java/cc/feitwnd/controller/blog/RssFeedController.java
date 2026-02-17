@@ -8,6 +8,7 @@ import cc.feitwnd.vo.PersonalInfoVO;
 import cc.feitwnd.result.PageResult;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -41,6 +42,7 @@ public class RssFeedController {
      * 生成 RSS 2.0 Feed XML
      */
     @GetMapping(value = "/rss", produces = MediaType.APPLICATION_XML_VALUE)
+    @Cacheable(value = "rssFeed", key = "'xml'")
     public String rssFeed() {
         log.info("生成RSS Feed");
 

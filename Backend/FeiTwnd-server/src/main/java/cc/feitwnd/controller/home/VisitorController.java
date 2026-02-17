@@ -1,10 +1,12 @@
 package cc.feitwnd.controller.home;
 
+import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.dto.VisitorRecordDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.VisitorService;
 import cc.feitwnd.vo.VisitorRecordVO;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +32,9 @@ public class VisitorController {
      * @return
      */
     @PostMapping("/record")
-    public Result<VisitorRecordVO> recordVisitorViewInfo(@RequestBody VisitorRecordDTO visitorRecordDTO,
+    @RateLimit(type = RateLimit.Type.IP, tokens = 10, burstCapacity = 15,
+            timeWindow = 60, message = "请求过于频繁，请稍后再试")
+    public Result<VisitorRecordVO> recordVisitorViewInfo(@Valid @RequestBody VisitorRecordDTO visitorRecordDTO,
                                                          HttpServletRequest httpRequest) {
         log.info("记录访客访问信息:{}", visitorRecordDTO);
         VisitorRecordVO visitorRecordVO = visitorService.recordVisitorViewInfo(visitorRecordDTO, httpRequest);

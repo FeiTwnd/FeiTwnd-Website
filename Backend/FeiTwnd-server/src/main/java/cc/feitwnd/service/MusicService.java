@@ -1,5 +1,6 @@
 package cc.feitwnd.service;
 
+import cc.feitwnd.dto.MusicDTO;
 import cc.feitwnd.dto.MusicPageQueryDTO;
 import cc.feitwnd.entity.Music;
 import cc.feitwnd.result.PageResult;
@@ -10,9 +11,9 @@ import java.util.List;
 public interface MusicService {
     /**
      * 添加音乐
-     * @param music
+     * @param musicDTO
      */
-    void addMusic(Music music);
+    void addMusic(MusicDTO musicDTO);
 
     /**
      * 分页查询音乐列表
@@ -23,9 +24,9 @@ public interface MusicService {
 
     /**
      * 更新音乐
-     * @param music
+     * @param musicDTO
      */
-    void updateMusic(Music music);
+    void updateMusic(MusicDTO musicDTO);
 
     /**
      * 批量删除音乐

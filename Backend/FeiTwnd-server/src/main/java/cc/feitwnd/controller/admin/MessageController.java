@@ -7,6 +7,7 @@ import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.MessageService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -69,7 +70,7 @@ public class MessageController {
      */
     @PostMapping("/reply")
     @OperationLog(value = OperationType.INSERT, target = "message", targetId = "#messageReplyDTO.parentId")
-    public Result<String> adminReply(@RequestBody MessageReplyDTO messageReplyDTO) {
+    public Result<String> adminReply(@Valid @RequestBody MessageReplyDTO messageReplyDTO) {
         log.info("管理员回复留言: {}", messageReplyDTO);
         messageService.adminReply(messageReplyDTO);
         return Result.success();

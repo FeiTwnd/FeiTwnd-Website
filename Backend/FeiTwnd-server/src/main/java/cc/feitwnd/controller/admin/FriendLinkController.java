@@ -1,10 +1,12 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.annotation.OperationLog;
+import cc.feitwnd.dto.FriendLinkDTO;
 import cc.feitwnd.entity.FriendLinks;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.FriendLinkService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,9 +38,9 @@ public class FriendLinkController {
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "friendLink")
-    public Result addFriendLink(@RequestBody FriendLinks friendLink) {
-        log.info("添加友情链接信息:{}", friendLink);
-        friendLinkService.addFriendLink(friendLink);
+    public Result addFriendLink(@Valid @RequestBody FriendLinkDTO friendLinkDTO) {
+        log.info("添加友情链接信息:{}", friendLinkDTO);
+        friendLinkService.addFriendLink(friendLinkDTO);
         return Result.success();
     }
 
@@ -57,10 +59,10 @@ public class FriendLinkController {
      * 修改友情链接信息
      */
     @PutMapping
-    @OperationLog(value = OperationType.UPDATE, target = "friendLink", targetId = "#friendLink.id")
-    public Result updateFriendLink(@RequestBody FriendLinks friendLink) {
-        log.info("修改友情链接信息:{}", friendLink);
-        friendLinkService.updateFriendLink(friendLink);
+    @OperationLog(value = OperationType.UPDATE, target = "friendLink", targetId = "#friendLinkDTO.id")
+    public Result updateFriendLink(@Valid @RequestBody FriendLinkDTO friendLinkDTO) {
+        log.info("修改友情链接信息:{}", friendLinkDTO);
+        friendLinkService.updateFriendLink(friendLinkDTO);
         return Result.success();
     }
 }

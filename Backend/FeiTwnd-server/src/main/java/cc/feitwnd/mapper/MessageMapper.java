@@ -76,5 +76,17 @@ public interface MessageMapper {
      */
     @Select("select count(*) from messages where is_approved = 0")
     Integer countPending();
+
+    /**
+     * 根据根留言ID删除所有子留言
+     */
+    @Delete("delete from messages where root_id = #{rootId}")
+    void deleteByRootId(Long rootId);
+
+    /**
+     * 统计某根留言下的子留言数
+     */
+    @Select("select count(*) from messages where root_id = #{rootId}")
+    Integer countByRootId(Long rootId);
 }
 

@@ -1,10 +1,12 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.annotation.OperationLog;
+import cc.feitwnd.dto.ArticleTagDTO;
 import cc.feitwnd.entity.ArticleTags;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleTagService;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -39,9 +41,9 @@ public class ArticleTagController {
      */
     @PostMapping
     @OperationLog(value = OperationType.INSERT, target = "articleTag")
-    public Result addTag(@RequestBody ArticleTags articleTag) {
-        log.info("添加文章标签: {}", articleTag);
-        articleTagService.addTag(articleTag);
+    public Result addTag(@Valid @RequestBody ArticleTagDTO articleTagDTO) {
+        log.info("添加文章标签: {}", articleTagDTO);
+        articleTagService.addTag(articleTagDTO);
         return Result.success();
     }
 
@@ -51,10 +53,10 @@ public class ArticleTagController {
      * @return
      */
     @PutMapping
-    @OperationLog(value = OperationType.UPDATE, target = "articleTag", targetId = "#articleTag.id")
-    public Result updateTag(@RequestBody ArticleTags articleTag) {
-        log.info("修改文章标签: {}", articleTag);
-        articleTagService.updateTag(articleTag);
+    @OperationLog(value = OperationType.UPDATE, target = "articleTag", targetId = "#articleTagDTO.id")
+    public Result updateTag(@Valid @RequestBody ArticleTagDTO articleTagDTO) {
+        log.info("修改文章标签: {}", articleTagDTO);
+        articleTagService.updateTag(articleTagDTO);
         return Result.success();
     }
 
