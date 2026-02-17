@@ -40,9 +40,9 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
      */
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
+        registry.addMapping("/**")
                 .allowedOriginPatterns("*")  // 允许所有源，或指定域名
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "FETCH", "OPTIONS")  // 允许的HTTP方法
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")  // 允许的HTTP方法
                 .allowedHeaders("*")
                 .allowCredentials(true)
                 .maxAge(3600);  // 预检请求缓存时间

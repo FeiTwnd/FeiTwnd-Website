@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Data
 @Slf4j
 @Configuration
-public class RateLimitConfig {
+public class RateLimitConfiguration {
 
     /**
      * 本地Bucket缓存: key -> Bucket

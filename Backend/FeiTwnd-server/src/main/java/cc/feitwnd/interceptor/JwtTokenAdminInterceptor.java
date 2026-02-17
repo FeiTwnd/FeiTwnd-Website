@@ -72,4 +72,22 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             throw new UnauthorizedException(MessageConstant.NOT_AUTHORIZED);
         }
     }
+
+    /**
+     * 后置处理 - 清理ThreadLocal
+     * @param request
+     * @param response
+     * @param handler
+     * @param ex
+     */
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response,
+                                Object handler, Exception ex) {
+        try {
+            // 清理ThreadLocal，防止虚拟线程复用导致adminId串用
+            BaseContext.removeCurrentId();
+        } catch (Exception e) {
+            log.error("清理ThreadLocal失败", e);
+        }
+    }
 }

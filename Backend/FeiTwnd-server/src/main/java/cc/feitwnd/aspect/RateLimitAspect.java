@@ -1,7 +1,7 @@
 package cc.feitwnd.aspect;
 
 import cc.feitwnd.annotation.RateLimit;
-import cc.feitwnd.config.RateLimitConfig;
+import cc.feitwnd.config.RateLimitConfiguration;
 import cc.feitwnd.exception.BlockedException;
 import cc.feitwnd.utils.IpUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +27,7 @@ import java.time.Duration;
 public class RateLimitAspect {
 
     @Autowired
-    private RateLimitConfig rateLimitConfig;
+    private RateLimitConfiguration rateLimitConfig;
 
     /**
      * 环绕通知：拦截带有 @RateLimit 注解的方法
