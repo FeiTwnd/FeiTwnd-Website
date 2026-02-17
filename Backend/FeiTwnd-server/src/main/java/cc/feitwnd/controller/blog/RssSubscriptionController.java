@@ -26,6 +26,8 @@ public class RssSubscriptionController {
      * @return
      */
     @PostMapping
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+            timeWindow = 60, message = "操作过于频繁，请稍后再试")
     public Result addSubscription(@RequestBody RssSubscriptionDTO rssSubscriptionDTO) {
         log.info("添加RSS订阅,{}", rssSubscriptionDTO);
         rssSubscriptionService.addSubscription(rssSubscriptionDTO);

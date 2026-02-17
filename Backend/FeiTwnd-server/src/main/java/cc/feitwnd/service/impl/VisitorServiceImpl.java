@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -143,6 +144,8 @@ public class VisitorServiceImpl implements VisitorService {
                     .isBlocked(StatusConstant.DISABLE)
                     .build();
             visitorMapper.insertVisitor(visitor);
+            // 写入Redis缓存
+            redisTemplate.opsForValue().set(cacheKey, visitor, 1, TimeUnit.HOURS);
         }else{
             // 老访客：更新基本信息
             visitor.setLastVisitTime(LocalDateTime.now());
@@ -156,6 +159,8 @@ public class VisitorServiceImpl implements VisitorService {
 
             visitor.setIp(ip);
             visitorMapper.updateById(visitor);
+            // 回写Redis缓存
+            redisTemplate.opsForValue().set(cacheKey, visitor, 1, TimeUnit.HOURS);
         }
         return visitor;
     }

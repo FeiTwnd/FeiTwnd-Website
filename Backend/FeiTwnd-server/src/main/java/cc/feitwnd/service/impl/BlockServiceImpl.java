@@ -34,7 +34,7 @@ public class BlockServiceImpl implements BlockService {
         String blockedKey = BLOCKED_KEY + fingerprint;
         Boolean isBlocked = redisTemplate.hasKey(blockedKey);
 
-        if(isBlocked){
+        if(Boolean.TRUE.equals(isBlocked)){
             throw new BlockedException(MessageConstant.VISITOR_BLOCKED);
         }
         // 检查数据库

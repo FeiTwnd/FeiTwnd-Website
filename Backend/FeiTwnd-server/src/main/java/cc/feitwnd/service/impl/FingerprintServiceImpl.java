@@ -69,31 +69,36 @@ public class FingerprintServiceImpl implements FingerprintService {
             // 提取Chrome版本号
             int chromeIndex = lowerUserAgent.indexOf("chrome/");
             if (chromeIndex > 0) {
-                version = userAgent.substring(chromeIndex + 7, chromeIndex + 12).split("\\.")[0];
+                int endIndex = Math.min(chromeIndex + 12, userAgent.length());
+                version = userAgent.substring(chromeIndex + 7, endIndex).split("\\.")[0];
             }
         } else if (lowerUserAgent.contains("firefox")) {
             browser = "Firefox";
             int firefoxIndex = lowerUserAgent.indexOf("firefox/");
             if (firefoxIndex > 0) {
-                version = userAgent.substring(firefoxIndex + 8, firefoxIndex + 12).split("\\.")[0];
+                int endIndex = Math.min(firefoxIndex + 12, userAgent.length());
+                version = userAgent.substring(firefoxIndex + 8, endIndex).split("\\.")[0];
             }
         } else if (lowerUserAgent.contains("safari") && !lowerUserAgent.contains("chrome")) {
             browser = "Safari";
             int versionIndex = lowerUserAgent.indexOf("version/");
             if (versionIndex > 0) {
-                version = userAgent.substring(versionIndex + 8, versionIndex + 12).split("\\.")[0];
+                int endIndex = Math.min(versionIndex + 12, userAgent.length());
+                version = userAgent.substring(versionIndex + 8, endIndex).split("\\.")[0];
             }
         } else if (lowerUserAgent.contains("edge")) {
             browser = "Edge";
             int edgeIndex = lowerUserAgent.indexOf("edg");
             if (edgeIndex > 0) {
-                version = userAgent.substring(edgeIndex + 4, edgeIndex + 8).split("\\.")[0];
+                int endIndex = Math.min(edgeIndex + 8, userAgent.length());
+                version = userAgent.substring(edgeIndex + 4, endIndex).split("\\.")[0];
             }
         } else if (lowerUserAgent.contains("opera")) {
             browser = "Opera";
             int operaIndex = lowerUserAgent.indexOf("opr/");
             if (operaIndex > 0) {
-                version = userAgent.substring(operaIndex + 4, operaIndex + 8).split("\\.")[0];
+                int endIndex = Math.min(operaIndex + 8, userAgent.length());
+                version = userAgent.substring(operaIndex + 4, endIndex).split("\\.")[0];
             }
         }
 

@@ -59,6 +59,12 @@ public interface ArticleCommentMapper {
     void incrementCommentCount(Long articleId);
 
     /**
+     * 评论数-1（最小为0）
+     */
+    @Update("update articles set comment_count = case when comment_count > 0 then comment_count - 1 else 0 end where id = #{articleId}")
+    void decrementCommentCount(Long articleId);
+
+    /**
      * 根据ID查询评论
      */
     @Select("select * from article_comments where id = #{id}")

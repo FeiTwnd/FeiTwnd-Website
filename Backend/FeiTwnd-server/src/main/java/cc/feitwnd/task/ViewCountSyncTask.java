@@ -46,8 +46,12 @@ public class ViewCountSyncTask {
 
                 // 批量累加到MySQL
                 articleMapper.addViewCount(articleId, increment);
-                // 从Redis中移除已同步的key
-                redisTemplate.opsForHash().delete(VIEW_COUNT_KEY, entry.getKey());
+                // 使用原子操作减去已同步的值，避免丢失同步期间新增的浏览量
+                Long remaining = redisTemplate.opsForHash().increment(VIEW_COUNT_KEY, entry.getKey(), -increment);
+                // 如果剩余值<=0，清理该key
+                if (remaining != null && remaining <= 0) {
+                    redisTemplate.opsForHash().delete(VIEW_COUNT_KEY, entry.getKey());
+                }
                 syncCount++;
             }
 

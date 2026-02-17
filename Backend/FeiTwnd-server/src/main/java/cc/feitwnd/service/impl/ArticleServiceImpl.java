@@ -31,6 +31,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -69,8 +70,10 @@ public class ArticleServiceImpl implements ArticleService {
      * 创建文章
      * @param articleDTO
      */
+    @Transactional
     @Caching(evict = {
             @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "articleDetail", allEntries = true),
             @CacheEvict(value = "articleArchive", allEntries = true),
             @CacheEvict(value = "blogReport", allEntries = true)
     })
@@ -135,6 +138,7 @@ public class ArticleServiceImpl implements ArticleService {
      * 更新文章
      * @param articleDTO
      */
+    @Transactional
     @Caching(evict = {
             @CacheEvict(value = "articleList", allEntries = true),
             @CacheEvict(value = "articleDetail", allEntries = true),
@@ -175,6 +179,7 @@ public class ArticleServiceImpl implements ArticleService {
      * 批量删除文章
      * @param ids
      */
+    @Transactional
     @Caching(evict = {
             @CacheEvict(value = "articleList", allEntries = true),
             @CacheEvict(value = "articleDetail", allEntries = true),
@@ -267,14 +272,12 @@ public class ArticleServiceImpl implements ArticleService {
         return new PageResult(pageResult.getTotal(), pageResult.getResult());
     }
 
+    @Cacheable(value = "articleDetail", key = "#slug")
     public BlogArticleDetailVO getBySlug(String slug) {
         BlogArticleDetailVO articleDetail = articleMapper.getBySlug(slug);
         if (articleDetail == null) {
             throw new ArticleException(MessageConstant.ARTICLE_NOT_FOUND);
         }
-        // 浏览量+1（写入Redis，定时同步MySQL）
-        redisTemplate.opsForHash().increment(VIEW_COUNT_KEY, articleDetail.getId().toString(), 1);
-        articleDetail.setViewCount(articleDetail.getViewCount() + 1);
 
         // 填充标签名称列表
         List<ArticleTags> tags = articleTagMapper.getTagsByArticleId(articleDetail.getId());
@@ -293,6 +296,16 @@ public class ArticleServiceImpl implements ArticleService {
         }
 
         return articleDetail;
+    }
+
+    /**
+     * 文章浏览量+1（写入Redis，定时同步MySQL）
+     */
+    public void incrementViewCount(String slug) {
+        BlogArticleDetailVO articleDetail = articleMapper.getBySlug(slug);
+        if (articleDetail != null) {
+            redisTemplate.opsForHash().increment(VIEW_COUNT_KEY, articleDetail.getId().toString(), 1);
+        }
     }
 
     public PageResult getPublishedByCategoryId(Long categoryId, int page, int pageSize) {

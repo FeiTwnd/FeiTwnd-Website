@@ -39,6 +39,8 @@ public class ArticleController {
     @GetMapping("/detail/{slug}")
     public Result<BlogArticleDetailVO> getBySlug(@PathVariable String slug) {
         log.info("博客端获取文章详情: slug={}", slug);
+        // 浏览量+1（写入Redis，与查询分离，不影响缓存）
+        articleService.incrementViewCount(slug);
         BlogArticleDetailVO articleDetail = articleService.getBySlug(slug);
         return Result.success(articleDetail);
     }

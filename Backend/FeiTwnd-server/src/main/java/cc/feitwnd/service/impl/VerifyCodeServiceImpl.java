@@ -135,16 +135,14 @@ public class VerifyCodeServiceImpl implements VerifyCodeService {
     // 获取当前尝试次数
     public Long getAttemptCount() {
         try {
-            Integer count = (Integer) redis.opsForValue().get(KEY_ATTEMPT_COUNT);
-            if (count == null) {
+            Object value = redis.opsForValue().get(KEY_ATTEMPT_COUNT);
+            if (value == null) {
                 return 0L;
             }
-            // 转化类型
-            if (count instanceof Integer) {
-                return (count).longValue();
-            }else {
-                return 0L;
+            if (value instanceof Number) {
+                return ((Number) value).longValue();
             }
+            return 0L;
         } catch (Exception e) {
             return 0L;
         }

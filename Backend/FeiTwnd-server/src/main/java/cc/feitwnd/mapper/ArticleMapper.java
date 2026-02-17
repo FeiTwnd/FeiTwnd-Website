@@ -119,6 +119,12 @@ public interface ArticleMapper {
     @Select("select count(*) from articles where is_published = 1")
     Integer countPublished();
 
+    /**
+     * 根据分类ID统计文章数
+     */
+    @Select("select count(*) from articles where category_id = #{categoryId}")
+    Integer countByCategoryId(Long categoryId);
+
     List<ArticleTitleViewCountDTO> getViewTop10();
 
     /**

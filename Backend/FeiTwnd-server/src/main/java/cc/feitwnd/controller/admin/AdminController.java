@@ -1,5 +1,6 @@
 package cc.feitwnd.controller.admin;
 
+import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.dto.*;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.AdminService;
@@ -24,6 +25,8 @@ public class AdminController {
      * 发送验证码
      */
     @PostMapping("/sendCode")
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+            timeWindow = 60, message = "操作过于频繁，请稍后再试")
     public Result sendCode(@RequestBody SendCodeDTO sendCodeDTO) {
         log.info("发送验证码,{}", sendCodeDTO);
         adminService.sendVerifyCode(sendCodeDTO.getUsername());
@@ -34,6 +37,8 @@ public class AdminController {
      * 管理员登录
      */
     @PostMapping("/login")
+    @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
+            timeWindow = 60, message = "操作过于频繁，请稍后再试")
     public Result<AdminLoginVO> AdminLogin(@RequestBody AdminLoginDTO adminLoginDTO) throws Exception {
         log.info("管理员登录：{}", adminLoginDTO);
         AdminLoginVO adminLoginVO = adminService.login(adminLoginDTO);

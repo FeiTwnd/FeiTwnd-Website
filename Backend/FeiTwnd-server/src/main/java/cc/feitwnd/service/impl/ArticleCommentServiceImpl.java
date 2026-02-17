@@ -83,6 +83,13 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      * @param ids
      */
     public void batchDelete(List<Long> ids) {
+        // 先查询每条评论的articleId，用于减少对应文章的评论数
+        for (Long id : ids) {
+            ArticleComments comment = articleCommentMapper.getById(id);
+            if (comment != null && comment.getArticleId() != null) {
+                articleCommentMapper.decrementCommentCount(comment.getArticleId());
+            }
+        }
         articleCommentMapper.batchDelete(ids);
     }
 
@@ -253,6 +260,8 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         }
 
         articleCommentMapper.deleteById(id);
+        // 文章评论数-1
+        articleCommentMapper.decrementCommentCount(comment.getArticleId());
         log.info("访客删除评论成功: id={}, visitorId={}", id, visitorId);
     }
 

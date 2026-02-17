@@ -6,6 +6,7 @@ import cc.feitwnd.service.ArticleTagService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +33,10 @@ public class ArticleTagServiceImpl implements ArticleTagService {
      * 添加标签
      * @param articleTag
      */
-    @CacheEvict(value = "articleTags", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "articleTags", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void addTag(ArticleTags articleTag) {
         articleTagMapper.insert(articleTag);
     }
@@ -41,7 +45,10 @@ public class ArticleTagServiceImpl implements ArticleTagService {
      * 修改标签
      * @param articleTag
      */
-    @CacheEvict(value = "articleTags", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "articleTags", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void updateTag(ArticleTags articleTag) {
         articleTagMapper.update(articleTag);
     }
@@ -50,7 +57,10 @@ public class ArticleTagServiceImpl implements ArticleTagService {
      * 批量删除标签
      * @param ids
      */
-    @CacheEvict(value = "articleTags", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "articleTags", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     @Transactional
     public void batchDelete(List<Long> ids) {
         // 先删除关联关系中涉及这些标签的记录

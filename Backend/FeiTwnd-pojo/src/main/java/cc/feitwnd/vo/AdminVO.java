@@ -13,6 +13,6 @@ import java.io.Serializable;
 @NoArgsConstructor
 public class AdminVO implements Serializable {
     private Long id;
-    private String nickName;
+    private String nickname;
     private String email;
 }

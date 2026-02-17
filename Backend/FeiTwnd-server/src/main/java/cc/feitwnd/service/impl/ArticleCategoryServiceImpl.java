@@ -2,10 +2,12 @@ package cc.feitwnd.service.impl;
 
 import cc.feitwnd.entity.ArticleCategories;
 import cc.feitwnd.mapper.ArticleCategoryMapper;
+import cc.feitwnd.mapper.ArticleMapper;
 import cc.feitwnd.service.ArticleCategoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,6 +17,9 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
 
     @Autowired
     private ArticleCategoryMapper articleCategoryMapper;
+
+    @Autowired
+    private ArticleMapper articleMapper;
 
     /**
      * 获取所有文章分类
@@ -29,7 +34,11 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
      * 添加文章分类
      * @param articleCategories
      */
-    @CacheEvict(value = "articleCategories", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "articleCategories", allEntries = true),
+            @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void addCategory(ArticleCategories articleCategories) {
         articleCategoryMapper.insert(articleCategories);
     }
@@ -38,7 +47,11 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
      * 更新文章分类（含排序）
      * @param articleCategories
      */
-    @CacheEvict(value = "articleCategories", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "articleCategories", allEntries = true),
+            @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void updateCategory(ArticleCategories articleCategories) {
         articleCategoryMapper.update(articleCategories);
     }
@@ -47,8 +60,19 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
      * 批量删除文章分类
      * @param ids
      */
-    @CacheEvict(value = "articleCategories", allEntries = true)
+    @Caching(evict = {
+            @CacheEvict(value = "articleCategories", allEntries = true),
+            @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "blogReport", allEntries = true)
+    })
     public void batchDelete(List<Long> ids) {
+        // 检查分类下是否有关联文章
+        for (Long id : ids) {
+            Integer count = articleMapper.countByCategoryId(id);
+            if (count != null && count > 0) {
+                throw new RuntimeException("分类下存在关联文章，无法删除");
+            }
+        }
         articleCategoryMapper.batchDelete(ids);
     }
 
