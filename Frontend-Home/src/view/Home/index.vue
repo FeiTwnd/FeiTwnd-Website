@@ -3,14 +3,21 @@ import { onMounted, ref, watch, nextTick } from 'vue'
 import { getSocialMediaAPI } from '@/api/socialMedia'
 import { getPersonalInfoAPI } from '@/api/personalInfo'
 import { recordVisitorAPI } from '@/api/visitor'
+import { getSystemConfigAPI } from '@/api/systemConfig'
 
-const startYear = 2025
-const currentYear = ref(2025)
+// 网站创建年份
+const startYear = ref(0)
+// 当前年份
+const currentYear = ref(0)
 
 // 个人信息
 const personalInfo = ref({})
 // 社交媒体信息
 const socialMedia = ref([])
+// icp备案信息
+const icpBeian = ref('')
+// 公安备案信息
+const gonganBeian = ref('')
 // 数据加载状态
 const isDataLoaded = ref(false)
 
@@ -42,9 +49,6 @@ const initTheme = () => {
   // 检测系统主题偏好
   const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
   isDarkMode.value = prefersDark
-
-  console.log('系统主题检测结果:', prefersDark ? '黑暗模式' : '亮色模式')
-
   // 立即应用主题
   applyTheme()
 
@@ -53,7 +57,6 @@ const initTheme = () => {
     .matchMedia('(prefers-color-scheme: dark)')
     .addEventListener('change', (e) => {
       isDarkMode.value = e.matches
-      console.log('主题已切换:', e.matches ? '黑暗模式' : '亮色模式')
       applyTheme()
     })
 }
@@ -61,8 +64,6 @@ const initTheme = () => {
 // 应用主题样式
 const applyTheme = () => {
   const root = document.documentElement
-
-  console.log('应用主题:', isDarkMode.value ? '黑暗' : '亮色')
 
   if (isDarkMode.value) {
     // 黑暗模式
@@ -87,13 +88,21 @@ const applyTheme = () => {
 const fetchData = async () => {
   try {
     // 并行请求数据
-    const [personalRes, socialRes] = await Promise.all([
-      getPersonalInfoAPI(),
-      getSocialMediaAPI()
-    ])
-
+    const [personalRes, socialRes, icpRes, gonganRes, startTimeRes] =
+      await Promise.all([
+        getPersonalInfoAPI(),
+        getSocialMediaAPI(),
+        getSystemConfigAPI('icp-beian'),
+        getSystemConfigAPI('gongan-beian'),
+        getSystemConfigAPI('start-time')
+      ])
     personalInfo.value = personalRes.data.data || {}
     socialMedia.value = socialRes.data.data || []
+    icpBeian.value = icpRes?.data?.data?.configValue || ''
+    gonganBeian.value = gonganRes?.data?.data?.configValue || ''
+    startYear.value = startTimeRes?.data?.data?.configValue.split('-')[0]
+      ? parseInt(startTimeRes.data.data.configValue.split('-')[0])
+      : startYear.value
     isDataLoaded.value = true
   } catch (error) {
     console.error('数据获取失败:', error)
@@ -156,14 +165,14 @@ watch([() => socialMedia.value, isDataLoaded], () => {
       <!-- 页脚 -->
       <footer>
         <div class="beian-info">
-          <span>豫公网安备41132702000130号</span>
+          <span>{{ gonganBeian }}</span>
           <span class="beian-divider">|</span>
           <a
             href="https://beian.miit.gov.cn/"
             target="_blank"
             rel="noopener noreferrer"
           >
-            豫ICP备2025138023号-1
+            {{ icpBeian }}
           </a>
           <span class="beian-divider">|</span>
           <span>© {{ startYear }}-{{ currentYear }} FeiTwnd.</span>
