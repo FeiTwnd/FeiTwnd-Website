@@ -1,0 +1,41 @@
+:root {
+  --el-color-primary: #000000;
+  --el-color-primary-light-3: #303133;
+  --el-color-primary-light-5: #606266;
+  --el-color-primary-light-7: #909399;
+  --el-color-primary-light-8: #c0c4cc;
+  --el-color-primary-light-9: #e4e7ed;
+  --el-color-primary-dark-2: #000000;
+
+  --el-text-color-primary: #303133;
+  --el-text-color-regular: #606266;
+  --el-text-color-secondary: #909399;
+  --el-text-color-placeholder: #c0c4cc;
+
+  --el-border-color: #e4e7ed;
+  --el-border-color-light: #ebeef5;
+  --el-border-color-lighter: #f2f6fc;
+
+  --el-bg-color: #ffffff;
+  --el-bg-color-page: #f5f7fa;
+  --el-fill-color: #f5f7fa;
+  --el-fill-color-light: #fafafa;
+
+  --el-border-radius-base: 6px;
+  --el-border-radius-small: 4px;
+  --el-border-radius-round: 12px;
+}
+
+.el-button {
+  font-weight: 500;
+}
+
+.el-card {
+  border-radius: 10px;
+  border-color: #e4e7ed;
+  box-shadow: none;
+}
+
+.el-table th {
+  font-weight: 600;
+}
