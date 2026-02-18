@@ -8,7 +8,7 @@ const visitorStore = useVisitorStore()
 /* ---- 搜索 ---- */
 const searchForm = ref({ country: '', province: '', city: '', status: '' })
 const page = ref(1)
-const size = ref(20)
+const size = ref(15)
 const selected = ref([])
 
 const load = () => {

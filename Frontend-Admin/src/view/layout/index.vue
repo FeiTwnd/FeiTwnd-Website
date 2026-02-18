@@ -12,6 +12,9 @@ const collapsed = ref(false)
 
 const activeMenu = computed(() => route.path)
 
+/** 文章编辑页需要全高无内边距布局 */
+const isEditorPage = computed(() => route.path.startsWith('/article/edit'))
+
 const navItems = [
   { path: '/dashboard', icon: 'icon-dashboard', label: '仪表盘' },
   { path: '/article/list', icon: 'icon-article', label: '文章管理' },
@@ -102,10 +105,10 @@ const handleLogout = () => {
       </header>
 
       <!-- 页面内容 -->
-      <main class="page-main">
+      <main :class="['page-main', { 'editor-page': isEditorPage }]">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
-            <component :is="Component" />
+            <component :is="Component" :key="$route.fullPath" />
           </transition>
         </router-view>
       </main>
@@ -270,6 +273,11 @@ const handleLogout = () => {
   flex: 1;
   overflow-y: auto;
   padding: 24px;
+}
+
+.page-main.editor-page {
+  padding: 0;
+  overflow: hidden;
 }
 
 /* ---- 路由过渡 ---- */

@@ -8,7 +8,7 @@ const logStore = useOperationLogStore()
 /* ---- 搜索 ---- */
 const searchForm = ref({ operationTarget: '', operationType: '' })
 const page = ref(1)
-const size = ref(20)
+const size = ref(15)
 const selected = ref([])
 
 /** 操作类型选项（与后端枚举对齐） */
@@ -193,7 +193,7 @@ onMounted(load)
       <el-pagination
         v-model:current-page="page"
         v-model:page-size="size"
-        :page-sizes="[10, 20, 50, 100]"
+        :page-sizes="[10, 15, 20, 50]"
         :total="logStore.total"
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="handleSizeChange"

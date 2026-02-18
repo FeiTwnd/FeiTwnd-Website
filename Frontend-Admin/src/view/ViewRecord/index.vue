@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 const analyticsStore = useAnalyticsStore()
 
 const page = ref(1)
-const size = ref(20)
+const size = ref(15)
 const selected = ref([])
 
 const load = () => {
@@ -125,7 +125,7 @@ onMounted(load)
       <el-pagination
         v-model:current-page="page"
         v-model:page-size="size"
-        :page-sizes="[10, 20, 50, 100]"
+        :page-sizes="[10, 15, 20, 50]"
         :total="analyticsStore.viewTotal"
         layout="total, sizes, prev, pager, next, jumper"
         @size-change="handleSizeChange"

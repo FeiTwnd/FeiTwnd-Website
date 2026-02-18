@@ -84,9 +84,17 @@ const openDialog = (row = null) => {
     }
   } else {
     form.value = {
-      id: null, title: '', artist: '', duration: null,
-      coverImage: '', musicUrl: '', lyricUrl: '',
-      hasLyric: 0, lyricType: '', sort: null, isVisible: 1
+      id: null,
+      title: '',
+      artist: '',
+      duration: null,
+      coverImage: '',
+      musicUrl: '',
+      lyricUrl: '',
+      hasLyric: 0,
+      lyricType: '',
+      sort: null,
+      isVisible: 1
     }
   }
   dialogVisible.value = true
@@ -101,7 +109,9 @@ const handleCoverUpload = async (options) => {
     const res = await uploadFile(fd)
     form.value.coverImage = res.data
     ElMessage.success('封面上传成功')
-  } finally { uploadingCover.value = false }
+  } finally {
+    uploadingCover.value = false
+  }
 }
 
 /** 音频上传 */
@@ -114,7 +124,9 @@ const handleAudioUpload = async (options) => {
     form.value.musicUrl = res.data
     form.value.hasLyric = form.value.musicUrl ? form.value.hasLyric : 0
     ElMessage.success('音频上传成功')
-  } finally { uploadingAudio.value = false }
+  } finally {
+    uploadingAudio.value = false
+  }
 }
 
 /** 歌词文件上传 */
@@ -127,7 +139,9 @@ const handleLyricUpload = async (options) => {
     form.value.lyricUrl = res.data
     form.value.hasLyric = 1
     ElMessage.success('歌词上传成功')
-  } finally { uploadingLyric.value = false }
+  } finally {
+    uploadingLyric.value = false
+  }
 }
 
 const handleSave = async () => {
@@ -235,18 +249,28 @@ onMounted(load)
         <el-table-column prop="artist" label="艺术家" width="130" />
         <el-table-column label="时长" width="80" align="center">
           <template #default="{ row }">
-            {{ row.duration ? Math.floor(row.duration / 60) + ':' + String(row.duration % 60).padStart(2,'0') : '-' }}
+            {{
+              row.duration
+                ? Math.floor(row.duration / 60) +
+                  ':' +
+                  String(row.duration % 60).padStart(2, '0')
+                : '-'
+            }}
           </template>
         </el-table-column>
         <el-table-column label="音频" width="90" align="center">
           <template #default="{ row }">
-            <el-tag v-if="row.musicUrl" type="success" size="small">已上传</el-tag>
+            <el-tag v-if="row.musicUrl" type="success" size="small"
+              >已上传</el-tag
+            >
             <el-tag v-else type="info" size="small">无</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="歌词" width="90" align="center">
           <template #default="{ row }">
-            <el-tag v-if="row.hasLyric" type="success" size="small">{{ row.lyricType || 'lrc' }}</el-tag>
+            <el-tag v-if="row.hasLyric" type="success" size="small">{{
+              row.lyricType || 'lrc'
+            }}</el-tag>
             <el-tag v-else type="info" size="small">无</el-tag>
           </template>
         </el-table-column>
@@ -270,9 +294,11 @@ onMounted(load)
     <div class="pagination-wrap">
       <el-pagination
         v-model:current-page="page"
-        :page-size="size"
+        v-model:page-size="size"
+        :page-sizes="[10, 15, 20, 50]"
         :total="musicStore.total"
-        layout="total, prev, pager, next"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
         @current-change="handlePageChange"
       />
     </div>
@@ -289,48 +315,117 @@ onMounted(load)
           <el-input v-model="form.title" placeholder="歌曲名称" clearable />
         </el-form-item>
         <el-form-item label="艺术家">
-          <el-input v-model="form.artist" placeholder="艺术家 / 歌手" clearable />
+          <el-input
+            v-model="form.artist"
+            placeholder="艺术家 / 歌手"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="时长(秒)">
-          <el-input-number v-model="form.duration" :min="0" :precision="0" controls-position="right" style="width:140px" placeholder="单位秒" />
+          <el-input-number
+            v-model="form.duration"
+            :min="0"
+            :precision="0"
+            controls-position="right"
+            style="width: 140px"
+            placeholder="单位秒"
+          />
         </el-form-item>
         <el-form-item label="封面">
           <div class="upload-row">
-            <el-upload :show-file-list="false" :http-request="handleCoverUpload" accept="image/*">
-              <el-button size="small" :loading="uploadingCover"><!-- ICON --><span class="iconfont icon-upload" />上传封面</el-button>
+            <el-upload
+              :show-file-list="false"
+              :http-request="handleCoverUpload"
+              accept="image/*"
+            >
+              <el-button size="small" :loading="uploadingCover"
+                ><!-- ICON --><span
+                  class="iconfont icon-upload"
+                />上传封面</el-button
+              >
             </el-upload>
-            <el-input v-model="form.coverImage" placeholder="封面图片 URL" clearable class="upload-url-input" />
+            <el-input
+              v-model="form.coverImage"
+              placeholder="封面图片 URL"
+              clearable
+              class="upload-url-input"
+            />
           </div>
-          <img v-if="form.coverImage" :src="form.coverImage" class="cover-preview" />
+          <img
+            v-if="form.coverImage"
+            :src="form.coverImage"
+            class="cover-preview"
+          />
         </el-form-item>
         <el-form-item label="音频" required>
           <div class="upload-row">
-            <el-upload :show-file-list="false" :http-request="handleAudioUpload" accept="audio/*">
-              <el-button size="small" :loading="uploadingAudio"><!-- ICON --><span class="iconfont icon-upload" />上传音频</el-button>
+            <el-upload
+              :show-file-list="false"
+              :http-request="handleAudioUpload"
+              accept="audio/*"
+            >
+              <el-button size="small" :loading="uploadingAudio"
+                ><!-- ICON --><span
+                  class="iconfont icon-upload"
+                />上传音频</el-button
+              >
             </el-upload>
-            <el-input v-model="form.musicUrl" placeholder="音频文件 URL" clearable class="upload-url-input" />
+            <el-input
+              v-model="form.musicUrl"
+              placeholder="音频文件 URL"
+              clearable
+              class="upload-url-input"
+            />
           </div>
         </el-form-item>
         <el-form-item label="歌词文件">
           <div class="upload-row">
-            <el-upload :show-file-list="false" :http-request="handleLyricUpload" accept=".lrc,.txt,.json">
-              <el-button size="small" :loading="uploadingLyric"><!-- ICON --><span class="iconfont icon-upload" />上传歌词</el-button>
+            <el-upload
+              :show-file-list="false"
+              :http-request="handleLyricUpload"
+              accept=".lrc,.txt,.json"
+            >
+              <el-button size="small" :loading="uploadingLyric"
+                ><!-- ICON --><span
+                  class="iconfont icon-upload"
+                />上传歌词</el-button
+              >
             </el-upload>
-            <el-input v-model="form.lyricUrl" placeholder="歌词文件 URL" clearable class="upload-url-input" />
+            <el-input
+              v-model="form.lyricUrl"
+              placeholder="歌词文件 URL"
+              clearable
+              class="upload-url-input"
+            />
           </div>
         </el-form-item>
         <el-form-item label="歌词类型">
-          <el-select v-model="form.lyricType" placeholder="选择歌词类型" clearable style="width:140px">
+          <el-select
+            v-model="form.lyricType"
+            placeholder="选择歌词类型"
+            clearable
+            style="width: 140px"
+          >
             <el-option label="LRC" value="lrc" />
             <el-option label="JSON" value="json" />
             <el-option label="TXT" value="txt" />
           </el-select>
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="form.sort" :min="0" :precision="0" controls-position="right" style="width:120px" />
+          <el-input-number
+            v-model="form.sort"
+            :min="0"
+            :precision="0"
+            controls-position="right"
+            style="width: 120px"
+          />
         </el-form-item>
         <el-form-item label="可见">
-          <el-switch v-model="form.isVisible" :active-value="1" :inactive-value="0" />
+          <el-switch
+            v-model="form.isVisible"
+            :active-value="1"
+            :inactive-value="0"
+          />
         </el-form-item>
       </el-form>
       <template #footer>

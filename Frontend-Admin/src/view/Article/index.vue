@@ -53,15 +53,25 @@ const handleSizeChange = (s) => {
 }
 
 /* ---- 操作 ---- */
-const toEdit = (id) => router.push(id ? `/article/edit/${id}` : '/article/edit')
+const toEdit = (id) => {
+  viewDialogVisible.value = false
+  router.push(id ? `/article/edit/${id}` : '/article/edit')
+}
 const toCreate = () => router.push('/article/edit')
 
 /* 查看文章内容 */
 const viewDialogVisible = ref(false)
 const viewRow = ref(null)
-const openView = (row) => {
-  viewRow.value = row
+const viewLoading = ref(false)
+const openView = async (row) => {
   viewDialogVisible.value = true
+  viewLoading.value = true
+  try {
+    const detail = await articleStore.fetchDetail(row.id)
+    viewRow.value = detail
+  } finally {
+    viewLoading.value = false
+  }
 }
 
 const togglePublish = async (row) => {
@@ -233,19 +243,13 @@ onMounted(load)
     top="5vh"
   >
     <div
+      v-loading="viewLoading"
       class="article-preview"
-      v-html="viewRow?.contentHtml ?? '<p>暂无内容</p>'"
+      v-html="viewRow?.contentHtml ?? (viewLoading ? '' : '<p>暂无内容</p>')"
     />
     <template #footer>
       <el-button @click="viewDialogVisible = false">关闭</el-button>
-      <el-button
-        type="primary"
-        @click="
-          toEdit(viewRow?.id);
-          viewDialogVisible = false
-        "
-        >去编辑</el-button
-      >
+      <el-button type="primary" @click="toEdit(viewRow?.id)">去编辑</el-button>
     </template>
   </el-dialog>
 </template>
