@@ -1,18 +1,35 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import {
-  getConfigList, createConfig, updateConfig, deleteConfigs,
-  getPersonalInfo, updatePersonalInfo, uploadFile
+  getConfigList,
+  createConfig,
+  updateConfig,
+  deleteConfigs,
+  getPersonalInfo,
+  updatePersonalInfo,
+  uploadFile
 } from '@/api/settings'
-import { changePassword, changeNickname, changeEmail, sendCode } from '@/api/auth'
+import {
+  changePassword,
+  changeNickname,
+  changeEmail,
+  sendCode
+} from '@/api/auth'
+import { useUserStore } from '@/stores'
 
 /* ---- Tab ---- */
 const activeTab = ref('personal')
 
 /* ---- 个人信息 ---- */
 const personalForm = ref({
-  nickname: '', tag: '', description: '', avatar: '',
-  email: '', website: '', github: '', location: ''
+  nickname: '',
+  tag: '',
+  description: '',
+  avatar: '',
+  email: '',
+  website: '',
+  github: '',
+  location: ''
 })
 const savingPersonal = ref(false)
 
@@ -40,11 +57,17 @@ const savePersonal = async () => {
 }
 
 /* ---- 系统配置 ---- */
-const configs          = ref([])
-const loadingConfig    = ref(false)
+const configs = ref([])
+const loadingConfig = ref(false)
 const configDialogVisible = ref(false)
-const configForm       = ref({ id: null, configKey: '', configValue: '', remark: '' })
-const configEditing    = ref(false)
+const configForm = ref({
+  id: null,
+  configKey: '',
+  configValue: '',
+  configType: '',
+  description: ''
+})
+const configEditing = ref(false)
 
 const fetchConfigs = async () => {
   loadingConfig.value = true
@@ -59,13 +82,26 @@ const fetchConfigs = async () => {
 const openConfigDialog = (row = null) => {
   configEditing.value = !!row
   configForm.value = row
-    ? { id: row.id, configKey: row.configKey, configValue: row.configValue, remark: row.remark ?? '' }
-    : { id: null, configKey: '', configValue: '', remark: '' }
+    ? {
+        id: row.id,
+        configKey: row.configKey,
+        configValue: row.configValue,
+        configType: row.configType ?? '',
+        description: row.description ?? ''
+      }
+    : {
+        id: null,
+        configKey: '',
+        configValue: '',
+        configType: '',
+        description: ''
+      }
   configDialogVisible.value = true
 }
 
 const saveConfig = async () => {
-  if (!configForm.value.configKey.trim()) return ElMessage.warning('配置键不能为空')
+  if (!configForm.value.configKey.trim())
+    return ElMessage.warning('配置键不能为空')
   if (configEditing.value) {
     await updateConfig({ ...configForm.value })
   } else {
@@ -78,7 +114,9 @@ const saveConfig = async () => {
 
 const deleteConfig = async (row) => {
   await ElMessageBox.confirm(`确认删除配置「${row.configKey}」？`, '警告', {
-    confirmButtonText: '删除', cancelButtonText: '取消', type: 'warning'
+    confirmButtonText: '删除',
+    cancelButtonText: '取消',
+    type: 'warning'
   })
   await deleteConfigs([row.id])
   ElMessage.success('删除成功')
@@ -110,8 +148,9 @@ const handleChangePassword = async () => {
   savingPwd.value = true
   try {
     await changePassword({ ...pwdForm.value })
-    ElMessage.success('密码修改成功，请重新登录')
-    pwdForm.value = { oldPassword: '', newPassword: '', confirmNewPassword: '' }
+    ElMessage.success('密码修改成功，即将退出登录')
+    const userStore = useUserStore()
+    await userStore.logoutAction()
   } finally {
     savingPwd.value = false
   }
@@ -127,6 +166,8 @@ const handleChangeNickname = async () => {
   try {
     await changeNickname({ nickname: nicknameVal.value })
     ElMessage.success('昵称修改成功')
+    const userStore = useUserStore()
+    await userStore.fetchUserInfo()
   } finally {
     savingNickname.value = false
   }
@@ -188,37 +229,79 @@ const handleChangeEmail = async () => {
             :show-file-list="false"
             :http-request="handleAvatarUpload"
           >
-            <img v-if="personalForm.avatar" :src="personalForm.avatar" class="avatar-preview" />
+            <img
+              v-if="personalForm.avatar"
+              :src="personalForm.avatar"
+              class="avatar-preview"
+            />
             <div v-else class="avatar-placeholder">
               <!-- ICON: icon-user -->
               <span class="iconfont icon-user" />
             </div>
           </el-upload>
 
-          <el-form :model="personalForm" label-width="90px" class="personal-form">
+          <el-form
+            :model="personalForm"
+            label-width="90px"
+            class="personal-form"
+          >
             <el-form-item label="昵称">
-              <el-input v-model="personalForm.nickname" placeholder="昵称" clearable />
+              <el-input
+                v-model="personalForm.nickname"
+                placeholder="昵称"
+                clearable
+              />
             </el-form-item>
             <el-form-item label="标签" required>
-              <el-input v-model="personalForm.tag" placeholder="如：全栈开发者 / 前端工程师" clearable />
+              <el-input
+                v-model="personalForm.tag"
+                placeholder="如：全栈开发者 / 前端工程师"
+                clearable
+              />
             </el-form-item>
             <el-form-item label="个人简介">
-              <el-input v-model="personalForm.description" type="textarea" :rows="3" placeholder="一句话介绍自己" />
+              <el-input
+                v-model="personalForm.description"
+                type="textarea"
+                :rows="3"
+                placeholder="一句话介绍自己"
+              />
             </el-form-item>
             <el-form-item label="邮箱">
-              <el-input v-model="personalForm.email" placeholder="联系邮箱" clearable />
+              <el-input
+                v-model="personalForm.email"
+                placeholder="联系邮箱"
+                clearable
+              />
             </el-form-item>
             <el-form-item label="个人网站">
-              <el-input v-model="personalForm.website" placeholder="https://..." clearable />
+              <el-input
+                v-model="personalForm.website"
+                placeholder="https://..."
+                clearable
+              />
             </el-form-item>
             <el-form-item label="GitHub">
-              <el-input v-model="personalForm.github" placeholder="https://github.com/xxx" clearable />
+              <el-input
+                v-model="personalForm.github"
+                placeholder="https://github.com/xxx"
+                clearable
+              />
             </el-form-item>
             <el-form-item label="所在地">
-              <el-input v-model="personalForm.location" placeholder="如：中国 · 广州" clearable />
+              <el-input
+                v-model="personalForm.location"
+                placeholder="如：中国 · 广州"
+                clearable
+              />
             </el-form-item>
             <el-form-item>
-              <el-button type="primary" :loading="savingPersonal" @click="savePersonal">保存</el-button>
+              <el-button
+                type="primary"
+                :loading="savingPersonal"
+                @click="savePersonal"
+                >保存</el-button
+              >
             </el-form-item>
           </el-form>
         </div>
@@ -233,14 +316,33 @@ const handleChangeEmail = async () => {
           </el-button>
         </div>
         <el-table :data="configs" border stripe v-loading="loadingConfig">
-          <el-table-column prop="configKey"   label="配置键"  min-width="180" />
-          <el-table-column prop="configValue" label="配置值"  min-width="200" show-overflow-tooltip />
-          <el-table-column prop="remark"      label="备注"    min-width="160" show-overflow-tooltip />
+          <el-table-column prop="configKey" label="配置键" min-width="160" />
+          <el-table-column
+            prop="configValue"
+            label="配置值"
+            min-width="180"
+            show-overflow-tooltip
+          />
+          <el-table-column prop="configType" label="类型" width="100" />
+          <el-table-column
+            prop="description"
+            label="描述"
+            min-width="160"
+            show-overflow-tooltip
+          />
           <el-table-column label="操作" width="140" align="center">
             <template #default="{ row }">
-              <el-button link size="small" @click="openConfigDialog(row)">编辑</el-button>
+              <el-button link size="small" @click="openConfigDialog(row)"
+                >编辑</el-button
+              >
               <el-divider direction="vertical" />
-              <el-button link size="small" type="danger" @click="deleteConfig(row)">删除</el-button>
+              <el-button
+                link
+                size="small"
+                type="danger"
+                @click="deleteConfig(row)"
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -285,7 +387,8 @@ const handleChangeEmail = async () => {
                   type="primary"
                   :loading="savingPwd"
                   @click="handleChangePassword"
-                >保存密码</el-button>
+                  >保存密码</el-button
+                >
               </el-form-item>
             </el-form>
           </div>
@@ -306,7 +409,8 @@ const handleChangeEmail = async () => {
                 type="primary"
                 :loading="savingNickname"
                 @click="handleChangeNickname"
-              >保存昵称</el-button>
+                >保存昵称</el-button
+              >
             </div>
           </div>
 
@@ -315,7 +419,11 @@ const handleChangeEmail = async () => {
           <!-- 换绑邮箱 -->
           <div class="security-section">
             <h3 class="section-title">换绑邮箱</h3>
-            <el-form :model="emailForm" label-width="100px" class="security-form">
+            <el-form
+              :model="emailForm"
+              label-width="100px"
+              class="security-form"
+            >
               <el-form-item label="新邮箱">
                 <el-input
                   v-model="emailForm.email"
@@ -336,7 +444,9 @@ const handleChangeEmail = async () => {
                     :disabled="emailCounting"
                     @click="sendEmailCode"
                   >
-                    {{ emailCounting ? `${emailCountdown}s 后重试` : '获取验证码' }}
+                    {{
+                      emailCounting ? `${emailCountdown}s 后重试` : '获取验证码'
+                    }}
                   </el-button>
                 </div>
               </el-form-item>
@@ -345,7 +455,8 @@ const handleChangeEmail = async () => {
                   type="primary"
                   :loading="savingEmail"
                   @click="handleChangeEmail"
-                >确认换绑</el-button>
+                  >确认换绑</el-button
+                >
               </el-form-item>
             </el-form>
           </div>
@@ -354,16 +465,47 @@ const handleChangeEmail = async () => {
     </el-tabs>
 
     <!-- 配置弹窗 -->
-    <el-dialog v-model="configDialogVisible" :title="configEditing ? '编辑配置' : '新增配置'" width="480px">
+    <el-dialog
+      v-model="configDialogVisible"
+      :title="configEditing ? '编辑配置' : '新增配置'"
+      width="480px"
+    >
       <el-form :model="configForm" label-width="80px">
         <el-form-item label="配置键">
-          <el-input v-model="configForm.configKey" placeholder="例如 site.title" :disabled="configEditing" />
+          <el-input
+            v-model="configForm.configKey"
+            placeholder="例如 site.title"
+          />
         </el-form-item>
         <el-form-item label="配置值">
-          <el-input v-model="configForm.configValue" type="textarea" :rows="3" placeholder="配置值" />
+          <el-input
+            v-model="configForm.configValue"
+            type="textarea"
+            :rows="3"
+            placeholder="配置值"
+          />
         </el-form-item>
-        <el-form-item label="备注">
-          <el-input v-model="configForm.remark" placeholder="备注说明" />
+        <el-form-item label="类型">
+          <el-select
+            v-model="configForm.configType"
+            placeholder="选择类型"
+            clearable
+            style="width: 100%"
+          >
+            <el-option label="string" value="string" />
+            <el-option label="number" value="number" />
+            <el-option label="boolean" value="boolean" />
+            <el-option label="json" value="json" />
+            <el-option label="text" value="text" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input
+            v-model="configForm.description"
+            type="textarea"
+            :rows="2"
+            placeholder="配置说明"
+          />
         </el-form-item>
       </el-form>
       <template #footer>

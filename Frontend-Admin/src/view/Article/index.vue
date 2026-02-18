@@ -25,7 +25,7 @@ const handleSelectionChange = (rows) => {
 const load = () => {
   articleStore.fetchList({
     page: page.value,
-    size: size.value,
+    pageSize: size.value,
     ...searchForm.value
   })
   articleStore.fetchCategories()
@@ -46,9 +46,23 @@ const handlePageChange = (p) => {
   load()
 }
 
+const handleSizeChange = (s) => {
+  size.value = s
+  page.value = 1
+  load()
+}
+
 /* ---- 操作 ---- */
 const toEdit = (id) => router.push(id ? `/article/edit/${id}` : '/article/edit')
 const toCreate = () => router.push('/article/edit')
+
+/* 查看文章内容 */
+const viewDialogVisible = ref(false)
+const viewRow = ref(null)
+const openView = (row) => {
+  viewRow.value = row
+  viewDialogVisible.value = true
+}
 
 const togglePublish = async (row) => {
   await articleStore.toggleArticlePublish(row.id, row.isPublished ? 0 : 1)
@@ -176,6 +190,10 @@ onMounted(load)
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{ row }">
             <div class="row-actions">
+              <el-button link size="small" @click="openView(row)"
+                >查看</el-button
+              >
+              <el-divider direction="vertical" />
               <el-button link size="small" @click="togglePublish(row)">
                 {{ row.isPublished ? '撤回' : '发布' }}
               </el-button>
@@ -197,13 +215,39 @@ onMounted(load)
     <div class="pagination-wrap">
       <el-pagination
         v-model:current-page="page"
-        :page-size="size"
+        v-model:page-size="size"
+        :page-sizes="[10, 15, 20, 50]"
         :total="articleStore.total"
-        layout="total, prev, pager, next"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
         @current-change="handlePageChange"
       />
     </div>
   </div>
+
+  <!-- 查看文章内容 -->
+  <el-dialog
+    v-model="viewDialogVisible"
+    :title="viewRow?.title ?? '文章预览'"
+    width="760px"
+    top="5vh"
+  >
+    <div
+      class="article-preview"
+      v-html="viewRow?.contentHtml ?? '<p>暂无内容</p>'"
+    />
+    <template #footer>
+      <el-button @click="viewDialogVisible = false">关闭</el-button>
+      <el-button
+        type="primary"
+        @click="
+          toEdit(viewRow?.id);
+          viewDialogVisible = false
+        "
+        >去编辑</el-button
+      >
+    </template>
+  </el-dialog>
 </template>
 
 <style scoped>
@@ -267,5 +311,39 @@ onMounted(load)
 .pagination-wrap {
   display: flex;
   justify-content: flex-end;
+}
+
+.article-preview {
+  padding: 8px 4px;
+  line-height: 1.8;
+  font-size: 15px;
+  color: #303133;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.article-preview :deep(h1),
+.article-preview :deep(h2),
+.article-preview :deep(h3) {
+  font-weight: 600;
+  margin: 16px 0 8px;
+}
+.article-preview :deep(p) {
+  margin: 8px 0;
+}
+.article-preview :deep(img) {
+  max-width: 100%;
+  border-radius: 4px;
+}
+.article-preview :deep(pre) {
+  background: #f5f7fa;
+  padding: 12px;
+  border-radius: 4px;
+  overflow-x: auto;
+}
+.article-preview :deep(code) {
+  background: #f5f7fa;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 13px;
 }
 </style>

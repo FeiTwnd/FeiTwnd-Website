@@ -28,6 +28,12 @@ const handlePageChange = (p) => {
   load()
 }
 
+const handleSizeChange = (s) => {
+  size.value = s
+  page.value = 1
+  load()
+}
+
 const handleFilterChange = () => {
   page.value = 1
   load()
@@ -190,9 +196,11 @@ onMounted(load)
     <div class="pagination-wrap">
       <el-pagination
         v-model:current-page="page"
-        :page-size="size"
+        v-model:page-size="size"
+        :page-sizes="[10, 15, 20, 50]"
         :total="messageStore.total"
-        layout="total, prev, pager, next"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
         @current-change="handlePageChange"
       />
     </div>

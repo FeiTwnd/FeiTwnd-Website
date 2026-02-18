@@ -39,3 +39,36 @@
 .el-table th {
   font-weight: 600;
 }
+
+/* ---- Tag 严格黑白简约风 ---- */
+.el-tag {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #909399;
+  --el-tag-text-color: #303133;
+  --el-tag-hover-color: #606266;
+  font-weight: 500;
+}
+
+.el-tag--success {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #606266;
+  --el-tag-text-color: #303133;
+}
+
+.el-tag--warning {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #909399;
+  --el-tag-text-color: #303133;
+}
+
+.el-tag--danger {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #606266;
+  --el-tag-text-color: #606266;
+}
+
+.el-tag--info {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #c0c4cc;
+  --el-tag-text-color: #606266;
+}

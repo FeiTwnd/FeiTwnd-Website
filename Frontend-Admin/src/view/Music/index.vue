@@ -34,6 +34,12 @@ const handlePageChange = (p) => {
   load()
 }
 
+const handleSizeChange = (s) => {
+  size.value = s
+  page.value = 1
+  load()
+}
+
 const handleSelectionChange = (rows) => {
   selected.value = rows
 }

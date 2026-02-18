@@ -81,8 +81,11 @@ public class ArticleServiceImpl implements ArticleService {
         Articles articles = new Articles();
         BeanUtils.copyProperties(articleDTO, articles);
 
-        // Markdown转HTML
-        String contentHtml = MarkdownUtil.toHtml(articleDTO.getContentMarkdown());
+        // Markdown转HTML（如果是富文本编辑器输出的HTML，直接清洗）
+        String rawContent = articleDTO.getContentMarkdown();
+        String contentHtml = MarkdownUtil.isHtml(rawContent)
+                ? MarkdownUtil.sanitize(rawContent)
+                : MarkdownUtil.toHtml(rawContent);
         articles.setContentHtml(contentHtml);
 
         // 计算字数和阅读时间
@@ -155,7 +158,10 @@ public class ArticleServiceImpl implements ArticleService {
 
         // 如果Markdown内容有更新，重新转HTML并计算字数
         if (articleDTO.getContentMarkdown() != null) {
-            String contentHtml = MarkdownUtil.toHtml(articleDTO.getContentMarkdown());
+            String raw = articleDTO.getContentMarkdown();
+            String contentHtml = MarkdownUtil.isHtml(raw)
+                    ? MarkdownUtil.sanitize(raw)
+                    : MarkdownUtil.toHtml(raw);
             articles.setContentHtml(contentHtml);
 
             long wordCount = countWords(articleDTO.getContentMarkdown());

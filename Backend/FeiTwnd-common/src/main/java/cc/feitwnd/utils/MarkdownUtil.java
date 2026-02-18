@@ -33,7 +33,26 @@ public class MarkdownUtil {
     }
 
     /**
-     * 安全的HTML过滤
+     * 判断是否是 HTML 内容（如富文本编辑器输出）
+     */
+    public static boolean isHtml(String content) {
+        if (content == null) return false;
+        String trimmed = content.trim();
+        return trimmed.startsWith("<");
+    }
+
+    /**
+     * 对 HTML 内容进行 XSS 安全过滤（不进行 Markdown 转换）
+     */
+    public static String sanitize(String html) {
+        if (html == null || html.trim().isEmpty()) {
+            return "";
+        }
+        return sanitizeHtml(html);
+    }
+
+    /**
+     * 安全的 HTML 过滤
      */
     private static String sanitizeHtml(String html) {
         Safelist safelist = Safelist.relaxed()

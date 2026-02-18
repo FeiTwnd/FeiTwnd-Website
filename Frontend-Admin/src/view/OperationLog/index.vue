@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 const logStore = useOperationLogStore()
 
 /* ---- 搜索 ---- */
-const searchForm = ref({ target: '', operationType: '' })
+const searchForm = ref({ operationTarget: '', operationType: '' })
 const page = ref(1)
 const size = ref(20)
 const selected = ref([])
@@ -32,12 +32,18 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  searchForm.value = { target: '', operationType: '' }
+  searchForm.value = { operationTarget: '', operationType: '' }
   handleSearch()
 }
 
 const handlePageChange = (p) => {
   page.value = p
+  load()
+}
+
+const handleSizeChange = (s) => {
+  size.value = s
+  page.value = 1
   load()
 }
 
@@ -94,7 +100,7 @@ onMounted(load)
     <div class="toolbar">
       <div class="toolbar-left">
         <el-input
-          v-model="searchForm.target"
+          v-model="searchForm.operationTarget"
           placeholder="操作对象"
           clearable
           class="search-input"
@@ -153,7 +159,7 @@ onMounted(load)
             </el-tag>
           </template>
         </el-table-column>
-        <el-table-column prop="target" label="操作对象" width="160" />
+        <el-table-column prop="operationTarget" label="操作对象" width="160" />
         <el-table-column
           prop="targetId"
           label="目标 ID"
@@ -162,13 +168,15 @@ onMounted(load)
           show-overflow-tooltip
         />
         <el-table-column
-          prop="description"
-          label="描述"
+          prop="operateData"
+          label="操作数据"
           min-width="200"
           show-overflow-tooltip
         />
         <el-table-column label="操作时间" width="180" align="center">
-          <template #default="{ row }">{{ fmtDate(row.createTime) }}</template>
+          <template #default="{ row }">{{
+            fmtDate(row.operationTime)
+          }}</template>
         </el-table-column>
         <el-table-column label="操作" width="80" align="center" fixed="right">
           <template #default="{ row }">
@@ -184,9 +192,11 @@ onMounted(load)
     <div class="pagination-wrap">
       <el-pagination
         v-model:current-page="page"
-        :page-size="size"
+        v-model:page-size="size"
+        :page-sizes="[10, 20, 50, 100]"
         :total="logStore.total"
-        layout="total, prev, pager, next, jumper"
+        layout="total, sizes, prev, pager, next, jumper"
+        @size-change="handleSizeChange"
         @current-change="handlePageChange"
       />
     </div>

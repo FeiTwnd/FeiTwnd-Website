@@ -60,7 +60,7 @@ public class SystemConfigController {
 
     /**
      * 添加系统配置
-     * @param systemConfig
+     * @param systemConfigDTO
      * @return
      */
     @PostMapping
@@ -73,7 +73,7 @@ public class SystemConfigController {
 
     /**
      * 更新系统配置
-     * @param systemConfig
+     * @param systemConfigDTO
      * @return
      */
     @PutMapping

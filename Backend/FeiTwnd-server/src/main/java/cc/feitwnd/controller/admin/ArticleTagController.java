@@ -36,7 +36,7 @@ public class ArticleTagController {
 
     /**
      * 添加标签
-     * @param articleTag
+     * @param articleTagDTO
      * @return
      */
     @PostMapping
@@ -49,7 +49,7 @@ public class ArticleTagController {
 
     /**
      * 修改标签
-     * @param articleTag
+     * @param articleTagDTO
      * @return
      */
     @PutMapping

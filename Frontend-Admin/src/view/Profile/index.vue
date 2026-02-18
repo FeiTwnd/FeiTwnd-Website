@@ -16,6 +16,34 @@ const expDialogVisible = ref(false)
 const expEditing = ref(false)
 const uploadingLogo = ref(false)
 
+const handleLogoUpload = async (options) => {
+  uploadingLogo.value = true
+  try {
+    const fd = new FormData()
+    fd.append('file', options.file)
+    const res = await uploadFile(fd)
+    expForm.value.logo = res.data
+    ElMessage.success('上传成功')
+  } finally {
+    uploadingLogo.value = false
+  }
+}
+
+const uploadingSkillIcon = ref(false)
+
+const handleSkillIconUpload = async (options) => {
+  uploadingSkillIcon.value = true
+  try {
+    const fd = new FormData()
+    fd.append('file', options.file)
+    const res = await uploadFile(fd)
+    skillForm.value.icon = res.data
+    ElMessage.success('上传成功')
+  } finally {
+    uploadingSkillIcon.value = false
+  }
+}
+
 const expForm = ref({
   id: null,
   type: 0,
@@ -51,8 +79,15 @@ const openExpDialog = (row = null) => {
         isVisible: row.isVisible ?? 1
       }
     : {
-        id: null, type: 0, title: '', subtitle: '',
-        logoUrl: '', content: '', startDate: '', endDate: '', isVisible: 1
+        id: null,
+        type: 0,
+        title: '',
+        subtitle: '',
+        logoUrl: '',
+        content: '',
+        startDate: '',
+        endDate: '',
+        isVisible: 1
       }
   expDialogVisible.value = true
 }
@@ -86,7 +121,14 @@ const deleteExp = async (row) => {
    ============================================================ */
 const skillDialogVisible = ref(false)
 const skillEditing = ref(false)
-const skillForm = ref({ id: null, name: '', description: '', icon: '', sort: null, isVisible: 1 })
+const skillForm = ref({
+  id: null,
+  name: '',
+  description: '',
+  icon: '',
+  sort: null,
+  isVisible: 1
+})
 const skillSaving = ref(false)
 
 const openSkillDialog = (row = null) => {
@@ -100,7 +142,14 @@ const openSkillDialog = (row = null) => {
         sort: row.sort ?? null,
         isVisible: row.isVisible ?? 1
       }
-    : { id: null, name: '', description: '', icon: '', sort: null, isVisible: 1 }
+    : {
+        id: null,
+        name: '',
+        description: '',
+        icon: '',
+        sort: null,
+        isVisible: 1
+      }
   skillDialogVisible.value = true
 }
 
@@ -133,13 +182,27 @@ const deleteSkill = async (row) => {
    ============================================================ */
 const socialDialogVisible = ref(false)
 const socialEditing = ref(false)
-const socialForm = ref({ id: null, name: '', icon: '', link: '', sort: null, isVisible: 1 })
+const socialForm = ref({
+  id: null,
+  name: '',
+  icon: '',
+  link: '',
+  sort: null,
+  isVisible: 1
+})
 const socialSaving = ref(false)
 
 const openSocialDialog = (row = null) => {
   socialEditing.value = !!row
   socialForm.value = row
-    ? { id: row.id, name: row.name, icon: row.icon ?? '', link: row.link ?? '', sort: row.sort ?? null, isVisible: row.isVisible ?? 1 }
+    ? {
+        id: row.id,
+        name: row.name,
+        icon: row.icon ?? '',
+        link: row.link ?? '',
+        sort: row.sort ?? null,
+        isVisible: row.isVisible ?? 1
+      }
     : { id: null, name: '', icon: '', link: '', sort: null, isVisible: 1 }
   socialDialogVisible.value = true
 }
@@ -211,7 +274,9 @@ onMounted(() => {
           <el-table-column label="类型" width="100" align="center">
             <template #default="{ row }">
               <el-tag
-                :type="row.type === 0 ? '' : row.type === 1 ? 'success' : 'warning'"
+                :type="
+                  row.type === 0 ? '' : row.type === 1 ? 'success' : 'warning'
+                "
                 size="small"
               >
                 {{ row.type === 0 ? '教育' : row.type === 1 ? '工作' : '项目' }}
@@ -270,8 +335,18 @@ onMounted(() => {
           v-loading="profileStore.loading"
         >
           <el-table-column prop="name" label="技能名称" min-width="140" />
-          <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-          <el-table-column prop="icon" label="图标" width="160" show-overflow-tooltip />
+          <el-table-column
+            prop="description"
+            label="描述"
+            min-width="200"
+            show-overflow-tooltip
+          />
+          <el-table-column
+            prop="icon"
+            label="图标"
+            width="160"
+            show-overflow-tooltip
+          />
           <el-table-column prop="sort" label="排序" width="80" align="center" />
           <el-table-column
             label="操作"
@@ -390,11 +465,27 @@ onMounted(() => {
         </el-form-item>
         <el-form-item label="Logo">
           <div class="upload-row">
-            <el-upload :show-file-list="false" :http-request="handleLogoUpload" accept="image/*">
-              <el-button size="small" :loading="uploadingLogo"><span class="iconfont icon-upload" />上传Logo</el-button>
+            <el-upload
+              :show-file-list="false"
+              :http-request="handleLogoUpload"
+              accept="image/*"
+            >
+              <el-button size="small" :loading="uploadingLogo"
+                ><span class="iconfont icon-upload" />上传Logo</el-button
+              >
             </el-upload>
-            <el-input v-model="expForm.logoUrl" placeholder="Logo URL（可手动输入）" clearable class="upload-url-input" />
+            <el-input
+              v-model="expForm.logoUrl"
+              placeholder="Logo URL（可手动输入）"
+              clearable
+              class="upload-url-input"
+            />
           </div>
+          <img
+            v-if="expForm.logoUrl"
+            :src="expForm.logoUrl"
+            class="logo-preview"
+          />
         </el-form-item>
         <el-form-item label="开始时间" required>
           <el-input
@@ -419,7 +510,11 @@ onMounted(() => {
           />
         </el-form-item>
         <el-form-item label="可见">
-          <el-switch v-model="expForm.isVisible" :active-value="1" :inactive-value="0" />
+          <el-switch
+            v-model="expForm.isVisible"
+            :active-value="1"
+            :inactive-value="0"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -454,17 +549,58 @@ onMounted(() => {
           />
         </el-form-item>
         <el-form-item label="图标">
-          <el-input
-            v-model="skillForm.icon"
-            placeholder="图标类名或 URL（可选）"
-            clearable
+          <div
+            style="
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              flex-wrap: wrap;
+            "
+          >
+            <el-upload
+              :show-file-list="false"
+              :http-request="handleSkillIconUpload"
+              accept="image/*"
+            >
+              <el-button size="small" :loading="uploadingSkillIcon">
+                <span class="iconfont icon-upload" />上传图标
+              </el-button>
+            </el-upload>
+            <el-input
+              v-model="skillForm.icon"
+              placeholder="图标 URL（可手动填入）"
+              clearable
+              style="flex: 1; min-width: 160px"
+            />
+          </div>
+          <img
+            v-if="skillForm.icon"
+            :src="skillForm.icon"
+            style="
+              width: 36px;
+              height: 36px;
+              object-fit: contain;
+              margin-top: 6px;
+              border: 1px solid #e4e7ed;
+              border-radius: 4px;
+            "
           />
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="skillForm.sort" :min="0" :precision="0" controls-position="right" style="width:120px" />
+          <el-input-number
+            v-model="skillForm.sort"
+            :min="0"
+            :precision="0"
+            controls-position="right"
+            style="width: 120px"
+          />
         </el-form-item>
         <el-form-item label="可见">
-          <el-switch v-model="skillForm.isVisible" :active-value="1" :inactive-value="0" />
+          <el-switch
+            v-model="skillForm.isVisible"
+            :active-value="1"
+            :inactive-value="0"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -508,10 +644,20 @@ onMounted(() => {
           />
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="socialForm.sort" :min="0" :precision="0" controls-position="right" style="width:120px" />
+          <el-input-number
+            v-model="socialForm.sort"
+            :min="0"
+            :precision="0"
+            controls-position="right"
+            style="width: 120px"
+          />
         </el-form-item>
         <el-form-item label="可见">
-          <el-switch v-model="socialForm.isVisible" :active-value="1" :inactive-value="0" />
+          <el-switch
+            v-model="socialForm.isVisible"
+            :active-value="1"
+            :inactive-value="0"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -637,5 +783,25 @@ onMounted(() => {
   width: 36px;
   flex-shrink: 0;
   text-align: right;
+}
+
+/* ---- 上传行 ---- */
+.upload-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.upload-url-input {
+  flex: 1;
+}
+
+.logo-preview {
+  width: 56px;
+  height: 56px;
+  border-radius: 6px;
+  object-fit: contain;
+  margin-top: 8px;
+  border: 1px solid #e4e7ed;
 }
 </style>

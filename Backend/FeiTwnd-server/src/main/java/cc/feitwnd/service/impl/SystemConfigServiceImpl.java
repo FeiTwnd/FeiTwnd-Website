@@ -49,7 +49,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
     /**
      * 添加系统配置
-     * @param systemConfig
+     * @param systemConfigDTO
      */
     public void addConfig(SystemConfigDTO systemConfigDTO) {
         // 检查配置键是否已存在
@@ -64,7 +64,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 
     /**
      * 更新系统配置
-     * @param systemConfig
+     * @param systemConfigDTO
      */
     public void updateConfig(SystemConfigDTO systemConfigDTO) {
         SystemConfig systemConfig = new SystemConfig();
