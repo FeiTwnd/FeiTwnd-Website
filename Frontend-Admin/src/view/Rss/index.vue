@@ -5,12 +5,28 @@ import dayjs from 'dayjs'
 
 const analyticsStore = useAnalyticsStore()
 
+const searchForm = ref({ email: '', isActive: '' })
 const page = ref(1)
 const size = ref(15)
 const selected = ref([])
 
 const load = () => {
-  analyticsStore.fetchRssList({ page: page.value, pageSize: size.value })
+  analyticsStore.fetchRssList({
+    page: page.value,
+    pageSize: size.value,
+    email: searchForm.value.email || undefined,
+    isActive: searchForm.value.isActive === '' ? undefined : searchForm.value.isActive
+  })
+}
+
+const handleSearch = () => {
+  page.value = 1
+  load()
+}
+
+const handleReset = () => {
+  searchForm.value = { email: '', isActive: '' }
+  handleSearch()
 }
 
 const handlePageChange = (p) => {
@@ -62,15 +78,31 @@ onMounted(load)
     <!-- 工具栏 -->
     <div class="toolbar">
       <div class="toolbar-left">
-        <span class="page-heading">
-          <!-- ICON: icon-rss -->
-          <span class="iconfont icon-rss" />
-          RSS 订阅管理
-        </span>
+        <el-input
+          v-model="searchForm.email"
+          placeholder="搜索订阅邮箱"
+          clearable
+          class="search-input"
+          @keyup.enter="handleSearch"
+        >
+          <template #prefix>
+            <span class="iconfont icon-search" />
+          </template>
+        </el-input>
+        <el-select
+          v-model="searchForm.isActive"
+          placeholder="全部状态"
+          clearable
+          class="select-sm"
+        >
+          <el-option label="已激活" :value="1" />
+          <el-option label="未激活" :value="0" />
+        </el-select>
+        <el-button @click="handleSearch">查询</el-button>
+        <el-button @click="handleReset">重置</el-button>
       </div>
       <div class="toolbar-right">
         <el-button
-          type="danger"
           plain
           :disabled="!selected.length"
           @click="batchDelete"
@@ -92,20 +124,22 @@ onMounted(load)
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="48" />
-        <el-table-column prop="email" label="订阅邮箱" min-width="220" />
+        <el-table-column prop="nickname" label="昵称" width="130" show-overflow-tooltip />
+        <el-table-column prop="email" label="订阅邮箱" min-width="200" show-overflow-tooltip />
         <el-table-column label="状态" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.isActive ? 'success' : 'info'" size="small">
-              {{ row.isActive ? '已激活' : '未激活' }}
-            </el-tag>
+            <span>{{ row.isActive ? '已激活' : '未激活' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="订阅时间" width="170" align="center">
-          <template #default="{ row }">{{ fmtDate(row.createTime) }}</template>
+        <el-table-column label="订阅时间" width="160" align="center">
+          <template #default="{ row }">{{ fmtDate(row.subscribeTime) }}</template>
+        </el-table-column>
+        <el-table-column label="取消时间" width="160" align="center">
+          <template #default="{ row }">{{ fmtDate(row.unSubscribeTime) || '-' }}</template>
         </el-table-column>
         <el-table-column label="操作" width="80" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button link size="small" type="danger" @click="deleteOne(row)"
+            <el-button link size="small" @click="deleteOne(row)"
               >删除</el-button
             >
           </template>
@@ -143,7 +177,15 @@ onMounted(load)
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .toolbar-right {
@@ -151,23 +193,18 @@ onMounted(load)
   gap: 8px;
 }
 
+.toolbar-left .iconfont,
 .toolbar-right .iconfont {
   font-size: 14px;
   margin-right: 4px;
 }
 
-.page-heading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #303133;
+.search-input {
+  width: 200px;
 }
 
-.page-heading .iconfont {
-  font-size: 18px;
-  color: #606266;
+.select-sm {
+  width: 130px;
 }
 
 .table-wrap {

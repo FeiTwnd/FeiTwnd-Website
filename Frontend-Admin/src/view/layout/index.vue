@@ -1,10 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores'
 
 const route = useRoute()
-const router = useRouter()
 const userStore = useUserStore()
 
 /** 侧边栏是否收起 */
@@ -22,12 +21,12 @@ const navItems = [
   { path: '/comment', icon: 'icon-comment', label: '评论管理' },
   { path: '/message', icon: 'icon-message', label: '留言管理' },
   { path: '/friend-link', icon: 'icon-link', label: '友链管理' },
-  { path: '/profile', icon: 'icon-profile', label: '个人资料' },
   { path: '/music', icon: 'icon-music', label: '音乐管理' },
-  { path: '/visitor', icon: 'icon-user', label: '访客管理' },
-  { path: '/operation-log', icon: 'icon-log', label: '操作日志' },
   { path: '/rss', icon: 'icon-rss', label: 'RSS 订阅' },
+  { path: '/visitor', icon: 'icon-user', label: '访客管理' },
   { path: '/view-record', icon: 'icon-eye', label: '浏览记录' },
+  { path: '/operation-log', icon: 'icon-log', label: '操作日志' },
+  { path: '/profile', icon: 'icon-profile', label: '个人资料' },
   { path: '/settings', icon: 'icon-setting', label: '系统设置' }
 ]
 
@@ -107,9 +106,7 @@ const handleLogout = () => {
       <!-- 页面内容 -->
       <main :class="['page-main', { 'editor-page': isEditorPage }]">
         <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <component :is="Component" :key="$route.fullPath" />
-          </transition>
+          <component :is="Component" :key="$route.fullPath" />
         </router-view>
       </main>
     </div>
@@ -278,16 +275,5 @@ const handleLogout = () => {
 .page-main.editor-page {
   padding: 0;
   overflow: hidden;
-}
-
-/* ---- 路由过渡 ---- */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.18s;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

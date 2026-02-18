@@ -260,18 +260,12 @@ onMounted(load)
         </el-table-column>
         <el-table-column label="音频" width="90" align="center">
           <template #default="{ row }">
-            <el-tag v-if="row.musicUrl" type="success" size="small"
-              >已上传</el-tag
-            >
-            <el-tag v-else type="info" size="small">无</el-tag>
+            <span>{{ row.musicUrl ? '已上传' : '无' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="歌词" width="90" align="center">
           <template #default="{ row }">
-            <el-tag v-if="row.hasLyric" type="success" size="small">{{
-              row.lyricType || 'lrc'
-            }}</el-tag>
-            <el-tag v-else type="info" size="small">无</el-tag>
+            <span>{{ row.hasLyric ? row.lyricType || 'lrc' : '无' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="140" align="center" fixed="right">
@@ -281,7 +275,7 @@ onMounted(load)
                 >编辑</el-button
               >
               <el-divider direction="vertical" />
-              <el-button link size="small" type="danger" @click="deleteOne(row)"
+              <el-button link size="small" @click="deleteOne(row)"
                 >删除</el-button
               >
             </div>

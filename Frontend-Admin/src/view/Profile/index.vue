@@ -22,7 +22,7 @@ const handleLogoUpload = async (options) => {
     const fd = new FormData()
     fd.append('file', options.file)
     const res = await uploadFile(fd)
-    expForm.value.logo = res.data
+    expForm.value.logoUrl = res.data
     ElMessage.success('上传成功')
   } finally {
     uploadingLogo.value = false
@@ -273,14 +273,7 @@ onMounted(() => {
           />
           <el-table-column label="类型" width="100" align="center">
             <template #default="{ row }">
-              <el-tag
-                :type="
-                  row.type === 0 ? '' : row.type === 1 ? 'success' : 'warning'
-                "
-                size="small"
-              >
-                {{ row.type === 0 ? '教育' : row.type === 1 ? '工作' : '项目' }}
-              </el-tag>
+              <span>{{ row.type === 0 ? '教育' : row.type === 1 ? '工作' : '项目' }}</span>
             </template>
           </el-table-column>
           <el-table-column label="时间" width="200" align="center">

@@ -155,7 +155,6 @@ onMounted(load)
       </div>
       <div class="toolbar-right">
         <el-button
-          type="danger"
           plain
           :disabled="!selected.length"
           @click="batchDelete"
@@ -189,13 +188,13 @@ onMounted(load)
         <el-table-column prop="categoryName" label="分类" width="120" />
         <el-table-column label="状态" width="90" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.isPublished ? 'success' : 'info'" size="small">
-              {{ row.isPublished ? '已发布' : '草稿' }}
-            </el-tag>
+            <span>{{ row.isPublished ? '已发布' : '草稿' }}</span>
           </template>
         </el-table-column>
+        <el-table-column prop="viewCount" label="阅读" width="75" align="center" />
+        <el-table-column prop="commentCount" label="评论" width="75" align="center" />
         <el-table-column label="发布时间" width="120" align="center">
-          <template #default="{ row }">{{ fmtDate(row.createTime) }}</template>
+          <template #default="{ row }">{{ fmtDate(row.publishTime || row.createTime) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{ row }">
@@ -212,7 +211,7 @@ onMounted(load)
                 >编辑</el-button
               >
               <el-divider direction="vertical" />
-              <el-button link size="small" type="danger" @click="deleteOne(row)"
+              <el-button link size="small" @click="deleteOne(row)"
                 >删除</el-button
               >
             </div>

@@ -126,7 +126,6 @@ onMounted(load)
           批量通过
         </el-button>
         <el-button
-          type="danger"
           plain
           :disabled="!selected.length"
           @click="batchDelete"
@@ -154,16 +153,25 @@ onMounted(load)
         </el-table-column>
         <el-table-column prop="nickname" label="昵称" width="110" />
         <el-table-column
-          prop="email"
-          label="邮箱"
+          prop="emailOrQq"
+          label="邮笱/QQ"
           width="180"
           show-overflow-tooltip
         />
         <el-table-column label="状态" width="90" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.isApproved ? 'success' : 'warning'" size="small">
-              {{ row.isApproved ? '已通过' : '待审核' }}
-            </el-tag>
+            <span>{{ row.isApproved ? '已通过' : '待审核' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="location"
+          label="地区"
+          width="130"
+          show-overflow-tooltip
+        />
+        <el-table-column label="设备/浏览器" width="160" show-overflow-tooltip>
+          <template #default="{ row }">
+            <span>{{ [row.userAgentOs, row.userAgentBrowser].filter(Boolean).join(' / ') || '-' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="时间" width="158" align="center">
@@ -183,7 +191,7 @@ onMounted(load)
                 >回复</el-button
               >
               <el-divider direction="vertical" />
-              <el-button link size="small" type="danger" @click="deleteOne(row)"
+              <el-button link size="small" @click="deleteOne(row)"
                 >删除</el-button
               >
             </div>

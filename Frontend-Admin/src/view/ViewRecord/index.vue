@@ -5,12 +5,28 @@ import dayjs from 'dayjs'
 
 const analyticsStore = useAnalyticsStore()
 
+const searchForm = ref({ pagePath: '', visitorId: '' })
 const page = ref(1)
 const size = ref(15)
 const selected = ref([])
 
 const load = () => {
-  analyticsStore.fetchViewList({ page: page.value, pageSize: size.value })
+  analyticsStore.fetchViewList({
+    page: page.value,
+    pageSize: size.value,
+    pagePath: searchForm.value.pagePath || undefined,
+    visitorId: searchForm.value.visitorId || undefined
+  })
+}
+
+const handleSearch = () => {
+  page.value = 1
+  load()
+}
+
+const handleReset = () => {
+  searchForm.value = { pagePath: '', visitorId: '' }
+  handleSearch()
 }
 
 const handlePageChange = (p) => {
@@ -62,15 +78,29 @@ onMounted(load)
     <!-- 工具栏 -->
     <div class="toolbar">
       <div class="toolbar-left">
-        <span class="page-heading">
-          <!-- ICON: icon-eye -->
-          <span class="iconfont icon-eye" />
-          浏览记录
-        </span>
+        <el-input
+          v-model="searchForm.pagePath"
+          placeholder="搜索页面路径"
+          clearable
+          class="search-input"
+          @keyup.enter="handleSearch"
+        >
+          <template #prefix>
+            <span class="iconfont icon-search" />
+          </template>
+        </el-input>
+        <el-input
+          v-model="searchForm.visitorId"
+          placeholder="访客 ID"
+          clearable
+          class="search-input-sm"
+          @keyup.enter="handleSearch"
+        />
+        <el-button @click="handleSearch">查询</el-button>
+        <el-button @click="handleReset">重置</el-button>
       </div>
       <div class="toolbar-right">
         <el-button
-          type="danger"
           plain
           :disabled="!selected.length"
           @click="batchDelete"
@@ -93,26 +123,36 @@ onMounted(load)
       >
         <el-table-column type="selection" width="48" />
         <el-table-column
-          prop="articleTitle"
-          label="文章标题"
-          min-width="220"
+          prop="pageTitle"
+          label="页面标题"
+          min-width="200"
           show-overflow-tooltip
         />
-        <el-table-column prop="visitorIp" label="访客 IP" width="150" />
         <el-table-column
-          prop="province"
-          label="归属地"
-          width="130"
+          prop="pagePath"
+          label="页面路径"
+          min-width="180"
           show-overflow-tooltip
         />
-        <el-table-column label="浏览时间" width="170" align="center">
+        <el-table-column
+          prop="ipAddress"
+          label="访客 IP"
+          width="150"
+        />
+        <el-table-column
+          prop="referer"
+          label="来源"
+          min-width="160"
+          show-overflow-tooltip
+        />
+        <el-table-column label="浏览时间" width="160" align="center">
           <template #default="{ row }">{{
-            fmtDate(row.viewTime ?? row.createTime)
+            fmtDate(row.viewTime)
           }}</template>
         </el-table-column>
         <el-table-column label="操作" width="80" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button link size="small" type="danger" @click="deleteOne(row)"
+            <el-button link size="small" @click="deleteOne(row)"
               >删除</el-button
             >
           </template>
@@ -150,7 +190,15 @@ onMounted(load)
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .toolbar-right {
@@ -158,23 +206,18 @@ onMounted(load)
   gap: 8px;
 }
 
+.toolbar-left .iconfont,
 .toolbar-right .iconfont {
   font-size: 14px;
   margin-right: 4px;
 }
 
-.page-heading {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 15px;
-  font-weight: 600;
-  color: #303133;
+.search-input {
+  width: 200px;
 }
 
-.page-heading .iconfont {
-  font-size: 18px;
-  color: #606266;
+.search-input-sm {
+  width: 130px;
 }
 
 .table-wrap {

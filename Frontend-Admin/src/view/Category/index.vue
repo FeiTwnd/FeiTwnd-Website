@@ -62,7 +62,7 @@ const deleteTag = async (row) => {
     confirmButtonText: '删除',
     cancelButtonText: '取消',
     type: 'warning'
-  })
+  }).catch(() => { throw new Error('cancel') })
   await categoryStore.removeTags([row.id])
   ElMessage.success('删除成功')
 }
@@ -117,23 +117,23 @@ onMounted(() => {
             <span class="iconfont icon-plus" /> 新建标签
           </el-button>
         </div>
-        <div class="tag-cloud">
-          <div v-for="tag in categoryStore.tags" :key="tag.id" class="tag-item">
-            <span>{{ tag.name }}</span>
-            <span class="tag-ops">
-              <span
-                class="iconfont icon-edit op-btn"
-                @click="openTagDialog(tag)"
-              />
-              <!-- ICON: icon-edit -->
-              <span
-                class="iconfont icon-delete op-btn danger"
-                @click="deleteTag(tag)"
-              />
-              <!-- ICON: icon-delete -->
-            </span>
-          </div>
-        </div>
+        <el-table
+          :data="categoryStore.tags"
+          border
+          stripe
+          v-loading="categoryStore.loading"
+        >
+          <el-table-column prop="id" label="ID" width="80" align="center" />
+          <el-table-column prop="name" label="标签名称" min-width="140" />
+          <el-table-column prop="slug" label="Slug" min-width="180" />
+          <el-table-column label="操作" width="140" align="center">
+            <template #default="{ row }">
+              <el-button link size="small" @click="openTagDialog(row)">编辑</el-button>
+              <el-divider direction="vertical" />
+              <el-button link size="small" @click="deleteTag(row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
       </el-tab-pane>
     </el-tabs>
 
@@ -206,42 +206,5 @@ onMounted(() => {
   margin-right: 4px;
 }
 
-/* ---- 标签云 ---- */
-.tag-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
 
-.tag-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #f5f7fa;
-  border: 1px solid #e4e7ed;
-  border-radius: 16px;
-  padding: 6px 14px;
-  font-size: 13px;
-  color: #303133;
-}
-
-.tag-ops {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.op-btn {
-  font-size: 14px;
-  color: #909399;
-  cursor: pointer;
-  transition: color 0.15s;
-}
-
-.op-btn:hover {
-  color: #303133;
-}
-.op-btn.danger:hover {
-  color: #f56c6c;
-}
 </style>

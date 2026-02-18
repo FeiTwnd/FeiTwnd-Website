@@ -135,14 +135,11 @@ watch([() => socialMedia.value, isDataLoaded], () => {
     <main class="card" role="main">
       <!-- 头像 -->
       <div class="avatar-container">
-        <img
-          :src="personalInfo.avatar"
-          :alt="`${personalInfo.nickname || 'FeiTwnd'}的头像`"
-        />
+        <img :src="personalInfo.avatar" alt="头像" />
       </div>
 
       <!-- 昵称 -->
-      <h1 data-name>{{ personalInfo.nickname || 'FeiTwnd' }}</h1>
+      <h1 data-name>{{ personalInfo.nickname }}</h1>
 
       <!-- 标签 -->
       <p class="tagline">{{ personalInfo.tag }} · 欢迎来到我的主页</p>
@@ -175,7 +172,10 @@ watch([() => socialMedia.value, isDataLoaded], () => {
             {{ icpBeian }}
           </a>
           <span class="beian-divider">|</span>
-          <span>© {{ startYear }}-{{ currentYear }} FeiTwnd.</span>
+          <span
+            >© {{ startYear }}-{{ currentYear }}
+            {{ personalInfo.nickname }}.</span
+          >
         </div>
       </footer>
     </main>

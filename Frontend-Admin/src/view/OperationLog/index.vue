@@ -6,7 +6,7 @@ import dayjs from 'dayjs'
 const logStore = useOperationLogStore()
 
 /* ---- 搜索 ---- */
-const searchForm = ref({ operationTarget: '', operationType: '' })
+const searchForm = ref({ operationTarget: '', operationType: '', startTime: '', endTime: '' })
 const page = ref(1)
 const size = ref(15)
 const selected = ref([])
@@ -32,7 +32,7 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  searchForm.value = { operationTarget: '', operationType: '' }
+  searchForm.value = { operationTarget: '', operationType: '', startTime: '', endTime: '' }
   handleSearch()
 }
 
@@ -78,13 +78,7 @@ const batchDelete = async () => {
 /** 格式化时间 */
 const fmtDate = (d) => (d ? dayjs(d).format('YYYY-MM-DD HH:mm:ss') : '-')
 
-/** 操作类型 Tag 颜色 */
-const typeTagType = (t) => {
-  if (t === 'INSERT') return 'success'
-  if (t === 'UPDATE') return ''
-  if (t === 'DELETE') return 'danger'
-  return 'info'
-}
+const resultLabel = (r) => (r === 1 ? '成功' : '失败')
 
 const typeLabel = (t) => {
   const m = { INSERT: '新增', UPDATE: '更新', DELETE: '删除' }
@@ -124,12 +118,27 @@ onMounted(load)
             :value="opt.value"
           />
         </el-select>
+        <el-date-picker
+          v-model="searchForm.startTime"
+          type="datetime"
+          placeholder="开始时间"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          clearable
+          class="date-picker-sm"
+        />
+        <el-date-picker
+          v-model="searchForm.endTime"
+          type="datetime"
+          placeholder="结束时间"
+          value-format="YYYY-MM-DDTHH:mm:ss"
+          clearable
+          class="date-picker-sm"
+        />
         <el-button @click="handleSearch">查询</el-button>
         <el-button @click="handleReset">重置</el-button>
       </div>
       <div class="toolbar-right">
         <el-button
-          type="danger"
           plain
           :disabled="!selected.length"
           @click="batchDelete"
@@ -154,10 +163,8 @@ onMounted(load)
         <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column label="操作类型" width="100" align="center">
           <template #default="{ row }">
-            <el-tag :type="typeTagType(row.operationType)" size="small">
               {{ typeLabel(row.operationType) }}
-            </el-tag>
-          </template>
+            </template>
         </el-table-column>
         <el-table-column prop="operationTarget" label="操作对象" width="160" />
         <el-table-column
@@ -173,6 +180,17 @@ onMounted(load)
           min-width="200"
           show-overflow-tooltip
         />
+        <el-table-column label="操作结果" width="90" align="center">
+          <template #default="{ row }">
+            <span>{{ resultLabel(row.result) }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="errorMessage"
+          label="错误信息"
+          min-width="160"
+          show-overflow-tooltip
+        />
         <el-table-column label="操作时间" width="180" align="center">
           <template #default="{ row }">{{
             fmtDate(row.operationTime)
@@ -180,7 +198,7 @@ onMounted(load)
         </el-table-column>
         <el-table-column label="操作" width="80" align="center" fixed="right">
           <template #default="{ row }">
-            <el-button link size="small" type="danger" @click="deleteOne(row)">
+            <el-button link size="small" @click="deleteOne(row)">
               删除
             </el-button>
           </template>
@@ -246,6 +264,10 @@ onMounted(load)
 
 .select-sm {
   width: 130px;
+}
+
+.date-picker-sm {
+  width: 170px;
 }
 
 .table-wrap {

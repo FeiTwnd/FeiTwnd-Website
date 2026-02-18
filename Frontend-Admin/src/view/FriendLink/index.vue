@@ -102,7 +102,6 @@ onMounted(() => friendLinkStore.fetchList())
       </div>
       <div class="toolbar-right">
         <el-button
-          type="danger"
           plain
           :disabled="!selected.length"
           @click="batchDelete"
@@ -151,9 +150,15 @@ onMounted(() => friendLinkStore.fetchList())
         <el-table-column
           prop="description"
           label="描述"
-          min-width="200"
+          min-width="180"
           show-overflow-tooltip
         />
+        <el-table-column prop="sort" label="排序" width="75" align="center" />
+        <el-table-column label="可见" width="75" align="center">
+          <template #default="{ row }">
+            <span>{{ row.isVisible ? '是' : '否' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="140" align="center" fixed="right">
           <template #default="{ row }">
             <div class="row-actions">
@@ -165,7 +170,6 @@ onMounted(() => friendLinkStore.fetchList())
               <el-button
                 link
                 size="small"
-                type="danger"
                 @click="deleteOne(row)"
               >
                 <!-- ICON: icon-delete -->

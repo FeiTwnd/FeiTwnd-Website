@@ -133,7 +133,6 @@ onMounted(load)
           批量解封
         </el-button>
         <el-button
-          type="danger"
           plain
           :disabled="!selected.length"
           @click="batchBlock"
@@ -162,9 +161,7 @@ onMounted(load)
         <el-table-column prop="totalViews" label="浏览次数" width="100" align="center" />
         <el-table-column label="状态" width="90" align="center">
           <template #default="{ row }">
-            <el-tag :type="row.isBlocked ? 'danger' : 'success'" size="small">
-              {{ row.isBlocked ? '已封禁' : '正常' }}
-            </el-tag>
+            <span>{{ row.isBlocked ? '已封禁' : '正常' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="首次访问" width="158" align="center">
@@ -175,6 +172,11 @@ onMounted(load)
             fmtDate(row.lastVisitTime)
           }}</template>
         </el-table-column>
+        <el-table-column label="封禁到期" width="158" align="center">
+          <template #default="{ row }">
+            <span>{{ row.isBlocked ? fmtDate(row.expiresAt) || '永久' : '-' }}</span>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" width="140" align="center" fixed="right">
           <template #default="{ row }">
             <div class="row-actions">
@@ -182,7 +184,6 @@ onMounted(load)
                 v-if="!row.isBlocked"
                 link
                 size="small"
-                type="danger"
                 @click="blockOne(row)"
                 >封禁</el-button
               >
