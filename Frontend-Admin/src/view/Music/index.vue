@@ -157,7 +157,9 @@ const togglePlay = (row) => {
     audioInstance?.pause()
     audioInstance = new Audio(row.musicUrl)
     playingId.value = row.id
-    audioInstance.play().catch(() => ElMessage.error('播放失败，请检查音频地址'))
+    audioInstance
+      .play()
+      .catch(() => ElMessage.error('播放失败，请检查音频地址'))
     audioInstance.onended = () => {
       playingId.value = null
       audioInstance = null
@@ -271,8 +273,18 @@ onMounted(load)
             <span v-else class="cover-empty">-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="title" label="歌曲名" min-width="120" show-overflow-tooltip />
-        <el-table-column prop="artist" label="艺术家" width="160" show-overflow-tooltip />
+        <el-table-column
+          prop="title"
+          label="歌曲名"
+          min-width="120"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="artist"
+          label="作者"
+          width="160"
+          show-overflow-tooltip
+        />
         <el-table-column label="时长" width="80" align="center">
           <template #default="{ row }">
             {{
@@ -302,7 +314,7 @@ onMounted(load)
                 size="small"
                 :disabled="!row.musicUrl"
                 @click="togglePlay(row)"
-              >{{ playingId === row.id ? '暂停' : '播放' }}</el-button
+                >{{ playingId === row.id ? '暂停' : '播放' }}</el-button
               >
               <el-divider direction="vertical" />
               <el-button link size="small" @click="openDialog(row)"
@@ -342,12 +354,8 @@ onMounted(load)
         <el-form-item label="歌曲名" required>
           <el-input v-model="form.title" placeholder="歌曲名称" clearable />
         </el-form-item>
-        <el-form-item label="艺术家">
-          <el-input
-            v-model="form.artist"
-            placeholder="艺术家 / 歌手"
-            clearable
-          />
+        <el-form-item label="作者">
+          <el-input v-model="form.artist" placeholder="作者" clearable />
         </el-form-item>
         <el-form-item label="时长(秒)">
           <el-input-number

@@ -326,10 +326,20 @@ public class MessageServiceImpl implements MessageService {
             if (parentMessage != null
                     && parentMessage.getIsNotice() != null
                     && parentMessage.getIsNotice() == 1
-                    && parentMessage.getEmailOrQq() != null
-                    && parentMessage.getEmailOrQq().contains("@")) {
+                    && parentMessage.getEmailOrQq() != null) {
+                String emailOrQq = parentMessage.getEmailOrQq().trim();
+                String email;
+                if (emailOrQq.contains("@")) {
+                    // 本身就是邮箱，直接使用
+                    email = emailOrQq;
+                } else if (emailOrQq.matches("^[1-9]\\d{4,10}$")) {
+                    // QQ 号，拼接 @qq.com 构造邮箱地址
+                    email = emailOrQq + "@qq.com";
+                } else {
+                    return; // 格式不评别，跳过
+                }
                 asyncEmailService.sendReplyNotificationAsync(
-                        parentMessage.getEmailOrQq(),
+                        email,
                         parentMessage.getNickname(),
                         parentMessage.getContent(),
                         replyNickname,

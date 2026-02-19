@@ -7,6 +7,7 @@ import {
   getArticleViewTop10,
   getProvinceDistribution
 } from '@/api/report'
+import { getConfigByKey } from '@/api/settings'
 import * as echarts from 'echarts'
 import dayjs from 'dayjs'
 
@@ -31,6 +32,24 @@ const fetchOverview = async () => {
     overview.value = res.data ?? {}
   } finally {
     loadingOverview.value = false
+  }
+}
+
+/* ---- 运行天数 ---- */
+const runDays = ref(null)
+const runStartDate = ref('')
+
+const fetchRunDays = async () => {
+  try {
+    const res = await getConfigByKey('start-time')
+    const dateStr = res.data?.configValue ?? ''
+    if (dateStr) {
+      runStartDate.value = dateStr
+      const start = dayjs(dateStr)
+      runDays.value = dayjs().diff(start, 'day')
+    }
+  } catch (e) {
+    console.error('获取运行天数失败', e)
   }
 }
 
@@ -212,6 +231,7 @@ const initCharts = () => {
 
 onMounted(() => {
   fetchOverview()
+  fetchRunDays()
   initCharts()
 })
 </script>
@@ -286,6 +306,16 @@ onMounted(() => {
         <div ref="pieChartEl" class="chart-body" />
       </div>
     </div>
+
+    <!-- 网站运行时长 -->
+    <div v-if="runDays !== null" class="run-banner">
+      <div class="run-banner-inner">
+        <span class="run-icon iconfont icon-time" />
+        <span class="run-text">本站已稳定运行 </span>
+        <span class="run-days">{{ runDays }}</span>
+        <span class="run-unit">天</span>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -339,6 +369,44 @@ onMounted(() => {
   font-size: 13px;
   color: #909399;
   margin-top: 4px;
+}
+
+.run-banner {
+  background: #ffffff;
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 10px 28px;
+}
+
+.run-banner-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.run-icon {
+  font-size: 20px;
+  color: #303133;
+  margin-right: 2px;
+}
+
+.run-text {
+  font-size: 15px;
+  color: #606266;
+}
+
+.run-days {
+  font-size: 20px;
+  font-weight: 700;
+  color: #303133;
+  line-height: 1;
+  margin: 0 2px;
+}
+
+.run-unit {
+  font-size: 15px;
+  color: #606266;
 }
 
 .chart-row {

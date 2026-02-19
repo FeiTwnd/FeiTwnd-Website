@@ -1,5 +1,9 @@
 import http from '@/utils/request'
 
+/** 根据配置键获取配置 */
+export const getConfigByKey = (configKey) =>
+  http.get(`/admin/systemConfig/key/${configKey}`)
+
 /** 获取所有系统配置 */
 export const getConfigList = () => http.get('/admin/systemConfig')
 

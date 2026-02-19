@@ -315,10 +315,20 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
             if (parentComment != null
                     && parentComment.getIsNotice() != null
                     && parentComment.getIsNotice() == 1
-                    && parentComment.getEmailOrQq() != null
-                    && parentComment.getEmailOrQq().contains("@")) {
+                    && parentComment.getEmailOrQq() != null) {
+                String emailOrQq = parentComment.getEmailOrQq().trim();
+                String email;
+                if (emailOrQq.contains("@")) {
+                    // 本身就是邮箱，直接使用
+                    email = emailOrQq;
+                } else if (emailOrQq.matches("^[1-9]\\d{4,10}$")) {
+                    // QQ 号，拼接 @qq.com 构造邮箱地址
+                    email = emailOrQq + "@qq.com";
+                } else {
+                    return; // 格式不识别，跳过
+                }
                 asyncEmailService.sendReplyNotificationAsync(
-                        parentComment.getEmailOrQq(),
+                        email,
                         parentComment.getNickname(),
                         parentComment.getContent(),
                         replyNickname,
