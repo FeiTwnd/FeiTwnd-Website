@@ -48,7 +48,7 @@ const handleSubscribe = async () => {
             :disabled="subscribing"
             @click="handleSubscribe"
           >
-            <i class="iconfont icon-rss" />
+            <i class="iconfont icon-rssdingyue" />
           </button>
         </div>
       </div>
@@ -64,7 +64,7 @@ const handleSubscribe = async () => {
 
 <style scoped>
 .site-footer {
-  border-top: 2px solid #1a1a1a;
+  border-top: 2px solid #303133;
   background: var(--blog-bg);
   margin-top: auto;
 }
@@ -99,14 +99,14 @@ const handleSubscribe = async () => {
   font-size: 13px;
   font-weight: 600;
   margin: 0 0 8px;
-  color: #1a1a1a;
+  color: #303133;
 }
 .rss-row {
   display: flex;
   gap: 6px;
 }
 .rss-input {
-  border: 1px solid #d4d4d0;
+  border: 1px solid #e4e7ed;
   border-radius: 2px;
   padding: 5px 10px;
   font-size: 13px;
@@ -115,10 +115,10 @@ const handleSubscribe = async () => {
   font-family: inherit;
 }
 .rss-input:focus {
-  border-color: #1a1a1a;
+  border-color: #303133;
 }
 .rss-btn {
-  background: #1a1a1a;
+  background: #303133;
   color: #fff;
   border: none;
   padding: 5px 10px;
@@ -129,10 +129,10 @@ const handleSubscribe = async () => {
   opacity: 0.5;
 }
 .footer-bottom {
-  border-top: 1px solid #e8e8e4;
+  border-top: 1px solid #e4e7ed;
   text-align: center;
   padding: 12px 24px;
   font-size: 12px;
-  color: #999;
+  color: #909399;
 }
 </style>

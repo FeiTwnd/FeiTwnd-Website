@@ -23,7 +23,7 @@ onMounted(load)
 <template>
   <div class="links-page">
     <header class="page-header">
-      <i class="iconfont icon-link" />
+      <i class="iconfont icon-lianjie" />
       <h1 class="page-title">友链</h1>
       <p class="page-count">共 {{ links.length }} 位朋友</p>
     </header>
@@ -57,19 +57,19 @@ onMounted(load)
 .page-header {
   text-align: center;
   padding: 28px 0 20px;
-  border-bottom: 2px solid #1a1a1a;
+  border-bottom: 2px solid #303133;
   margin-bottom: 28px;
 }
 .page-header .iconfont {
   font-size: 22px;
-  color: #1a1a1a;
+  color: #303133;
 }
 .page-title {
   font-family: var(--blog-serif);
   font-size: 26px;
   font-weight: 700;
   margin: 6px 0 4px;
-  color: #1a1a1a;
+  color: #303133;
   letter-spacing: 1px;
 }
 .page-count {
@@ -85,7 +85,7 @@ onMounted(load)
 }
 .sk-card {
   height: 80px;
-  background: #eee;
+  background: #ebeef5;
   border-radius: 3px;
 }
 
@@ -100,7 +100,7 @@ onMounted(load)
   align-items: center;
   gap: 12px;
   padding: 14px;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 3px;
   text-decoration: none;
   color: inherit;
@@ -108,7 +108,7 @@ onMounted(load)
   background: #fff;
 }
 .link-card:hover {
-  border-color: #1a1a1a;
+  border-color: #303133;
 }
 .link-avatar {
   width: 44px;
@@ -116,7 +116,7 @@ onMounted(load)
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
 }
 .link-body {
   min-width: 0;
@@ -125,7 +125,7 @@ onMounted(load)
   font-size: 14px;
   font-weight: 600;
   margin: 0 0 2px;
-  color: #1a1a1a;
+  color: #303133;
 }
 .link-desc {
   font-size: 12px;
@@ -138,7 +138,7 @@ onMounted(load)
 
 .empty {
   text-align: center;
-  color: #999;
+  color: #909399;
   padding: 60px 0;
   font-size: 14px;
 }

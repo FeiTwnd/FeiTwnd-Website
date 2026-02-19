@@ -53,7 +53,7 @@ onMounted(load)
 <template>
   <div class="archive-page">
     <header class="page-header">
-      <i class="iconfont icon-time" />
+      <i class="iconfont icon-guidang" />
       <h1 class="page-title">归档</h1>
       <p class="page-count">共 {{ totalCount }} 篇文章</p>
     </header>
@@ -87,19 +87,19 @@ onMounted(load)
 .page-header {
   text-align: center;
   padding: 28px 0 20px;
-  border-bottom: 2px solid #1a1a1a;
+  border-bottom: 2px solid #303133;
   margin-bottom: 28px;
 }
 .page-header .iconfont {
   font-size: 22px;
-  color: #1a1a1a;
+  color: #303133;
 }
 .page-title {
   font-family: var(--blog-serif);
   font-size: 26px;
   font-weight: 700;
   margin: 6px 0 4px;
-  color: #1a1a1a;
+  color: #303133;
   letter-spacing: 1px;
 }
 .page-count {
@@ -112,7 +112,7 @@ onMounted(load)
 }
 .sk-line {
   height: 14px;
-  background: #eee;
+  background: #ebeef5;
   border-radius: 2px;
   margin-bottom: 12px;
   width: 60%;
@@ -128,10 +128,10 @@ onMounted(load)
   font-family: var(--blog-serif);
   font-size: 22px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #303133;
   margin: 0 0 12px;
   padding-bottom: 6px;
-  border-bottom: 1px solid #e8e8e4;
+  border-bottom: 1px solid #e4e7ed;
 }
 .year-list {
   list-style: none;
@@ -143,7 +143,7 @@ onMounted(load)
   align-items: baseline;
   gap: 14px;
   padding: 7px 0;
-  border-bottom: 1px dashed #f0f0ec;
+  border-bottom: 1px dashed #ebeef5;
   cursor: pointer;
   transition: color 0.15s;
 }
@@ -151,23 +151,23 @@ onMounted(load)
   border-bottom: none;
 }
 .archive-item:hover .item-title {
-  color: #1a1a1a;
+  color: #303133;
 }
 .item-date {
   flex-shrink: 0;
   font-size: 13px;
-  color: #999;
+  color: #909399;
   font-family: var(--blog-serif);
   font-variant-numeric: tabular-nums;
 }
 .item-title {
   font-size: 15px;
-  color: #555;
+  color: #606266;
 }
 
 .empty {
   text-align: center;
-  color: #999;
+  color: #909399;
   padding: 60px 0;
   font-size: 14px;
 }

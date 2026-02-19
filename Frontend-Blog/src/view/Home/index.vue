@@ -194,17 +194,17 @@ onMounted(() => {
 .search-result-tip {
   padding: 10px 0 16px;
   font-size: 14px;
-  color: #555;
-  border-bottom: 1px solid #e8e8e4;
+  color: #606266;
+  border-bottom: 1px solid #e4e7ed;
   margin-bottom: 4px;
 }
 .search-count {
-  color: #999;
+  color: #909399;
   margin-left: 8px;
   font-size: 13px;
 }
 .clear-search {
-  color: #1a1a1a;
+  color: #303133;
   cursor: pointer;
   margin-left: 8px;
   font-weight: 600;
@@ -212,11 +212,11 @@ onMounted(() => {
 
 .skeleton-card {
   padding: 22px 0;
-  border-bottom: 1px solid #e8e8e4;
+  border-bottom: 1px solid #e4e7ed;
 }
 .skeleton-line {
   height: 14px;
-  background: #eee;
+  background: #ebeef5;
   border-radius: 2px;
   margin-bottom: 10px;
 }
@@ -238,7 +238,7 @@ onMounted(() => {
 .empty-tip {
   padding: 60px 0;
   text-align: center;
-  color: #999;
+  color: #909399;
   font-size: 14px;
 }
 
@@ -250,7 +250,7 @@ onMounted(() => {
   top: 72px;
 }
 .side-block {
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 3px;
   padding: 16px;
   margin-bottom: 16px;
@@ -267,7 +267,7 @@ onMounted(() => {
   height: 48px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
 }
 .author-info {
   min-width: 0;
@@ -276,7 +276,7 @@ onMounted(() => {
   font-size: 15px;
   font-weight: 700;
   margin: 0;
-  color: #1a1a1a;
+  color: #303133;
 }
 .author-tag {
   font-size: 12px;
@@ -285,7 +285,7 @@ onMounted(() => {
 }
 .author-desc {
   font-size: 13px;
-  color: #666;
+  color: #606266;
   margin: 0;
   line-height: 1.6;
 }
@@ -296,8 +296,8 @@ onMounted(() => {
   letter-spacing: 1px;
   margin: 0 0 10px;
   padding-bottom: 6px;
-  border-bottom: 1px solid #e8e8e4;
-  color: #1a1a1a;
+  border-bottom: 1px solid #e4e7ed;
+  color: #303133;
 }
 .stats-grid {
   display: grid;
@@ -312,12 +312,12 @@ onMounted(() => {
   display: block;
   font-size: 18px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #303133;
   font-family: var(--blog-serif);
 }
 .stat-label {
   font-size: 11px;
-  color: #999;
+  color: #909399;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -332,16 +332,16 @@ onMounted(() => {
   justify-content: space-between;
   padding: 5px 0;
   font-size: 13px;
-  color: #555;
+  color: #606266;
   cursor: pointer;
-  border-bottom: 1px dashed #f0f0ec;
+  border-bottom: 1px dashed #ebeef5;
   transition: color 0.15s;
 }
 .cat-item:last-child {
   border-bottom: none;
 }
 .cat-item:hover {
-  color: #1a1a1a;
+  color: #303133;
 }
 
 .tag-cloud {
@@ -351,16 +351,16 @@ onMounted(() => {
 }
 .tag-item {
   font-size: 12px;
-  color: #666;
+  color: #606266;
   padding: 2px 8px;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 2px;
   cursor: pointer;
   transition: all 0.15s;
 }
 .tag-item:hover {
-  color: #1a1a1a;
-  border-color: #1a1a1a;
+  color: #303133;
+  border-color: #303133;
 }
 
 @media (max-width: 860px) {

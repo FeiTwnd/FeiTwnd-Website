@@ -220,7 +220,7 @@ onMounted(() => {
           >
           <span><i class="iconfont icon-eye" /> {{ article.viewCount }}</span>
           <span v-if="article.wordCount"
-            ><i class="iconfont icon-bianjiwenzhang_huaban" />
+            ><i class="iconfont icon-biaoqian" />
             {{ article.wordCount }} 字</span
           >
           <span v-if="article.readingTime"
@@ -245,7 +245,7 @@ onMounted(() => {
       <!-- 点赞 + 上下篇 -->
       <div class="article-actions">
         <button class="like-btn" :class="{ liked }" @click="toggleLike">
-          <i class="iconfont icon-shield" />
+          <i class="iconfont icon-dianzan" />
           {{ liked ? '已赞' : '赞' }} {{ article.likeCount ?? 0 }}
         </button>
       </div>
@@ -259,7 +259,7 @@ onMounted(() => {
           :to="`/article/${article.prevArticle.slug}`"
           class="nav-prev"
         >
-          <i class="iconfont icon-arrow-left-bold" />
+          <i class="iconfont icon-arrow-left" />
           <span>{{ article.prevArticle.title }}</span>
         </router-link>
         <div v-else />
@@ -269,7 +269,7 @@ onMounted(() => {
           class="nav-next"
         >
           <span>{{ article.nextArticle.title }}</span>
-          <i class="iconfont icon-arrow-right-bold" />
+          <i class="iconfont icon-arrow-right" />
         </router-link>
       </div>
 
@@ -286,7 +286,7 @@ onMounted(() => {
       <!-- 评论区 -->
       <div class="comment-section">
         <h3 class="comment-title">
-          <i class="iconfont icon-comment" /> 评论 ({{ flatCommentCount }})
+          <i class="iconfont icon-pinglun" /> 评论 ({{ flatCommentCount }})
         </h3>
 
         <!-- 评论表单 -->
@@ -405,7 +405,7 @@ onMounted(() => {
 }
 .skeleton-line {
   height: 14px;
-  background: #eee;
+  background: #ebeef5;
   border-radius: 2px;
   margin-bottom: 10px;
 }
@@ -438,7 +438,7 @@ onMounted(() => {
   font-weight: 800;
   margin: 0 0 12px;
   line-height: 1.35;
-  color: #1a1a1a;
+  color: #303133;
 }
 .article-meta {
   display: flex;
@@ -459,16 +459,16 @@ onMounted(() => {
 }
 .atag {
   font-size: 12px;
-  color: #666;
+  color: #606266;
   padding: 2px 8px;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 2px;
 }
 
 /* 封面 */
 .article-cover {
   margin-bottom: 24px;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 3px;
   overflow: hidden;
 }
@@ -489,13 +489,13 @@ onMounted(() => {
 .article-content :deep(h3),
 .article-content :deep(h4) {
   font-family: var(--blog-serif);
-  color: #1a1a1a;
+  color: #303133;
   margin: 28px 0 12px;
   font-weight: 700;
 }
 .article-content :deep(h2) {
   font-size: 22px;
-  border-bottom: 1px solid #e8e8e4;
+  border-bottom: 1px solid #e4e7ed;
   padding-bottom: 6px;
 }
 .article-content :deep(h3) {
@@ -505,32 +505,32 @@ onMounted(() => {
   margin: 0 0 14px;
 }
 .article-content :deep(a) {
-  color: #1a1a1a;
+  color: #303133;
   text-decoration: underline;
 }
 .article-content :deep(img) {
   max-width: 100%;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 3px;
   margin: 8px 0;
 }
 .article-content :deep(blockquote) {
   margin: 14px 0;
   padding: 10px 16px;
-  border-left: 3px solid #1a1a1a;
-  background: #fafaf7;
-  color: #555;
+  border-left: 3px solid #303133;
+  background: #f5f7fa;
+  color: #606266;
   font-style: italic;
 }
 .article-content :deep(code) {
-  background: #f4f4f0;
+  background: #f5f7fa;
   padding: 2px 5px;
   border-radius: 2px;
   font-size: 14px;
 }
 .article-content :deep(pre) {
-  background: #1a1a1a;
-  color: #e8e8e4;
+  background: #303133;
+  color: #e4e7ed;
   padding: 16px;
   border-radius: 3px;
   overflow-x: auto;
@@ -556,12 +556,12 @@ onMounted(() => {
 }
 .article-content :deep(th),
 .article-content :deep(td) {
-  border: 1px solid #d4d4d0;
+  border: 1px solid #e4e7ed;
   padding: 8px 12px;
   text-align: left;
 }
 .article-content :deep(th) {
-  background: #f4f4f0;
+  background: #f5f7fa;
   font-weight: 600;
 }
 
@@ -570,24 +570,24 @@ onMounted(() => {
   margin: 32px 0;
   text-align: center;
   padding: 20px 0;
-  border-top: 1px solid #e8e8e4;
-  border-bottom: 1px solid #e8e8e4;
+  border-top: 1px solid #e4e7ed;
+  border-bottom: 1px solid #e4e7ed;
 }
 .like-btn {
   background: none;
-  border: 1px solid #d4d4d0;
+  border: 1px solid #e4e7ed;
   border-radius: 2px;
   padding: 8px 24px;
   font-size: 14px;
-  color: #555;
+  color: #606266;
   cursor: pointer;
   transition: all 0.15s;
   font-family: inherit;
 }
 .like-btn:hover,
 .like-btn.liked {
-  color: #1a1a1a;
-  border-color: #1a1a1a;
+  color: #303133;
+  border-color: #303133;
 }
 .like-btn .iconfont {
   margin-right: 4px;
@@ -606,14 +606,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: #555;
+  color: #606266;
   text-decoration: none;
   max-width: 48%;
   transition: color 0.15s;
 }
 .nav-prev:hover,
 .nav-next:hover {
-  color: #1a1a1a;
+  color: #303133;
 }
 .nav-next {
   margin-left: auto;
@@ -624,7 +624,7 @@ onMounted(() => {
 .related-section {
   margin: 24px 0;
   padding: 16px 0;
-  border-top: 1px solid #e8e8e4;
+  border-top: 1px solid #e4e7ed;
 }
 .related-title {
   font-size: 14px;
@@ -632,7 +632,7 @@ onMounted(() => {
   text-transform: uppercase;
   letter-spacing: 1px;
   margin: 0 0 10px;
-  color: #1a1a1a;
+  color: #303133;
 }
 .related-list {
   list-style: none;
@@ -641,28 +641,28 @@ onMounted(() => {
 }
 .related-list li {
   padding: 5px 0;
-  border-bottom: 1px dashed #f0f0ec;
+  border-bottom: 1px dashed #ebeef5;
   font-size: 14px;
 }
 .related-list a {
-  color: #555;
+  color: #606266;
   text-decoration: none;
 }
 .related-list a:hover {
-  color: #1a1a1a;
+  color: #303133;
 }
 
 /* ===== 评论区 ===== */
 .comment-section {
   margin-top: 32px;
   padding-top: 24px;
-  border-top: 2px solid #1a1a1a;
+  border-top: 2px solid #303133;
 }
 .comment-title {
   font-size: 16px;
   font-weight: 700;
   margin: 0 0 18px;
-  color: #1a1a1a;
+  color: #303133;
 }
 .comment-title .iconfont {
   font-size: 16px;
@@ -675,7 +675,7 @@ onMounted(() => {
 }
 .reply-hint {
   font-size: 13px;
-  color: #555;
+  color: #606266;
   margin-bottom: 8px;
   padding: 6px 10px;
   background: #f7f7f4;
@@ -684,7 +684,7 @@ onMounted(() => {
 .cancel-reply {
   cursor: pointer;
   margin-left: 6px;
-  color: #999;
+  color: #909399;
   font-size: 16px;
 }
 .form-row {
@@ -694,7 +694,7 @@ onMounted(() => {
 }
 .form-input {
   flex: 1;
-  border: 1px solid #d4d4d0;
+  border: 1px solid #e4e7ed;
   border-radius: 2px;
   padding: 7px 10px;
   font-size: 13px;
@@ -703,11 +703,11 @@ onMounted(() => {
   background: #fff;
 }
 .form-input:focus {
-  border-color: #1a1a1a;
+  border-color: #303133;
 }
 .form-textarea {
   width: 100%;
-  border: 1px solid #d4d4d0;
+  border: 1px solid #e4e7ed;
   border-radius: 2px;
   padding: 8px 10px;
   font-size: 13px;
@@ -719,10 +719,10 @@ onMounted(() => {
   background: #fff;
 }
 .form-textarea:focus {
-  border-color: #1a1a1a;
+  border-color: #303133;
 }
 .form-submit {
-  background: #1a1a1a;
+  background: #303133;
   color: #fff;
   border: none;
   padding: 8px 20px;
@@ -741,12 +741,12 @@ onMounted(() => {
 }
 .comment-item {
   padding: 14px 0;
-  border-bottom: 1px solid #f0f0ec;
+  border-bottom: 1px solid #ebeef5;
 }
 .comment-item.child {
   padding: 10px 0 10px 16px;
-  border-bottom: 1px dashed #f0f0ec;
-  border-left: 2px solid #e8e8e4;
+  border-bottom: 1px dashed #ebeef5;
+  border-left: 2px solid #e4e7ed;
 }
 .comment-children {
   margin-top: 4px;
@@ -761,11 +761,11 @@ onMounted(() => {
 .c-nick {
   font-size: 13px;
   font-weight: 700;
-  color: #1a1a1a;
+  color: #303133;
 }
 .c-badge {
   font-size: 10px;
-  background: #1a1a1a;
+  background: #303133;
   color: #fff;
   padding: 1px 5px;
   border-radius: 2px;
@@ -777,7 +777,7 @@ onMounted(() => {
 }
 .c-date {
   font-size: 12px;
-  color: #aaa;
+  color: #c0c4cc;
   margin-left: auto;
 }
 .c-body {
@@ -800,7 +800,7 @@ onMounted(() => {
   text-decoration: none;
 }
 .c-actions a:hover {
-  color: #1a1a1a;
+  color: #303133;
 }
 .c-actions a.danger:hover {
   color: #c00;
@@ -813,7 +813,7 @@ onMounted(() => {
 }
 .inline-btn {
   background: none;
-  border: 1px solid #d4d4d0;
+  border: 1px solid #e4e7ed;
   padding: 3px 10px;
   font-size: 12px;
   cursor: pointer;
@@ -821,18 +821,18 @@ onMounted(() => {
   font-family: inherit;
 }
 .inline-btn:hover {
-  border-color: #1a1a1a;
+  border-color: #303133;
 }
 .empty-comment {
   padding: 32px 0;
   text-align: center;
-  color: #999;
+  color: #909399;
   font-size: 14px;
 }
 .not-found {
   padding: 80px 0;
   text-align: center;
-  color: #999;
+  color: #909399;
   font-size: 16px;
 }
 

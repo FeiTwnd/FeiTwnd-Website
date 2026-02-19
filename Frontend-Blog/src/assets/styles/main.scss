@@ -1,15 +1,42 @@
-/* === 博客 CSS 变量 === */
+/* === 博客 CSS 变量（与管理端保持黑白配色一致） === */
 :root {
-  --blog-bg: #fafaf7;
-  --blog-card: #fff;
-  --blog-text: #1a1a1a;
-  --blog-text2: #555;
-  --blog-text3: #999;
-  --blog-border: #d4d4d0;
-  --blog-border-light: #e8e8e4;
-  --blog-hover: #f4f4f0;
+  --blog-bg: #f5f7fa;
+  --blog-card: #ffffff;
+  --blog-text: #303133;
+  --blog-text2: #606266;
+  --blog-text3: #909399;
+  --blog-border: #e4e7ed;
+  --blog-border-light: #ebeef5;
+  --blog-hover: #f5f7fa;
   --blog-serif: 'Noto Serif SC', Georgia, 'Times New Roman', serif;
-  --blog-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --blog-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  /* Element Plus 全局覆盖 — 黑白简约 */
+  --el-color-primary: #000000;
+  --el-color-primary-light-3: #303133;
+  --el-color-primary-light-5: #606266;
+  --el-color-primary-light-7: #909399;
+  --el-color-primary-light-8: #c0c4cc;
+  --el-color-primary-light-9: #e4e7ed;
+  --el-color-primary-dark-2: #000000;
+
+  --el-text-color-primary: #303133;
+  --el-text-color-regular: #606266;
+  --el-text-color-secondary: #909399;
+  --el-text-color-placeholder: #c0c4cc;
+
+  --el-border-color: #e4e7ed;
+  --el-border-color-light: #ebeef5;
+  --el-border-color-lighter: #f2f6fc;
+
+  --el-bg-color: #ffffff;
+  --el-bg-color-page: #f5f7fa;
+  --el-fill-color: #f5f7fa;
+  --el-fill-color-light: #fafafa;
+
+  --el-border-radius-base: 6px;
+  --el-border-radius-small: 4px;
+  --el-border-radius-round: 12px;
 }
 
 /* === 全局重置 === */
@@ -53,20 +80,64 @@ img {
   background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: #ccc;
+  background: #c0c4cc;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #aaa;
+  background: #909399;
 }
 
 /* === 文本选择 === */
 ::selection {
-  background: #1a1a1a;
+  background: #303133;
   color: #fff;
 }
 
-/* === Element Plus 覆盖 === */
+/* === Element Plus 覆盖 — 黑白简约风 === */
+.el-button {
+  font-weight: 500;
+}
+
+.el-card {
+  border-radius: 10px;
+  border-color: #e4e7ed;
+  box-shadow: none;
+}
+
+.el-table th {
+  font-weight: 600;
+}
+
+/* Tag 黑白灰 */
+.el-tag {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #909399;
+  --el-tag-text-color: #303133;
+  --el-tag-hover-color: #606266;
+  font-weight: 500;
+}
+.el-tag--success {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #606266;
+  --el-tag-text-color: #303133;
+}
+.el-tag--warning {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #909399;
+  --el-tag-text-color: #303133;
+}
+.el-tag--danger {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #606266;
+  --el-tag-text-color: #606266;
+}
+.el-tag--info {
+  --el-tag-bg-color: #f5f7fa;
+  --el-tag-border-color: #c0c4cc;
+  --el-tag-text-color: #606266;
+}
+
+/* 分页 */
 .el-pagination {
   --el-pagination-bg-color: transparent;
   --el-pagination-button-bg-color: transparent;
@@ -75,18 +146,18 @@ img {
 .el-pagination .btn-next,
 .el-pagination .el-pager li {
   border: 1px solid var(--blog-border-light) !important;
-  border-radius: 2px !important;
+  border-radius: 4px !important;
   background: var(--blog-card) !important;
   color: var(--blog-text2) !important;
   font-family: var(--blog-serif) !important;
 }
 .el-pagination .el-pager li.is-active {
-  background: var(--blog-text) !important;
+  background: #303133 !important;
   color: #fff !important;
-  border-color: var(--blog-text) !important;
+  border-color: #303133 !important;
 }
 .el-message-box {
-  border-radius: 3px !important;
+  border-radius: 6px !important;
 }
 .el-overlay {
   backdrop-filter: blur(2px);

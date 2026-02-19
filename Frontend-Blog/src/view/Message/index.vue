@@ -236,19 +236,19 @@ onMounted(() => {
 .page-header {
   text-align: center;
   padding: 28px 0 20px;
-  border-bottom: 2px solid #1a1a1a;
+  border-bottom: 2px solid #303133;
   margin-bottom: 24px;
 }
 .page-header .iconfont {
   font-size: 22px;
-  color: #1a1a1a;
+  color: #303133;
 }
 .page-title {
   font-family: var(--blog-serif);
   font-size: 26px;
   font-weight: 700;
   margin: 6px 0 4px;
-  color: #1a1a1a;
+  color: #303133;
   letter-spacing: 1px;
 }
 .page-count {
@@ -259,7 +259,7 @@ onMounted(() => {
 
 /* 表单 */
 .msg-form {
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 3px;
   padding: 16px;
   margin-bottom: 28px;
@@ -267,7 +267,7 @@ onMounted(() => {
 }
 .reply-tip {
   font-size: 13px;
-  color: #555;
+  color: #606266;
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -277,7 +277,7 @@ onMounted(() => {
   cursor: pointer;
   font-size: 16px;
   margin-left: 4px;
-  color: #999;
+  color: #909399;
 }
 .form-row {
   display: flex;
@@ -287,29 +287,29 @@ onMounted(() => {
 .form-input {
   flex: 1;
   padding: 8px 10px;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 2px;
   font-size: 13px;
   outline: none;
-  background: #fafaf7;
+  background: #f5f7fa;
 }
 .form-input:focus {
-  border-color: #1a1a1a;
+  border-color: #303133;
 }
 .form-textarea {
   width: 100%;
   padding: 8px 10px;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
   border-radius: 2px;
   font-size: 13px;
   outline: none;
   resize: vertical;
   font-family: inherit;
-  background: #fafaf7;
+  background: #f5f7fa;
   box-sizing: border-box;
 }
 .form-textarea:focus {
-  border-color: #1a1a1a;
+  border-color: #303133;
 }
 .form-actions {
   margin-top: 8px;
@@ -318,8 +318,8 @@ onMounted(() => {
 .btn-submit {
   padding: 6px 20px;
   font-size: 13px;
-  border: 1px solid #1a1a1a;
-  background: #1a1a1a;
+  border: 1px solid #303133;
+  background: #303133;
   color: #fff;
   border-radius: 2px;
   cursor: pointer;
@@ -339,14 +339,14 @@ onMounted(() => {
 }
 .msg-item.root {
   padding: 16px 0;
-  border-bottom: 1px solid #e8e8e4;
+  border-bottom: 1px solid #e4e7ed;
 }
 .msg-item.root:last-child {
   border-bottom: none;
 }
 .msg-item.child {
   padding: 10px 0 0 20px;
-  border-left: 2px solid #f0f0ec;
+  border-left: 2px solid #ebeef5;
   margin-top: 6px;
 }
 .msg-head {
@@ -359,19 +359,19 @@ onMounted(() => {
 .msg-nick {
   font-size: 14px;
   font-weight: 600;
-  color: #1a1a1a;
+  color: #303133;
 }
 .badge-admin {
   font-size: 10px;
   padding: 1px 5px;
-  border: 1px solid #1a1a1a;
+  border: 1px solid #303133;
   border-radius: 2px;
-  color: #1a1a1a;
+  color: #303133;
   letter-spacing: 0.5px;
 }
 .reply-to {
   font-size: 12px;
-  color: #999;
+  color: #909399;
 }
 .msg-date {
   font-size: 12px;
@@ -393,12 +393,12 @@ onMounted(() => {
 }
 .act {
   font-size: 12px;
-  color: #999;
+  color: #909399;
   cursor: pointer;
   transition: color 0.15s;
 }
 .act:hover {
-  color: #1a1a1a;
+  color: #303133;
 }
 .act.del:hover {
   color: #c0392b;
@@ -409,14 +409,14 @@ onMounted(() => {
 }
 .sk-line {
   height: 14px;
-  background: #eee;
+  background: #ebeef5;
   border-radius: 2px;
   margin-bottom: 12px;
   width: 60%;
 }
 .empty {
   text-align: center;
-  color: #999;
+  color: #909399;
   padding: 60px 0;
   font-size: 14px;
 }

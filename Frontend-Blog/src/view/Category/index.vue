@@ -93,19 +93,19 @@ onMounted(() => {
 .page-header {
   text-align: center;
   padding: 28px 0 20px;
-  border-bottom: 2px solid #1a1a1a;
+  border-bottom: 2px solid #303133;
   margin-bottom: 4px;
 }
 .page-header .iconfont {
   font-size: 22px;
-  color: #1a1a1a;
+  color: #303133;
 }
 .page-title {
   font-family: var(--blog-serif);
   font-size: 26px;
   font-weight: 700;
   margin: 6px 0 4px;
-  color: #1a1a1a;
+  color: #303133;
   letter-spacing: 1px;
 }
 .page-count {
@@ -118,7 +118,7 @@ onMounted(() => {
 }
 .sk-line {
   height: 14px;
-  background: #eee;
+  background: #ebeef5;
   border-radius: 2px;
   margin-bottom: 12px;
   width: 70%;
@@ -130,7 +130,7 @@ onMounted(() => {
 }
 .empty {
   text-align: center;
-  color: #999;
+  color: #909399;
   padding: 60px 0;
   font-size: 14px;
 }

@@ -1,10 +1,10 @@
-/* @font-face {
+@font-face {
   font-family: 'iconfont';
   src:
     url('../font/iconfont.woff2?t=1771475019349') format('woff2'),
     url('../font/iconfont.woff?t=1771475019349') format('woff'),
     url('../font/iconfont.ttf?t=1771475019349') format('truetype');
-} */
+}
 
 .iconfont {
   font-family: 'iconfont' !important;
@@ -13,4 +13,96 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1;
+}
+
+.icon-dianzan:before {
+  content: "\e600";
+}
+
+.icon-pinglun:before {
+  content: "\e6ad";
+}
+
+.icon-user:before {
+  content: "\e6bc";
+}
+
+.icon-arrow-right:before {
+  content: "\e602";
+}
+
+.icon-arrow-left:before {
+  content: "\e608";
+}
+
+.icon-biaoqian:before {
+  content: "\e63d";
+}
+
+.icon-p_profile:before {
+  content: "\e619";
+}
+
+.icon-guanyu:before {
+  content: "\e637";
+}
+
+.icon-liuyan:before {
+  content: "\e614";
+}
+
+.icon-yinle:before {
+  content: "\e601";
+}
+
+.icon-eye:before {
+  content: "\e78f";
+}
+
+.icon-zanting:before {
+  content: "\e61a";
+}
+
+.icon-lianjie:before {
+  content: "\e63a";
+}
+
+.icon-guidang:before {
+  content: "\e666";
+}
+
+.icon-zhuye:before {
+  content: "\e663";
+}
+
+.icon-position:before {
+  content: "\e60b";
+}
+
+.icon-youxiang:before {
+  content: "\e639";
+}
+
+.icon-time:before {
+  content: "\e680";
+}
+
+.icon-sousuo:before {
+  content: "\e603";
+}
+
+.icon-play-full:before {
+  content: "\ea8d";
+}
+
+.icon-rssdingyue:before {
+  content: "\e6e2";
+}
+
+.icon-next:before {
+  content: "\e6bd";
+}
+
+.icon-folder:before {
+  content: "\e808";
 }

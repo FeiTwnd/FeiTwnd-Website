@@ -29,7 +29,7 @@ const fmtDate = (d) => {
           ><i class="iconfont icon-eye" /> {{ article.viewCount ?? 0 }}</span
         >
         <span
-          ><i class="iconfont icon-comment" />
+          ><i class="iconfont icon-pinglun" />
           {{ article.commentCount ?? 0 }}</span
         >
       </div>
@@ -42,7 +42,7 @@ const fmtDate = (d) => {
   display: flex;
   gap: 20px;
   padding: 22px 0;
-  border-bottom: 1px solid #e8e8e4;
+  border-bottom: 1px solid #e4e7ed;
   text-decoration: none;
   color: inherit;
   transition: background 0.15s;
@@ -59,7 +59,7 @@ const fmtDate = (d) => {
   height: 120px;
   overflow: hidden;
   border-radius: 3px;
-  border: 1px solid #e8e8e4;
+  border: 1px solid #e4e7ed;
 }
 .card-cover img {
   width: 100%;
@@ -88,7 +88,7 @@ const fmtDate = (d) => {
   font-weight: 700;
   margin: 0 0 6px;
   line-height: 1.4;
-  color: #1a1a1a;
+  color: #303133;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -96,7 +96,7 @@ const fmtDate = (d) => {
 }
 .card-summary {
   font-size: 13.5px;
-  color: #666;
+  color: #606266;
   margin: 0 0 8px;
   line-height: 1.65;
   display: -webkit-box;
@@ -108,7 +108,7 @@ const fmtDate = (d) => {
   display: flex;
   gap: 14px;
   font-size: 12px;
-  color: #999;
+  color: #909399;
 }
 .card-meta .iconfont {
   font-size: 12px;
