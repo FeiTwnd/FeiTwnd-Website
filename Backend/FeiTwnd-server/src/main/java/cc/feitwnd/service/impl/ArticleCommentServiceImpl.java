@@ -108,7 +108,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      * 管理员回复评论
      * @param articleCommentReplyDTO
      */
-    public void adminReply(ArticleCommentReplyDTO articleCommentReplyDTO) {
+    public void adminReply(ArticleCommentReplyDTO articleCommentReplyDTO, HttpServletRequest request) {
         ArticleComments articleComments = new ArticleComments();
         BeanUtils.copyProperties(articleCommentReplyDTO, articleComments);
 
@@ -127,6 +127,20 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         articleComments.setNickname(websiteProperties.getTitle());
         articleComments.setCreateTime(LocalDateTime.now());
         articleComments.setUpdateTime(LocalDateTime.now());
+
+        // 捕获 IP / 地理位置 / UserAgent
+        if (request != null) {
+            String clientIp = IpUtil.getClientIp(request);
+            Map<String, String> geoInfo = IpUtil.getGeoInfo(clientIp);
+            String location = String.format("%s-%s-%s",
+                    geoInfo.getOrDefault("country", ""),
+                    geoInfo.getOrDefault("province", ""),
+                    geoInfo.getOrDefault("city", ""));
+            articleComments.setLocation(location);
+            String userAgent = request.getHeader("User-Agent");
+            articleComments.setUserAgentOs(userAgentService.getOsName(userAgent));
+            articleComments.setUserAgentBrowser(userAgentService.getBrowserName(userAgent));
+        }
 
         articleCommentMapper.save(articleComments);
 

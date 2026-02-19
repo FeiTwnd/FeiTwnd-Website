@@ -131,19 +131,25 @@ onMounted(load)
           placeholder="文章 ID"
           clearable
           class="input-article-id"
-          @keyup.enter="() => { page = 1; load() }"
-          @clear="() => { page = 1; load() }"
+          @keyup.enter="
+            () => {
+              page = 1
+              load()
+            }
+          "
+          @clear="
+            () => {
+              page = 1
+              load()
+            }
+          "
         />
       </div>
       <div class="toolbar-right">
         <el-button plain :disabled="!selected.length" @click="batchApprove">
           批量通过
         </el-button>
-        <el-button
-          plain
-          :disabled="!selected.length"
-          @click="batchDelete"
-        >
+        <el-button plain :disabled="!selected.length" @click="batchDelete">
           <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" /> 批量删除
         </el-button>
@@ -166,6 +172,23 @@ onMounted(load)
         </el-table-column>
         <el-table-column prop="nickname" label="昵称" width="110" />
         <el-table-column
+          prop="emailOrQq"
+          label="邮笱/QQ"
+          width="160"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="parentNickname"
+          label="回复对象"
+          width="110"
+          show-overflow-tooltip
+        />
+        <el-table-column label="来源" width="80" align="center">
+          <template #default="{ row }">
+            <span>{{ row.isAdminReply ? '管理员' : '访客' }}</span>
+          </template>
+        </el-table-column>
+        <el-table-column
           label="所属文章ID"
           prop="articleId"
           width="120"
@@ -184,7 +207,11 @@ onMounted(load)
         />
         <el-table-column label="设备/浏览器" width="160" show-overflow-tooltip>
           <template #default="{ row }">
-            <span>{{ [row.userAgentOs, row.userAgentBrowser].filter(Boolean).join(' / ') || '-' }}</span>
+            <span>{{
+              [row.userAgentOs, row.userAgentBrowser]
+                .filter(Boolean)
+                .join(' / ') || '-'
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column label="时间" width="150" align="center">

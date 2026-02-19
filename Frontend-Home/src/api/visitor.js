@@ -19,5 +19,6 @@ const collectBrowserInfo = () => {
 // 记录访客
 export const recordVisitorAPI = () => {
   const data = collectBrowserInfo()
+  console.log(data)
   return request.post('/home/visitor/record', data)
 }

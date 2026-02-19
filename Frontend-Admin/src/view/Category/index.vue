@@ -15,7 +15,13 @@ const catEditing = ref(false)
 const openCatDialog = (row = null) => {
   catEditing.value = !!row
   catForm.value = row
-    ? { id: row.id, name: row.name, slug: row.slug, icon: row.icon ?? '', sort: row.sort ?? null }
+    ? {
+        id: row.id,
+        name: row.name,
+        slug: row.slug,
+        icon: row.icon ?? '',
+        sort: row.sort ?? null
+      }
     : { id: null, name: '', slug: '', icon: '', sort: null }
   catDialogVisible.value = true
 }
@@ -62,7 +68,9 @@ const deleteTag = async (row) => {
     confirmButtonText: '删除',
     cancelButtonText: '取消',
     type: 'warning'
-  }).catch(() => { throw new Error('cancel') })
+  }).catch(() => {
+    throw new Error('cancel')
+  })
   await categoryStore.removeTags([row.id])
   ElMessage.success('删除成功')
 }
@@ -93,7 +101,12 @@ onMounted(() => {
           <el-table-column prop="id" label="ID" width="80" align="center" />
           <el-table-column prop="name" label="分类名称" min-width="140" />
           <el-table-column prop="slug" label="Slug" min-width="130" />
-          <el-table-column prop="icon" label="图标" width="120" show-overflow-tooltip />
+          <el-table-column
+            prop="icon"
+            label="图标"
+            width="120"
+            show-overflow-tooltip
+          />
           <el-table-column prop="sort" label="排序" width="80" align="center" />
           <el-table-column label="操作" width="140" align="center">
             <template #default="{ row }">
@@ -128,9 +141,13 @@ onMounted(() => {
           <el-table-column prop="slug" label="Slug" min-width="180" />
           <el-table-column label="操作" width="140" align="center">
             <template #default="{ row }">
-              <el-button link size="small" @click="openTagDialog(row)">编辑</el-button>
+              <el-button link size="small" @click="openTagDialog(row)"
+                >编辑</el-button
+              >
               <el-divider direction="vertical" />
-              <el-button link size="small" @click="deleteTag(row)">删除</el-button>
+              <el-button link size="small" @click="deleteTag(row)"
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -148,13 +165,27 @@ onMounted(() => {
           <el-input v-model="catForm.name" placeholder="分类名称" clearable />
         </el-form-item>
         <el-form-item label="Slug" required>
-          <el-input v-model="catForm.slug" placeholder="URL 路径标识（如: tech）" clearable />
+          <el-input
+            v-model="catForm.slug"
+            placeholder="URL 路径标识（如: tech）"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="图标">
-          <el-input v-model="catForm.icon" placeholder="图标类名（可选）" clearable />
+          <el-input
+            v-model="catForm.icon"
+            placeholder="图标类名（可选）"
+            clearable
+          />
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="catForm.sort" :min="0" :precision="0" controls-position="right" style="width:120px" />
+          <el-input-number
+            v-model="catForm.sort"
+            :min="0"
+            :precision="0"
+            controls-position="right"
+            style="width: 120px"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -174,7 +205,11 @@ onMounted(() => {
           <el-input v-model="tagForm.name" placeholder="标签名称" clearable />
         </el-form-item>
         <el-form-item label="Slug" required>
-          <el-input v-model="tagForm.slug" placeholder="URL 路径标识（如: vue-js）" clearable />
+          <el-input
+            v-model="tagForm.slug"
+            placeholder="URL 路径标识（如: vue-js）"
+            clearable
+          />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -205,6 +240,4 @@ onMounted(() => {
   font-size: 14px;
   margin-right: 4px;
 }
-
-
 </style>

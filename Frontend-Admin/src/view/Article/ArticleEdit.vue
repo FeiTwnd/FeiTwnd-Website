@@ -94,8 +94,10 @@ const autoSlug = () => {
 /* ---- 保存 / 发布 ---- */
 const handleSave = async (isPublished) => {
   if (!form.value.title.trim()) return ElMessage.warning('请输入文章标题')
-  if (!form.value.slug.trim()) return ElMessage.warning('请输入 URL 标识 (Slug)')
-  if (!form.value.contentMarkdown.trim()) return ElMessage.warning('请输入文章内容')
+  if (!form.value.slug.trim())
+    return ElMessage.warning('请输入 URL 标识 (Slug)')
+  if (!form.value.contentMarkdown.trim())
+    return ElMessage.warning('请输入文章内容')
   if (!form.value.categoryId) return ElMessage.warning('请选择文章分类')
   saving.value = true
   try {
@@ -140,9 +142,19 @@ onMounted(async () => {
       </div>
 
       <div class="edit-actions">
-        <el-button size="small" @click="router.push('/article/list')">取消</el-button>
-        <el-button size="small" :loading="saving" @click="handleSave(0)">保存草稿</el-button>
-        <el-button size="small" type="primary" :loading="saving" @click="handleSave(1)">发布</el-button>
+        <el-button size="small" @click="router.push('/article/list')"
+          >取消</el-button
+        >
+        <el-button size="small" :loading="saving" @click="handleSave(0)"
+          >保存草稿</el-button
+        >
+        <el-button
+          size="small"
+          type="primary"
+          :loading="saving"
+          @click="handleSave(1)"
+          >发布</el-button
+        >
       </div>
     </div>
 
@@ -215,7 +227,6 @@ onMounted(async () => {
           <el-select
             v-model="form.tagIds"
             multiple
-            collapse-tags
             placeholder="选择标签"
             style="width: 100%"
             size="small"

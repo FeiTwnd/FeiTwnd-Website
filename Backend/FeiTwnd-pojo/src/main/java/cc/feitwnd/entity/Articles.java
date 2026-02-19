@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * 文章
@@ -85,4 +86,7 @@ public class Articles implements Serializable {
     // 更新时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateTime;
+
+    // 标签ID列表（非数据库字段，管理端返回时填充）
+    private List<Long> tagIds;
 }

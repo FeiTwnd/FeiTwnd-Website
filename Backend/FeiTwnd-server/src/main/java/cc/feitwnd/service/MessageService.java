@@ -44,7 +44,7 @@ public interface MessageService {
      * 管理员回复留言
      * @param messageReplyDTO
      */
-    void adminReply(MessageReplyDTO messageReplyDTO);
+    void adminReply(MessageReplyDTO messageReplyDTO, HttpServletRequest request);
 
     // ===== 博客端方法 =====
 

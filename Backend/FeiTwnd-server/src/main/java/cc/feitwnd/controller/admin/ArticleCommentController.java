@@ -8,6 +8,7 @@ import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleCommentService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,9 +84,10 @@ public class ArticleCommentController {
      */
     @PostMapping("/reply")
     @OperationLog(value = OperationType.INSERT, target = "articleComment", targetId = "#articleCommentReplyDTO.parentId")
-    public Result<String> adminReply(@Valid @RequestBody ArticleCommentReplyDTO articleCommentReplyDTO) {
+    public Result<String> adminReply(@Valid @RequestBody ArticleCommentReplyDTO articleCommentReplyDTO,
+                                     HttpServletRequest request) {
         log.info("管理员回复文章评论: {}", articleCommentReplyDTO);
-        articleCommentService.adminReply(articleCommentReplyDTO);
+        articleCommentService.adminReply(articleCommentReplyDTO, request);
         return Result.success();
     }
 }

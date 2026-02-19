@@ -36,7 +36,7 @@ public class ArticleCategoryController {
 
     /**
      * 添加文章分类
-     * @param articleCategories
+     * @param articleCategoryDTO
      * @return
      */
     @PostMapping
@@ -49,7 +49,7 @@ public class ArticleCategoryController {
 
     /**
      * 更新文章分类
-     * @param articleCategories
+     * @param articleCategoryDTO
      * @return
      */
     @PutMapping

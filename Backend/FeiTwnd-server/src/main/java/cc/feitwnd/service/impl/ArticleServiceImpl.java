@@ -134,6 +134,9 @@ public class ArticleServiceImpl implements ArticleService {
         if (articles == null) {
             throw new ArticleException(MessageConstant.ARTICLE_NOT_FOUND);
         }
+        // 填充标签ID列表，用于管理端编辑时回显
+        List<Long> tagIds = articleTagMapper.getTagIdsByArticleId(id);
+        articles.setTagIds(tagIds);
         return articles;
     }
 

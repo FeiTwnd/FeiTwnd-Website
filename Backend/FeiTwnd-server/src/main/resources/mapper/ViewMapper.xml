@@ -4,8 +4,8 @@
 <mapper namespace="cc.feitwnd.mapper.ViewMapper">
 
     <insert id="insert">
-        insert into views (visitor_id, page_path, referer, ip_address, user_agent, view_time)
-        values (#{visitorId}, #{pagePath}, #{referer}, #{ipAddress}, #{userAgent}, #{viewTime})
+        insert into views (visitor_id, page_path, referer,page_title, ip_address, user_agent, view_time)
+        values (#{visitorId}, #{pagePath}, #{referer},#{pageTitle}, #{ipAddress}, #{userAgent}, #{viewTime})
     </insert>
 
     <select id="pageQuery" resultType="cc.feitwnd.entity.Views">

@@ -15,8 +15,14 @@ public interface ArticleTagMapper {
     /**
      * 获取所有标签
      */
-    @Select("select * from article_tags order by id desc")
+    @Select("select * from article_tags order by id")
     List<ArticleTags> listAll();
+
+    /**
+     * 根据文章ID获取标签ID列表
+     */
+    @Select("select tag_id from article_tag_relations where article_id = #{articleId}")
+    List<Long> getTagIdsByArticleId(Long articleId);
 
     /**
      * 添加标签

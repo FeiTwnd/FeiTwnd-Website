@@ -193,7 +193,7 @@ public class MessageServiceImpl implements MessageService {
      * 管理员回复留言
      * @param messageReplyDTO
      */
-    public void adminReply(MessageReplyDTO messageReplyDTO) {
+    public void adminReply(MessageReplyDTO messageReplyDTO, HttpServletRequest request) {
         // 1. 创建留言实体
         Messages messages = new Messages();
         BeanUtils.copyProperties(messageReplyDTO, messages);
@@ -214,10 +214,24 @@ public class MessageServiceImpl implements MessageService {
         messages.setCreateTime(LocalDateTime.now());
         messages.setUpdateTime(LocalDateTime.now());
 
-        // 4. 保存到数据库
+        // 4. 捕获 IP / 地理位置 / UserAgent
+        if (request != null) {
+            String clientIp = IpUtil.getClientIp(request);
+            Map<String, String> geoInfo = IpUtil.getGeoInfo(clientIp);
+            String location = String.format("%s-%s-%s",
+                    geoInfo.getOrDefault("country", ""),
+                    geoInfo.getOrDefault("province", ""),
+                    geoInfo.getOrDefault("city", ""));
+            messages.setLocation(location);
+            String userAgent = request.getHeader("User-Agent");
+            messages.setUserAgentOs(userAgentService.getOsName(userAgent));
+            messages.setUserAgentBrowser(userAgentService.getBrowserName(userAgent));
+        }
+
+        // 5. 保存到数据库
         messageMapper.save(messages);
 
-        // 5. 检查父留言是否开启邮箱通知
+        // 6. 检查父留言是否开启邮箱通知
         notifyParentIfNeeded(messageReplyDTO.getParentId(), websiteProperties.getTitle(),
                 messageReplyDTO.getContent(), "message");
 

@@ -34,7 +34,7 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
 
     /**
      * 添加文章分类
-     * @param articleCategories
+     * @param articleCategoryDTO
      */
     @Caching(evict = {
             @CacheEvict(value = "articleCategories", allEntries = true),
@@ -49,7 +49,7 @@ public class ArticleCategoryServiceImpl implements ArticleCategoryService {
 
     /**
      * 更新文章分类（含排序）
-     * @param articleCategories
+     * @param articleCategoryDTO
      */
     @Caching(evict = {
             @CacheEvict(value = "articleCategories", allEntries = true),

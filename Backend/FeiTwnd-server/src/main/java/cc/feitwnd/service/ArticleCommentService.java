@@ -44,8 +44,9 @@ public interface ArticleCommentService {
     /**
      * 管理员回复评论
      * @param articleCommentReplyDTO
+     * @param request
      */
-    void adminReply(ArticleCommentReplyDTO articleCommentReplyDTO);
+    void adminReply(ArticleCommentReplyDTO articleCommentReplyDTO, HttpServletRequest request);
 
     // ===== 博客端方法 =====
 

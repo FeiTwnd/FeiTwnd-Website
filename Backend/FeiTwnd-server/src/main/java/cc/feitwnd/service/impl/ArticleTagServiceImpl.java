@@ -33,7 +33,7 @@ public class ArticleTagServiceImpl implements ArticleTagService {
 
     /**
      * 添加标签
-     * @param articleTag
+     * @param articleTagDTO
      */
     @Caching(evict = {
             @CacheEvict(value = "articleTags", allEntries = true),
@@ -47,7 +47,7 @@ public class ArticleTagServiceImpl implements ArticleTagService {
 
     /**
      * 修改标签
-     * @param articleTag
+     * @param articleTagDTO
      */
     @Caching(evict = {
             @CacheEvict(value = "articleTags", allEntries = true),

@@ -154,11 +154,7 @@ onMounted(load)
         <el-button @click="handleReset">重置</el-button>
       </div>
       <div class="toolbar-right">
-        <el-button
-          plain
-          :disabled="!selected.length"
-          @click="batchDelete"
-        >
+        <el-button plain :disabled="!selected.length" @click="batchDelete">
           <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" /> 批量删除
         </el-button>
@@ -186,21 +182,39 @@ onMounted(load)
           show-overflow-tooltip
         />
         <el-table-column prop="categoryName" label="分类" width="120" />
+        <el-table-column
+          prop="slug"
+          label="Slug"
+          min-width="160"
+          show-overflow-tooltip
+        />
         <el-table-column label="状态" width="90" align="center">
           <template #default="{ row }">
             <span>{{ row.isPublished ? '已发布' : '草稿' }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="viewCount" label="阅读" width="75" align="center" />
-        <el-table-column prop="commentCount" label="评论" width="75" align="center" />
+        <el-table-column
+          prop="viewCount"
+          label="阅读"
+          width="75"
+          align="center"
+        />
+        <el-table-column
+          prop="commentCount"
+          label="评论"
+          width="75"
+          align="center"
+        />
         <el-table-column label="发布时间" width="120" align="center">
-          <template #default="{ row }">{{ fmtDate(row.publishTime || row.createTime) }}</template>
+          <template #default="{ row }">{{
+            fmtDate(row.publishTime || row.createTime)
+          }}</template>
         </el-table-column>
         <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{ row }">
             <div class="row-actions">
               <el-button link size="small" @click="openView(row)"
-                >查看</el-button
+                >预览</el-button
               >
               <el-divider direction="vertical" />
               <el-button link size="small" @click="togglePublish(row)">
