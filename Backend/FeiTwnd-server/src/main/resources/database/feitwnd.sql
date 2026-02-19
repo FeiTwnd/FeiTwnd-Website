@@ -164,7 +164,7 @@ create table article_categories(
     id int primary key auto_increment,
     name varchar(20) not null comment '分类名称,如：日常,心得,年度总结,编程,面经',
     slug varchar(20) not null comment 'URL标识，如：daily, thinking, year-summary, programming, interview',
-    icon varchar(50) comment '图标类名',
+    description varchar(100) comment '分类描述',
     sort int default 0 comment '排序，越小越靠前',
     create_time datetime comment '创建时间',
     update_time datetime comment '更新时间'

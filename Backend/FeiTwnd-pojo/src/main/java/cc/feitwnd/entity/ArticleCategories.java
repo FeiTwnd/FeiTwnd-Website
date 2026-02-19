@@ -28,8 +28,8 @@ public class ArticleCategories implements Serializable {
     // URL标识
     private String slug;
 
-    // 图标类名
-    private String icon;
+    // 分类描述
+    private String description;
 
     // 排序，越小越靠前
     private Integer sort;

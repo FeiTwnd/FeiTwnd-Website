@@ -4,8 +4,8 @@
 <mapper namespace="cc.feitwnd.mapper.ArticleCategoryMapper">
 
     <insert id="insert">
-        insert into article_categories (name, slug, icon, sort, create_time, update_time)
-        values (#{name}, #{slug}, #{icon}, #{sort}, #{createTime}, #{updateTime})
+        insert into article_categories (name, slug, description, sort, create_time, update_time)
+        values (#{name}, #{slug}, #{description}, #{sort}, #{createTime}, #{updateTime})
     </insert>
 
     <update id="update">
@@ -13,7 +13,7 @@
         <set>
             <if test="name != null">name = #{name},</if>
             <if test="slug != null">slug = #{slug},</if>
-            <if test="icon != null">icon = #{icon},</if>
+            <if test="description != null">description = #{description},</if>
             <if test="sort != null">sort = #{sort},</if>
             <if test="updateTime != null">update_time = #{updateTime}</if>
         </set>

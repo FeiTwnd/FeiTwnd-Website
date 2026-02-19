@@ -7,9 +7,12 @@ import cc.feitwnd.entity.OperationLogs;
 import cc.feitwnd.service.SaveLogAsyncService;
 import cc.feitwnd.service.OperationLogService;
 import com.alibaba.fastjson.JSON;
+import jakarta.servlet.ServletRequest;
+import jakarta.servlet.ServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -153,6 +156,12 @@ public class SaveLogAsyncServiceImpl implements SaveLogAsyncService {
             Expression expression = parser.parseExpression(targetIdExpression);
             Object value = expression.getValue(context);
 
+            // 如果是集合类型（批量操作 #ids），取第一个元素
+            if (value instanceof java.util.Collection<?> col) {
+                if (col.isEmpty()) return null;
+                value = col.iterator().next();
+            }
+
             if (value instanceof Number) {
                 return ((Number) value).intValue();
             } else if (value != null) {
@@ -190,6 +199,13 @@ public class SaveLogAsyncServiceImpl implements SaveLogAsyncService {
             for (int i = 0; i < args.length; i++) {
                 String paramName = (paramNames != null && i < paramNames.length)
                         ? paramNames[i] : "arg" + i;
+
+                // 跳过不可序列化的 Servlet / IO 类型参数
+                if (args[i] instanceof ServletRequest
+                        || args[i] instanceof ServletResponse
+                        || args[i] instanceof MultipartFile) {
+                    continue;
+                }
 
                 // 敏感参数过滤
                 Object paramValue = filterSensitiveParam(paramName, args[i]);

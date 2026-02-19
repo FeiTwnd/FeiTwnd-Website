@@ -243,25 +243,25 @@ onMounted(load)
         @current-change="handlePageChange"
       />
     </div>
-  </div>
 
-  <!-- 查看文章内容 -->
-  <el-dialog
-    v-model="viewDialogVisible"
-    :title="viewRow?.title ?? '文章预览'"
-    width="760px"
-    top="5vh"
-  >
-    <div
-      v-loading="viewLoading"
-      class="article-preview"
-      v-html="viewRow?.contentHtml ?? (viewLoading ? '' : '<p>暂无内容</p>')"
-    />
-    <template #footer>
-      <el-button @click="viewDialogVisible = false">关闭</el-button>
-      <el-button type="primary" @click="toEdit(viewRow?.id)">去编辑</el-button>
-    </template>
-  </el-dialog>
+    <!-- 查看文章内容 -->
+    <el-dialog
+      v-model="viewDialogVisible"
+      :title="viewRow?.title ?? '文章预览'"
+      width="760px"
+      top="5vh"
+    >
+      <div
+        v-loading="viewLoading"
+        class="article-preview"
+        v-html="viewRow?.contentHtml ?? (viewLoading ? '' : '<p>暂无内容</p>')"
+      />
+      <template #footer>
+        <el-button @click="viewDialogVisible = false">关闭</el-button>
+        <el-button type="primary" @click="toEdit(viewRow?.id)">去编辑</el-button>
+      </template>
+    </el-dialog>
+  </div>
 </template>
 
 <style scoped>

@@ -30,9 +30,9 @@ public class ArticleCategoryDTO implements Serializable {
     @Size(max = 20, message = "URL标识不能超过20字")
     private String slug;
 
-    // 图标类名
-    @Size(max = 50, message = "图标类名不能超过50字")
-    private String icon;
+    // 分类描述
+    @Size(max = 100, message = "分类描述不能超过100字")
+    private String description;
 
     // 排序，越小越靠前
     private Integer sort;

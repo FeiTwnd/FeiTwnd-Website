@@ -9,7 +9,7 @@ const activeTab = ref('category')
 
 /* ---- 分类弹窗 ---- */
 const catDialogVisible = ref(false)
-const catForm = ref({ id: null, name: '', slug: '', icon: '', sort: null })
+const catForm = ref({ id: null, name: '', slug: '', description: '', sort: null })
 const catEditing = ref(false)
 
 const openCatDialog = (row = null) => {
@@ -19,10 +19,10 @@ const openCatDialog = (row = null) => {
         id: row.id,
         name: row.name,
         slug: row.slug,
-        icon: row.icon ?? '',
+        description: row.description ?? '',
         sort: row.sort ?? null
       }
-    : { id: null, name: '', slug: '', icon: '', sort: null }
+    : { id: null, name: '', slug: '', description: '', sort: null }
   catDialogVisible.value = true
 }
 
@@ -101,9 +101,9 @@ onMounted(() => {
           <el-table-column prop="name" label="分类名称" min-width="140" />
           <el-table-column prop="slug" label="Slug" min-width="130" />
           <el-table-column
-            prop="icon"
-            label="图标"
-            width="120"
+            prop="description"
+            label="描述"
+            min-width="160"
             show-overflow-tooltip
           />
           <el-table-column prop="sort" label="排序" width="80" align="center" />
@@ -169,10 +169,10 @@ onMounted(() => {
             clearable
           />
         </el-form-item>
-        <el-form-item label="图标">
+        <el-form-item label="描述">
           <el-input
-            v-model="catForm.icon"
-            placeholder="图标类名（可选）"
+            v-model="catForm.description"
+            placeholder="分类描述（可选）"
             clearable
           />
         </el-form-item>

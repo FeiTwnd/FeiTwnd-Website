@@ -124,15 +124,18 @@ const makeLineOption = (title, categories, data, color) => ({
 })
 
 /* 浏览量折线图（独立日期） */
+const splitStr = (s) => (s ? s.split(',') : [])
+const splitNum = (s) => (s ? s.split(',').map(Number) : [])
+
 const fetchViewChart = async () => {
   const [begin, end] = viewDateRange.value
   const res = await getViewStatistics({ begin, end })
-  const data = res.data ?? []
+  const vo = res.data ?? {}
   viewChart.value?.setOption(
     makeLineOption(
       '浏览量',
-      data.map((d) => d.date),
-      data.map((d) => d.count),
+      splitStr(vo.dateList),
+      splitNum(vo.viewCountList),
       '#000000'
     )
   )
@@ -142,12 +145,12 @@ const fetchViewChart = async () => {
 const fetchVisitorChart = async () => {
   const [begin, end] = visitorDateRange.value
   const res = await getVisitorStatistics({ begin, end })
-  const data = res.data ?? []
+  const vo = res.data ?? {}
   visitorChart.value?.setOption(
     makeLineOption(
       '访客数',
-      data.map((d) => d.date),
-      data.map((d) => d.count),
+      splitStr(vo.dateList),
+      splitNum(vo.newVisitorCountList),
       '#606266'
     )
   )
@@ -156,7 +159,9 @@ const fetchVisitorChart = async () => {
 /* 文章阅读量 TOP10 柱状图 */
 const fetchBarChart = async () => {
   const res = await getArticleViewTop10()
-  const data = (res.data ?? []).slice(0, 10).reverse()
+  const vo = res.data ?? {}
+  const titles = splitStr(vo.titleList).slice(0, 10).reverse()
+  const counts = splitNum(vo.viewCountList).slice(0, 10).reverse()
   barChart.value?.setOption({
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     grid: { left: 130, right: 20, top: 16, bottom: 24 },
@@ -167,9 +172,7 @@ const fetchBarChart = async () => {
     },
     yAxis: {
       type: 'category',
-      data: data.map((d) =>
-        d.title && d.title.length > 14 ? d.title.slice(0, 14) + '…' : d.title
-      ),
+      data: titles.map((t) => (t && t.length > 14 ? t.slice(0, 14) + '…' : t)),
       axisLabel: { color: '#606266', fontSize: 12 },
       axisLine: { lineStyle: { color: '#e4e7ed' } }
     },
@@ -177,7 +180,7 @@ const fetchBarChart = async () => {
       {
         name: '阅读量',
         type: 'bar',
-        data: data.map((d) => d.viewCount ?? d.count),
+        data: counts,
         barMaxWidth: 20,
         itemStyle: { color: '#303133', borderRadius: [0, 4, 4, 0] }
       }
@@ -188,10 +191,12 @@ const fetchBarChart = async () => {
 /* 访客省份饼图 */
 const fetchPieChart = async () => {
   const res = await getProvinceDistribution()
-  const raw = res.data ?? []
-  const pieData = raw.map((d) => ({
-    name: d.province || '未知',
-    value: d.count
+  const vo = res.data ?? {}
+  const provinces = splitStr(vo.provinceList)
+  const counts = splitNum(vo.countList)
+  const pieData = provinces.map((name, i) => ({
+    name: name || '未知',
+    value: counts[i] ?? 0
   }))
   pieChart.value?.setOption({
     tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },

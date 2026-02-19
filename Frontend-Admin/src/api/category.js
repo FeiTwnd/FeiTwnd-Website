@@ -5,14 +5,14 @@ export const getCategoryList = () => http.get('/admin/articleCategory')
 
 /**
  * 新增分类
- * @param {{ name: string, slug: string, icon?: string, sort?: number }} data
+ * @param {{ name: string, slug: string, description?: string, sort?: number }} data
  */
 export const createCategory = (data) =>
   http.post('/admin/articleCategory', data)
 
 /**
  * 更新分类
- * @param {{ id: number, name: string, slug: string, icon?: string, sort?: number }} data
+ * @param {{ id: number, name: string, slug: string, description?: string, sort?: number }} data
  */
 export const updateCategory = (data) => http.put('/admin/articleCategory', data)
 
