@@ -157,6 +157,12 @@ onMounted(load)
           </template>
         </el-table-column>
         <el-table-column prop="nickname" label="昵称" width="110" />
+        <el-table-column
+          prop="parentNickname"
+          label="回复对象"
+          width="110"
+          show-overflow-tooltip
+        />
         <el-table-column label="状态" width="90" align="center">
           <template #default="{ row }">
             <span>{{ row.isApproved ? '已通过' : '待审核' }}</span>

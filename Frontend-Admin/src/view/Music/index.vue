@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useMusicStore } from '@/stores'
 import { uploadFile } from '@/api/settings'
 
@@ -144,6 +144,32 @@ const handleLyricUpload = async (options) => {
   }
 }
 
+/* ---- 音频播放 ---- */
+const playingId = ref(null)
+let audioInstance = null
+
+const togglePlay = (row) => {
+  if (playingId.value === row.id) {
+    audioInstance?.pause()
+    audioInstance = null
+    playingId.value = null
+  } else {
+    audioInstance?.pause()
+    audioInstance = new Audio(row.musicUrl)
+    playingId.value = row.id
+    audioInstance.play().catch(() => ElMessage.error('播放失败，请检查音频地址'))
+    audioInstance.onended = () => {
+      playingId.value = null
+      audioInstance = null
+    }
+  }
+}
+
+onBeforeUnmount(() => {
+  audioInstance?.pause()
+  audioInstance = null
+})
+
 const handleSave = async () => {
   if (!form.value.title.trim()) return ElMessage.warning('歌曲名称不能为空')
   if (!form.value.musicUrl.trim()) return ElMessage.warning('音频文件不能为空')
@@ -245,8 +271,8 @@ onMounted(load)
             <span v-else class="cover-empty">-</span>
           </template>
         </el-table-column>
-        <el-table-column prop="title" label="歌曲名" min-width="160" />
-        <el-table-column prop="artist" label="艺术家" width="130" />
+        <el-table-column prop="title" label="歌曲名" min-width="120" show-overflow-tooltip />
+        <el-table-column prop="artist" label="艺术家" width="160" show-overflow-tooltip />
         <el-table-column label="时长" width="80" align="center">
           <template #default="{ row }">
             {{
@@ -268,9 +294,17 @@ onMounted(load)
             <span>{{ row.hasLyric ? row.lyricType || 'lrc' : '无' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="140" align="center" fixed="right">
+        <el-table-column label="操作" width="200" align="center" fixed="right">
           <template #default="{ row }">
             <div class="row-actions">
+              <el-button
+                link
+                size="small"
+                :disabled="!row.musicUrl"
+                @click="togglePlay(row)"
+              >{{ playingId === row.id ? '暂停' : '播放' }}</el-button
+              >
+              <el-divider direction="vertical" />
               <el-button link size="small" @click="openDialog(row)"
                 >编辑</el-button
               >
