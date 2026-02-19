@@ -1,0 +1,16 @@
+/* @font-face {
+  font-family: 'iconfont';
+  src:
+    url('../font/iconfont.woff2?t=1771475019349') format('woff2'),
+    url('../font/iconfont.woff?t=1771475019349') format('woff'),
+    url('../font/iconfont.ttf?t=1771475019349') format('truetype');
+} */
+
+.iconfont {
+  font-family: 'iconfont' !important;
+  font-size: 16px;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1;
+}

@@ -1,37 +1,68 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useUserStore } from '@/stores'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
+  scrollBehavior: () => ({ top: 0 }),
   routes: [
     {
       path: '/',
-      name: 'home',
-      component: () => import('@/view/Home/index.vue'),
-      meta: {
-        title: '首页'
-      }
-    },
-    {
-      path: '/login',
-      name: 'login',
-      component: () => import('@/view/Login/index.vue'),
-      meta: {
-        title: '登录'
-      }
+      component: () => import('@/view/Layout/index.vue'),
+      children: [
+        {
+          path: '',
+          name: 'home',
+          component: () => import('@/view/Home/index.vue'),
+          meta: { title: '首页' }
+        },
+        {
+          path: 'article/:slug',
+          name: 'article',
+          component: () => import('@/view/Article/index.vue'),
+          meta: { title: '文章' }
+        },
+        {
+          path: 'category/:slug',
+          name: 'category',
+          component: () => import('@/view/Category/index.vue'),
+          meta: { title: '分类' }
+        },
+        {
+          path: 'tag/:slug',
+          name: 'tag',
+          component: () => import('@/view/Tag/index.vue'),
+          meta: { title: '标签' }
+        },
+        {
+          path: 'archive',
+          name: 'archive',
+          component: () => import('@/view/Archive/index.vue'),
+          meta: { title: '归档' }
+        },
+        {
+          path: 'links',
+          name: 'links',
+          component: () => import('@/view/Links/index.vue'),
+          meta: { title: '友链' }
+        },
+        {
+          path: 'message',
+          name: 'message',
+          component: () => import('@/view/Message/index.vue'),
+          meta: { title: '留言板' }
+        },
+        {
+          path: 'about',
+          name: 'about',
+          component: () => import('@/view/About/index.vue'),
+          meta: { title: '关于' }
+        }
+      ]
     }
   ]
 })
 
 router.beforeEach((to) => {
-  //如果用户未登录，切访问的是非登录页就跳转到登录页
-  const userStore = useUserStore()
-  if (!userStore.isLoggedIn() && to.path !== '/login') {
-    ElMessage.warning('请先登录')
-    return '/login'
-  }
-  //设置页面标题
-  document.title = to.meta.title || '网站名称'
+  document.title = to.meta.title ? `${to.meta.title} - FeiTwnd` : 'FeiTwnd'
   return true
 })
 
