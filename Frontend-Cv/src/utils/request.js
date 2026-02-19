@@ -1,22 +1,14 @@
-import { useUserStore } from '@/stores'
 import axios from 'axios'
-import router from '@/router'
 
 const baseURL = '/api'
 
 const instance = axios.create({
   baseURL,
-  timeout: 100000
+  timeout: 10000
 })
 
 instance.interceptors.request.use(
-  (config) => {
-    const userStore = useUserStore()
-    if (userStore.token) {
-      config.headers.token = userStore.token
-    }
-    return config
-  },
+  (config) => config,
   (err) => Promise.reject(err)
 )
 
@@ -28,12 +20,7 @@ instance.interceptors.response.use(
     return Promise.reject(res.data)
   },
   (err) => {
-    console.log(err)
-    if (err.response?.status === 401) {
-      const userStore = useUserStore()
-      userStore.clearToken()
-      router.push('/login')
-    }
+    console.error(err)
     return Promise.reject(err)
   }
 )

@@ -1,5 +1,75 @@
+/* ====== CSS 变量（亮/暗模式） ====== */
+:root,
+[data-theme='light'] {
+  --cv-bg: #fafafa;
+  --cv-card: #ffffff;
+  --cv-border: #e8e8e8;
+  --cv-text: #1a1a1a;
+  --cv-muted: #666;
+  --cv-accent: #333;
+  --cv-dot: #c0c0c0;
+  --cv-line: #e0e0e0;
+  --cv-hover: #f4f4f4;
+  --cv-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+[data-theme='dark'] {
+  --cv-bg: #111;
+  --cv-card: #1a1a1a;
+  --cv-border: #2a2a2a;
+  --cv-text: #e8e8e8;
+  --cv-muted: #999;
+  --cv-accent: #ddd;
+  --cv-dot: #555;
+  --cv-line: #333;
+  --cv-hover: #222;
+  --cv-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+/* ====== 全局重置 ====== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
 body {
   margin: 0;
   padding: 0;
-  background-color: #f5f5f5;
+  background-color: var(--cv-bg);
+  color: var(--cv-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+/* ====== 滚动条（Webkit） ====== */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cv-dot);
+  border-radius: 3px;
+}
+
+/* ====== 选中文字 ====== */
+::selection {
+  background: var(--cv-text);
+  color: var(--cv-bg);
+}
+
+/* ====== Element Plus 弹窗暗黑适配 ====== */
+[data-theme='dark'] .el-dialog {
+  --el-dialog-bg-color: #1a1a1a;
+  --el-dialog-title-font-size: 16px;
+  --el-text-color-primary: #e8e8e8;
+  --el-text-color-regular: #ccc;
+  --el-border-color-lighter: #333;
 }
