@@ -100,11 +100,7 @@ onMounted(load)
         <el-button @click="handleReset">重置</el-button>
       </div>
       <div class="toolbar-right">
-        <el-button
-          plain
-          :disabled="!selected.length"
-          @click="batchDelete"
-        >
+        <el-button plain :disabled="!selected.length" @click="batchDelete">
           <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" />
           批量删除
@@ -134,11 +130,7 @@ onMounted(load)
           min-width="180"
           show-overflow-tooltip
         />
-        <el-table-column
-          prop="ipAddress"
-          label="访客 IP"
-          width="150"
-        />
+        <el-table-column prop="ipAddress" label="访客 IP" width="150" />
         <el-table-column
           prop="referer"
           label="来源"
@@ -146,9 +138,7 @@ onMounted(load)
           show-overflow-tooltip
         />
         <el-table-column label="浏览时间" width="160" align="center">
-          <template #default="{ row }">{{
-            fmtDate(row.viewTime)
-          }}</template>
+          <template #default="{ row }">{{ fmtDate(row.viewTime) }}</template>
         </el-table-column>
         <el-table-column label="操作" width="80" align="center" fixed="right">
           <template #default="{ row }">

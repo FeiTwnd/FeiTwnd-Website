@@ -15,7 +15,8 @@ const load = () => {
     page: page.value,
     pageSize: size.value,
     email: searchForm.value.email || undefined,
-    isActive: searchForm.value.isActive === '' ? undefined : searchForm.value.isActive
+    isActive:
+      searchForm.value.isActive === '' ? undefined : searchForm.value.isActive
   })
 }
 
@@ -102,11 +103,7 @@ onMounted(load)
         <el-button @click="handleReset">重置</el-button>
       </div>
       <div class="toolbar-right">
-        <el-button
-          plain
-          :disabled="!selected.length"
-          @click="batchDelete"
-        >
+        <el-button plain :disabled="!selected.length" @click="batchDelete">
           <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" />
           批量删除
@@ -124,18 +121,32 @@ onMounted(load)
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="48" />
-        <el-table-column prop="nickname" label="昵称" width="130" show-overflow-tooltip />
-        <el-table-column prop="email" label="订阅邮箱" min-width="200" show-overflow-tooltip />
+        <el-table-column
+          prop="nickname"
+          label="昵称"
+          width="130"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="email"
+          label="订阅邮箱"
+          min-width="200"
+          show-overflow-tooltip
+        />
         <el-table-column label="状态" width="100" align="center">
           <template #default="{ row }">
             <span>{{ row.isActive ? '已激活' : '未激活' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="订阅时间" width="160" align="center">
-          <template #default="{ row }">{{ fmtDate(row.subscribeTime) }}</template>
+          <template #default="{ row }">{{
+            fmtDate(row.subscribeTime)
+          }}</template>
         </el-table-column>
         <el-table-column label="取消时间" width="160" align="center">
-          <template #default="{ row }">{{ fmtDate(row.unSubscribeTime) || '-' }}</template>
+          <template #default="{ row }">{{
+            fmtDate(row.unSubscribeTime) || '-'
+          }}</template>
         </el-table-column>
         <el-table-column label="操作" width="80" align="center" fixed="right">
           <template #default="{ row }">

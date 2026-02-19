@@ -1,6 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { getMusicPage, createMusic, updateMusic, deleteMusics } from '@/api/music'
+import {
+  getMusicPage,
+  createMusic,
+  updateMusic,
+  deleteMusics
+} from '@/api/music'
 
 export const useMusicStore = defineStore('music', () => {
   const list = ref([])

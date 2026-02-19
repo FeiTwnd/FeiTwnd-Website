@@ -6,7 +6,12 @@ import dayjs from 'dayjs'
 const logStore = useOperationLogStore()
 
 /* ---- 搜索 ---- */
-const searchForm = ref({ operationTarget: '', operationType: '', startTime: '', endTime: '' })
+const searchForm = ref({
+  operationTarget: '',
+  operationType: '',
+  startTime: '',
+  endTime: ''
+})
 const page = ref(1)
 const size = ref(15)
 const selected = ref([])
@@ -32,7 +37,12 @@ const handleSearch = () => {
 }
 
 const handleReset = () => {
-  searchForm.value = { operationTarget: '', operationType: '', startTime: '', endTime: '' }
+  searchForm.value = {
+    operationTarget: '',
+    operationType: '',
+    startTime: '',
+    endTime: ''
+  }
   handleSearch()
 }
 
@@ -138,11 +148,7 @@ onMounted(load)
         <el-button @click="handleReset">重置</el-button>
       </div>
       <div class="toolbar-right">
-        <el-button
-          plain
-          :disabled="!selected.length"
-          @click="batchDelete"
-        >
+        <el-button plain :disabled="!selected.length" @click="batchDelete">
           <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" />
           批量删除
@@ -163,8 +169,8 @@ onMounted(load)
         <el-table-column prop="id" label="ID" width="80" align="center" />
         <el-table-column label="操作类型" width="100" align="center">
           <template #default="{ row }">
-              {{ typeLabel(row.operationType) }}
-            </template>
+            {{ typeLabel(row.operationType) }}
+          </template>
         </el-table-column>
         <el-table-column prop="operationTarget" label="操作对象" width="160" />
         <el-table-column

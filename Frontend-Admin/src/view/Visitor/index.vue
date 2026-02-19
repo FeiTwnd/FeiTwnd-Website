@@ -132,11 +132,7 @@ onMounted(load)
         <el-button plain :disabled="!selected.length" @click="batchUnblock">
           批量解封
         </el-button>
-        <el-button
-          plain
-          :disabled="!selected.length"
-          @click="batchBlock"
-        >
+        <el-button plain :disabled="!selected.length" @click="batchBlock">
           <!-- ICON: icon-ban -->
           <span class="iconfont icon-ban" />
           批量封禁
@@ -155,17 +151,39 @@ onMounted(load)
       >
         <el-table-column type="selection" width="48" />
         <el-table-column prop="ip" label="IP 地址" width="160" />
-        <el-table-column prop="country" label="国家" width="100" show-overflow-tooltip />
-        <el-table-column prop="province" label="省份" width="120" show-overflow-tooltip />
-        <el-table-column prop="city" label="城市" width="120" show-overflow-tooltip />
-        <el-table-column prop="totalViews" label="浏览次数" width="100" align="center" />
+        <el-table-column
+          prop="country"
+          label="国家"
+          width="100"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="province"
+          label="省份"
+          width="120"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="city"
+          label="城市"
+          width="120"
+          show-overflow-tooltip
+        />
+        <el-table-column
+          prop="totalViews"
+          label="浏览次数"
+          width="100"
+          align="center"
+        />
         <el-table-column label="状态" width="90" align="center">
           <template #default="{ row }">
             <span>{{ row.isBlocked ? '已封禁' : '正常' }}</span>
           </template>
         </el-table-column>
         <el-table-column label="首次访问" width="158" align="center">
-          <template #default="{ row }">{{ fmtDate(row.firstVisitTime) }}</template>
+          <template #default="{ row }">{{
+            fmtDate(row.firstVisitTime)
+          }}</template>
         </el-table-column>
         <el-table-column label="最近访问" width="158" align="center">
           <template #default="{ row }">{{
@@ -174,7 +192,9 @@ onMounted(load)
         </el-table-column>
         <el-table-column label="封禁到期" width="158" align="center">
           <template #default="{ row }">
-            <span>{{ row.isBlocked ? fmtDate(row.expiresAt) || '永久' : '-' }}</span>
+            <span>{{
+              row.isBlocked ? fmtDate(row.expiresAt) || '永久' : '-'
+            }}</span>
           </template>
         </el-table-column>
         <el-table-column label="操作" width="140" align="center" fixed="right">

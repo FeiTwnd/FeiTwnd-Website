@@ -77,6 +77,15 @@ const batchDelete = async () => {
   load()
 }
 
+/* ---- 详情弹窗 ---- */
+const detailVisible = ref(false)
+const detailRow = ref(null)
+
+const openDetail = (row) => {
+  detailRow.value = row
+  detailVisible.value = true
+}
+
 /* ---- 回复弹窗 ---- */
 const replyDialogVisible = ref(false)
 const replyTarget = ref(null)
@@ -165,33 +174,22 @@ onMounted(load)
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="48" />
-        <el-table-column label="内容" min-width="260" show-overflow-tooltip>
+        <el-table-column label="评论内容" min-width="240" show-overflow-tooltip>
           <template #default="{ row }">
             <span v-html="row.contentHtml || '-'" class="comment-content" />
           </template>
         </el-table-column>
         <el-table-column prop="nickname" label="昵称" width="110" />
         <el-table-column
-          prop="emailOrQq"
-          label="邮笱/QQ"
-          width="160"
-          show-overflow-tooltip
-        />
-        <el-table-column
           prop="parentNickname"
           label="回复对象"
           width="110"
           show-overflow-tooltip
         />
-        <el-table-column label="来源" width="80" align="center">
-          <template #default="{ row }">
-            <span>{{ row.isAdminReply ? '管理员' : '访客' }}</span>
-          </template>
-        </el-table-column>
         <el-table-column
           label="所属文章ID"
           prop="articleId"
-          width="120"
+          width="110"
           align="center"
         />
         <el-table-column label="状态" width="90" align="center">
@@ -199,27 +197,16 @@ onMounted(load)
             <span>{{ row.isApproved ? '已通过' : '待审核' }}</span>
           </template>
         </el-table-column>
-        <el-table-column
-          prop="location"
-          label="地区"
-          width="130"
-          show-overflow-tooltip
-        />
-        <el-table-column label="设备/浏览器" width="160" show-overflow-tooltip>
-          <template #default="{ row }">
-            <span>{{
-              [row.userAgentOs, row.userAgentBrowser]
-                .filter(Boolean)
-                .join(' / ') || '-'
-            }}</span>
-          </template>
-        </el-table-column>
         <el-table-column label="时间" width="150" align="center">
           <template #default="{ row }">{{ fmtDate(row.createTime) }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="180" align="center" fixed="right">
+        <el-table-column label="操作" width="220" align="center" fixed="right">
           <template #default="{ row }">
             <div class="row-actions">
+              <el-button link size="small" @click="openDetail(row)"
+                >查看</el-button
+              >
+              <el-divider direction="vertical" />
               <el-button
                 v-if="!row.isApproved"
                 link
@@ -252,6 +239,53 @@ onMounted(load)
         @current-change="handlePageChange"
       />
     </div>
+
+    <!-- 详情弹窗 -->
+    <el-dialog
+      v-model="detailVisible"
+      title="评论详情"
+      width="580px"
+      :close-on-click-modal="false"
+    >
+      <el-descriptions v-if="detailRow" :column="2" border size="small">
+        <el-descriptions-item label="文章ID">{{
+          detailRow.articleId ?? '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="来源">{{
+          detailRow.isAdminReply ? '管理员' : '访客'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="昵称">{{
+          detailRow.nickname ?? '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="邮箱/QQ">{{
+          detailRow.emailOrQq ?? '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="回复对象">{{
+          detailRow.parentNickname ?? '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="状态">{{
+          detailRow.isApproved ? '已通过' : '待审核'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="地区">{{
+          detailRow.location ?? '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="时间">{{
+          fmtDate(detailRow.createTime)
+        }}</el-descriptions-item>
+        <el-descriptions-item label="操作系统">{{
+          detailRow.userAgentOs ?? '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="浏览器">{{
+          detailRow.userAgentBrowser ?? '-'
+        }}</el-descriptions-item>
+        <el-descriptions-item label="评论内容" :span="2">
+          <div v-html="detailRow.contentHtml || detailRow.content || '-'" />
+        </el-descriptions-item>
+      </el-descriptions>
+      <template #footer>
+        <el-button @click="detailVisible = false">关闭</el-button>
+      </template>
+    </el-dialog>
 
     <!-- 回复弹窗 -->
     <el-dialog v-model="replyDialogVisible" title="回复评论" width="500px">
@@ -290,6 +324,12 @@ onMounted(load)
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+  gap: 12px;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
 

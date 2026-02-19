@@ -273,7 +273,9 @@ onMounted(() => {
           />
           <el-table-column label="类型" width="100" align="center">
             <template #default="{ row }">
-              <span>{{ row.type === 0 ? '教育' : row.type === 1 ? '工作' : '项目' }}</span>
+              <span>{{
+                row.type === 0 ? '教育' : row.type === 1 ? '工作' : '项目'
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="时间" width="200" align="center">

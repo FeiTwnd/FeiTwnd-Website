@@ -10,7 +10,15 @@ const dialogVisible = ref(false)
 const isEditing = ref(false)
 const uploading = ref(false)
 
-const form = ref({ id: null, name: '', url: '', avatarUrl: '', description: '', sort: null, isVisible: 1 })
+const form = ref({
+  id: null,
+  name: '',
+  url: '',
+  avatarUrl: '',
+  description: '',
+  sort: null,
+  isVisible: 1
+})
 
 const openDialog = (row = null) => {
   isEditing.value = !!row
@@ -24,7 +32,15 @@ const openDialog = (row = null) => {
         sort: row.sort ?? null,
         isVisible: row.isVisible ?? 1
       }
-    : { id: null, name: '', url: '', avatarUrl: '', description: '', sort: null, isVisible: 1 }
+    : {
+        id: null,
+        name: '',
+        url: '',
+        avatarUrl: '',
+        description: '',
+        sort: null,
+        isVisible: 1
+      }
   dialogVisible.value = true
 }
 
@@ -101,11 +117,7 @@ onMounted(() => friendLinkStore.fetchList())
         </span>
       </div>
       <div class="toolbar-right">
-        <el-button
-          plain
-          :disabled="!selected.length"
-          @click="batchDelete"
-        >
+        <el-button plain :disabled="!selected.length" @click="batchDelete">
           <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" />
           批量删除
@@ -167,11 +179,7 @@ onMounted(() => friendLinkStore.fetchList())
                 编辑
               </el-button>
               <el-divider direction="vertical" />
-              <el-button
-                link
-                size="small"
-                @click="deleteOne(row)"
-              >
+              <el-button link size="small" @click="deleteOne(row)">
                 <!-- ICON: icon-delete -->
                 删除
               </el-button>
@@ -203,7 +211,9 @@ onMounted(() => friendLinkStore.fetchList())
               accept="image/*"
             >
               <el-button size="small" :loading="uploading"
-                ><!-- ICON: icon-upload --><span class="iconfont icon-upload" />点击上传</el-button
+                ><!-- ICON: icon-upload --><span
+                  class="iconfont icon-upload"
+                />点击上传</el-button
               >
             </el-upload>
             <el-input
@@ -226,10 +236,20 @@ onMounted(() => friendLinkStore.fetchList())
           />
         </el-form-item>
         <el-form-item label="排序">
-          <el-input-number v-model="form.sort" :min="0" :precision="0" controls-position="right" style="width:120px" />
+          <el-input-number
+            v-model="form.sort"
+            :min="0"
+            :precision="0"
+            controls-position="right"
+            style="width: 120px"
+          />
         </el-form-item>
         <el-form-item label="可见">
-          <el-switch v-model="form.isVisible" :active-value="1" :inactive-value="0" />
+          <el-switch
+            v-model="form.isVisible"
+            :active-value="1"
+            :inactive-value="0"
+          />
         </el-form-item>
       </el-form>
       <template #footer>
