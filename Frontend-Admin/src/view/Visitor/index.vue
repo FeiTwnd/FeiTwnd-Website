@@ -133,7 +133,6 @@ onMounted(load)
           批量解封
         </el-button>
         <el-button plain :disabled="!selected.length" @click="batchBlock">
-          <!-- ICON: icon-ban -->
           <span class="iconfont icon-ban" />
           批量封禁
         </el-button>

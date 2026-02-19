@@ -101,7 +101,6 @@ onMounted(load)
       </div>
       <div class="toolbar-right">
         <el-button plain :disabled="!selected.length" @click="batchDelete">
-          <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" />
           批量删除
         </el-button>

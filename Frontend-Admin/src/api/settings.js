@@ -4,6 +4,12 @@ import http from '@/utils/request'
 export const getConfigByKey = (configKey) =>
   http.get(`/admin/systemConfig/key/${configKey}`)
 
+/**
+ * 根据 ID 获取配置
+ * @param {number} id
+ */
+export const getConfigById = (id) => http.get(`/admin/systemConfig/${id}`)
+
 /** 获取所有系统配置 */
 export const getConfigList = () => http.get('/admin/systemConfig')
 

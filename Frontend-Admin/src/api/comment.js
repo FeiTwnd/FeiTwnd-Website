@@ -8,6 +8,13 @@ export const getCommentPage = (params) =>
   http.get('/admin/article/comment/page', { params })
 
 /**
+ * 根据文章 ID 获取所有评论
+ * @param {number} articleId
+ */
+export const getCommentsByArticleId = (articleId) =>
+  http.get(`/admin/article/comment/${articleId}`)
+
+/**
  * 批量审核通过评论
  * @param {number[]} ids
  */

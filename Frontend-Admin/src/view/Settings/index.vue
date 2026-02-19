@@ -235,7 +235,6 @@ const handleChangeEmail = async () => {
               class="avatar-preview"
             />
             <div v-else class="avatar-placeholder">
-              <!-- ICON: icon-user -->
               <span class="iconfont icon-user" />
             </div>
           </el-upload>
@@ -311,7 +310,6 @@ const handleChangeEmail = async () => {
       <el-tab-pane label="系统配置" name="config">
         <div class="tab-toolbar">
           <el-button type="primary" @click="openConfigDialog()">
-            <!-- ICON: icon-plus -->
             <span class="iconfont icon-plus" /> 新增配置
           </el-button>
         </div>

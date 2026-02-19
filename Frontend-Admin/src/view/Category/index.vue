@@ -88,7 +88,6 @@ onMounted(() => {
       <el-tab-pane label="分类管理" name="category">
         <div class="tab-toolbar">
           <el-button type="primary" @click="openCatDialog()">
-            <!-- ICON: icon-plus -->
             <span class="iconfont icon-plus" /> 新建分类
           </el-button>
         </div>
@@ -126,7 +125,6 @@ onMounted(() => {
       <el-tab-pane label="标签管理" name="tag">
         <div class="tab-toolbar">
           <el-button type="primary" @click="openTagDialog()">
-            <!-- ICON: icon-plus -->
             <span class="iconfont icon-plus" /> 新建标签
           </el-button>
         </div>

@@ -15,18 +15,18 @@ const activeMenu = computed(() => route.path)
 const isEditorPage = computed(() => route.path.startsWith('/article/edit'))
 
 const navItems = [
-  { path: '/dashboard', icon: 'icon-dashboard', label: '仪表盘' },
-  { path: '/article/list', icon: 'icon-article', label: '文章管理' },
+  { path: '/dashboard', icon: 'icon-yibiaopan', label: '仪表盘' },
+  { path: '/article/list', icon: 'icon-bianjiwenzhang_huaban', label: '文章管理' },
   { path: '/category', icon: 'icon-folder', label: '分类 / 标签' },
   { path: '/comment', icon: 'icon-comment', label: '评论管理' },
-  { path: '/message', icon: 'icon-message', label: '留言管理' },
+  { path: '/message', icon: 'icon-liuyan', label: '留言管理' },
   { path: '/friend-link', icon: 'icon-link', label: '友链管理' },
   { path: '/music', icon: 'icon-music', label: '音乐管理' },
   { path: '/rss', icon: 'icon-rss', label: 'RSS 订阅' },
   { path: '/visitor', icon: 'icon-user', label: '访客管理' },
   { path: '/view-record', icon: 'icon-eye', label: '浏览记录' },
-  { path: '/operation-log', icon: 'icon-log', label: '操作日志' },
-  { path: '/profile', icon: 'icon-profile', label: '个人资料' },
+  { path: '/operation-log', icon: 'icon-wj-rz', label: '操作日志' },
+  { path: '/profile', icon: 'icon-iconfontprofile', label: '个人资料' },
   { path: '/settings', icon: 'icon-setting', label: '系统设置' }
 ]
 
@@ -48,8 +48,7 @@ const handleLogout = () => {
       <div class="sidebar-logo">
         <span v-if="!collapsed" class="logo-text">管理控制台</span>
         <span v-else class="logo-icon">
-          <!-- ICON: icon-dashboard -->
-          <span class="iconfont icon-dashboard" />
+          <span class="iconfont icon-guanliduan" />
         </span>
       </div>
 
@@ -60,18 +59,16 @@ const handleLogout = () => {
           :to="item.path"
           :class="['nav-item', { active: activeMenu.startsWith(item.path) }]"
         >
-          <!-- ICON: {{ item.icon }} -->
           <span :class="['iconfont', item.icon]" />
           <span v-if="!collapsed" class="nav-label">{{ item.label }}</span>
         </router-link>
       </nav>
 
       <button class="collapse-btn" @click="collapsed = !collapsed">
-        <!-- ICON: icon-arrow-left / icon-arrow-right -->
         <span
           :class="[
             'iconfont',
-            collapsed ? 'icon-arrow-right' : 'icon-arrow-left'
+            collapsed ? 'icon-arrow-right-bold' : 'icon-arrow-left-bold'
           ]"
         />
       </button>
@@ -91,12 +88,10 @@ const handleLogout = () => {
         </div>
         <div class="topbar-right">
           <span class="user-name">
-            <!-- ICON: icon-user -->
             <span class="iconfont icon-user" />
             {{ userStore.userInfo?.nickname || '管理员' }}
           </span>
           <button class="logout-btn" @click="handleLogout">
-            <!-- ICON: icon-logout -->
             <span class="iconfont icon-logout" />
             退出
           </button>
@@ -106,7 +101,9 @@ const handleLogout = () => {
       <!-- 页面内容 -->
       <main :class="['page-main', { 'editor-page': isEditorPage }]">
         <router-view v-slot="{ Component }">
-          <component :is="Component" :key="$route.fullPath" />
+          <transition name="page-fade" mode="out-in">
+            <component :is="Component" :key="$route.fullPath" />
+          </transition>
         </router-view>
       </main>
     </div>
@@ -275,5 +272,21 @@ const handleLogout = () => {
 .page-main.editor-page {
   padding: 0;
   overflow: hidden;
+}
+
+/* ---- 路由切换过渡 ---- */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-4px);
 }
 </style>

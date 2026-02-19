@@ -111,7 +111,6 @@ onMounted(load)
           @keyup.enter="handleSearch"
         >
           <template #prefix>
-            <!-- ICON: icon-search -->
             <span class="iconfont icon-search" />
           </template>
         </el-input>
@@ -149,7 +148,6 @@ onMounted(load)
       </div>
       <div class="toolbar-right">
         <el-button plain :disabled="!selected.length" @click="batchDelete">
-          <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" />
           批量删除
         </el-button>

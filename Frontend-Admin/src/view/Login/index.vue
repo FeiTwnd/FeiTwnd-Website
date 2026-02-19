@@ -87,8 +87,7 @@ onUnmounted(() => {
       <!-- 标题区 -->
       <div class="login-header">
         <div class="login-brand">
-          <!-- ICON: icon-dashboard -->
-          <span class="iconfont icon-dashboard brand-icon" />
+          <span class="iconfont icon-guanliduan brand-icon" />
         </div>
         <h1 class="login-title">管理控制台</h1>
       </div>
@@ -108,7 +107,6 @@ onUnmounted(() => {
             clearable
           >
             <template #prefix>
-              <!-- ICON: icon-user -->
               <span class="iconfont icon-user field-icon" />
             </template>
           </el-input>
@@ -123,7 +121,6 @@ onUnmounted(() => {
             show-password
           >
             <template #prefix>
-              <!-- ICON: icon-lock -->
               <span class="iconfont icon-lock field-icon" />
             </template>
           </el-input>
@@ -138,7 +135,6 @@ onUnmounted(() => {
               class="code-input"
             >
               <template #prefix>
-                <!-- ICON: icon-shield -->
                 <span class="iconfont icon-shield field-icon" />
               </template>
             </el-input>

@@ -1,3 +1,10 @@
+@font-face {
+  font-family: "iconfont";
+  src: url('../font/iconfont.woff2?t=1771475019349') format('woff2'),
+       url('../font/iconfont.woff?t=1771475019349') format('woff'),
+       url('../font/iconfont.ttf?t=1771475019349') format('truetype');
+}
+
 .iconfont {
   font-family: 'iconfont' !important;
   font-size: 16px;
@@ -5,4 +12,121 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1;
+}
+
+.icon-guanliduan:before {
+  content: "\e618";
+}
+
+
+.icon-iconfontprofile:before {
+  content: "\e615";
+}
+
+.icon-new:before {
+  content: "\e71e";
+}
+
+.icon-upload:before {
+  content: "\e656";
+}
+
+.icon-rss:before {
+  content: "\ea5a";
+}
+
+.icon-ban:before {
+  content: "\e632";
+}
+
+.icon-user:before {
+  content: "\e610";
+}
+
+.icon-eye:before {
+  content: "\e78f";
+}
+
+.icon-link:before {
+  content: "\e7e2";
+}
+
+.icon-image-fill:before {
+  content: "\e860";
+}
+
+.icon-wj-rz:before {
+  content: "\e715";
+}
+
+.icon-comment:before {
+  content: "\e8e8";
+}
+
+.icon-today:before {
+  content: "\e8ca";
+}
+
+.icon-plus:before {
+  content: "\e8fe";
+}
+
+.icon-delete:before {
+  content: "\e6f4";
+}
+
+.icon-lock:before {
+  content: "\e676";
+}
+
+.icon-setting:before {
+  content: "\e67d";
+}
+
+.icon-time:before {
+  content: "\e680";
+}
+
+.icon-arrow-left-bold:before {
+  content: "\e685";
+}
+
+.icon-arrow-right-bold:before {
+  content: "\e687";
+}
+
+.icon-shield:before {
+  content: "\e87f";
+}
+
+.icon-liuyan:before {
+  content: "\e602";
+}
+
+.icon-folder:before {
+  content: "\e856";
+}
+
+.icon-logout:before {
+  content: "\ea1e";
+}
+
+.icon-music:before {
+  content: "\ea2b";
+}
+
+.icon-pending:before {
+  content: "\ea3f";
+}
+
+.icon-search:before {
+  content: "\ea56";
+}
+
+.icon-bianjiwenzhang_huaban:before {
+  content: "\e62e";
+}
+
+.icon-yibiaopan:before {
+  content: "\e6cf";
 }

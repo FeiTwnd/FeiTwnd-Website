@@ -20,7 +20,7 @@ const statCards = [
   { key: 'totalVisitorCount', label: '总访客数', icon: 'icon-user' },
   { key: 'todayViewCount', label: '今日浏览', icon: 'icon-today' },
   { key: 'todayNewVisitorCount', label: '今日新访客', icon: 'icon-new' },
-  { key: 'totalArticleCount', label: '文章总数', icon: 'icon-article' },
+  { key: 'totalArticleCount', label: '文章总数', icon: 'icon-bianjiwenzhang_huaban' },
   { key: 'totalCommentCount', label: '评论总数', icon: 'icon-comment' },
   { key: 'pendingCommentCount', label: '待审评论', icon: 'icon-pending' }
 ]

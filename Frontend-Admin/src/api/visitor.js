@@ -2,7 +2,7 @@ import http from '@/utils/request'
 
 /**
  * 分页查询访客列表
- * @param {{ page: number, pageSize: number, ip?: string, isBlocked?: number }} params
+ * @param {{ page: number, pageSize: number, country?: string, province?: string, city?: string, status?: number }} params
  */
 export const getVisitorPage = (params) =>
   http.get('/admin/visitor/page', { params })

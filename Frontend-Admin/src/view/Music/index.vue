@@ -226,7 +226,6 @@ onMounted(load)
           @keyup.enter="handleSearch"
         >
           <template #prefix>
-            <!-- ICON: icon-search -->
             <span class="iconfont icon-search" />
           </template>
         </el-input>
@@ -240,13 +239,11 @@ onMounted(load)
           :disabled="!selected.length"
           @click="batchDelete"
         >
-          <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" />
           批量删除
         </el-button>
         <el-button type="primary" @click="openDialog()">
-          <!-- ICON: icon-add -->
-          <span class="iconfont icon-add" />
+          <span class="iconfont icon-plus" />
           新增音乐
         </el-button>
       </div>

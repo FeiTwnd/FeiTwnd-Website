@@ -255,8 +255,7 @@ onMounted(() => {
             </el-radio-group>
           </div>
           <el-button type="primary" @click="openExpDialog()">
-            <!-- ICON: icon-add -->
-            <span class="iconfont icon-add" /> 新增经历
+            <span class="iconfont icon-plus" /> 新增经历
           </el-button>
         </div>
         <el-table
@@ -319,8 +318,7 @@ onMounted(() => {
         <div class="tab-toolbar">
           <div />
           <el-button type="primary" @click="openSkillDialog()">
-            <!-- ICON: icon-add -->
-            <span class="iconfont icon-add" /> 新增技能
+            <span class="iconfont icon-plus" /> 新增技能
           </el-button>
         </div>
         <el-table
@@ -373,8 +371,7 @@ onMounted(() => {
         <div class="tab-toolbar">
           <div />
           <el-button type="primary" @click="openSocialDialog()">
-            <!-- ICON: icon-add -->
-            <span class="iconfont icon-add" /> 新增平台
+            <span class="iconfont icon-plus" /> 新增平台
           </el-button>
         </div>
         <el-table

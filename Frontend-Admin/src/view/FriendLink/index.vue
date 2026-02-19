@@ -111,20 +111,17 @@ onMounted(() => friendLinkStore.fetchList())
     <div class="toolbar">
       <div class="toolbar-left">
         <span class="page-heading">
-          <!-- ICON: icon-link -->
           <span class="iconfont icon-link" />
           友情链接管理
         </span>
       </div>
       <div class="toolbar-right">
         <el-button plain :disabled="!selected.length" @click="batchDelete">
-          <!-- ICON: icon-delete -->
           <span class="iconfont icon-delete" />
           批量删除
         </el-button>
         <el-button type="primary" @click="openDialog()">
-          <!-- ICON: icon-add -->
-          <span class="iconfont icon-add" />
+          <span class="iconfont icon-plus" />
           新增友链
         </el-button>
       </div>
@@ -175,12 +172,10 @@ onMounted(() => friendLinkStore.fetchList())
           <template #default="{ row }">
             <div class="row-actions">
               <el-button link size="small" @click="openDialog(row)">
-                <!-- ICON: icon-edit -->
                 编辑
               </el-button>
               <el-divider direction="vertical" />
               <el-button link size="small" @click="deleteOne(row)">
-                <!-- ICON: icon-delete -->
                 删除
               </el-button>
             </div>
@@ -211,7 +206,7 @@ onMounted(() => friendLinkStore.fetchList())
               accept="image/*"
             >
               <el-button size="small" :loading="uploading"
-                ><!-- ICON: icon-upload --><span
+                ><span
                   class="iconfont icon-upload"
                 />点击上传</el-button
               >

@@ -254,7 +254,7 @@ onMounted(async () => {
               class="cover-preview"
             />
             <div v-else class="cover-placeholder">
-              <span class="iconfont icon-image" />
+              <span class="iconfont icon-image-fill" />
               <span>点击上传</span>
             </div>
           </el-upload>
