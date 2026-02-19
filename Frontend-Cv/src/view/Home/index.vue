@@ -16,14 +16,6 @@ const education = computed(() => experiences.value.filter((e) => e.type === 0))
 const work = computed(() => experiences.value.filter((e) => e.type === 1))
 const projects = computed(() => experiences.value.filter((e) => e.type === 2))
 
-/* ============ 技能弹窗 ============ */
-const skillDialogVisible = ref(false)
-const activeSkill = ref(null)
-const openSkill = (s) => {
-  activeSkill.value = s
-  skillDialogVisible.value = true
-}
-
 /* ============ 暗黑模式 ============ */
 const isDark = ref(false)
 const initTheme = () => {
@@ -48,7 +40,10 @@ const fmtDate = (d) => {
   const [y, m] = d.split('-')
   return `${y}.${m}`
 }
-const dateRange = (e) => `${fmtDate(e.startDate)} — ${fmtDate(e.endDate)}`
+const dateRange = (e) => `${fmtDate(e.startDate)} ~ ${fmtDate(e.endDate)}`
+
+/* ============ 打印 ============ */
+const printPage = () => window.print()
 
 /* ============ 滚入动画 ============ */
 const observeSections = () => {
@@ -94,30 +89,34 @@ onMounted(async () => {
 
 <template>
   <div v-if="loaded" class="cv-page">
+    <!-- 打印按钮 -->
+    <button
+      class="print-btn no-print"
+      title="打印 / 导出 PDF"
+      @click="printPage"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <polyline points="6 9 6 2 18 2 18 9" />
+        <path
+          d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"
+        />
+        <rect x="6" y="14" width="12" height="8" />
+      </svg>
+    </button>
+
     <!-- ========== 头部个人信息 ========== -->
     <header class="hero fade-section">
-      <div class="hero-avatar" v-if="info.avatar">
-        <img :src="info.avatar" :alt="info.nickname" />
-      </div>
       <h1 class="hero-name">{{ info.nickname }}</h1>
-      <p v-if="info.tag" class="hero-tag">{{ info.tag }}</p>
-      <p v-if="info.description" class="hero-desc">{{ info.description }}</p>
-
       <ul class="hero-meta">
-        <li v-if="info.location">
-          <svg
-            viewBox="0 0 24 24"
-            width="16"
-            height="16"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
-            <circle cx="12" cy="10" r="3" />
-          </svg>
-          <span>{{ info.location }}</span>
-        </li>
         <li v-if="info.email">
           <svg
             viewBox="0 0 24 24"
@@ -138,7 +137,9 @@ onMounted(async () => {
               d="M12 .3a12 12 0 00-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.33 3.3 1.23a11.5 11.5 0 016.02 0c2.28-1.56 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18a4.65 4.65 0 011.23 3.22c0 4.61-2.81 5.63-5.48 5.93.43.37.81 1.1.81 2.22l-.01 3.29c0 .31.22.69.83.57A12 12 0 0012 .3"
             />
           </svg>
-          <a :href="info.github" target="_blank" rel="noopener">GitHub</a>
+          <a :href="info.github" target="_blank" rel="noopener">{{
+            info.github.replace(/^https?:\/\/(www\.)?github\.com\//, '')
+          }}</a>
         </li>
         <li v-if="info.website">
           <svg
@@ -166,8 +167,8 @@ onMounted(async () => {
       <h2 class="section-title">
         <svg
           viewBox="0 0 24 24"
-          width="20"
-          height="20"
+          width="22"
+          height="22"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
@@ -205,8 +206,8 @@ onMounted(async () => {
       <h2 class="section-title">
         <svg
           viewBox="0 0 24 24"
-          width="20"
-          height="20"
+          width="22"
+          height="22"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
@@ -244,8 +245,8 @@ onMounted(async () => {
       <h2 class="section-title">
         <svg
           viewBox="0 0 24 24"
-          width="20"
-          height="20"
+          width="22"
+          height="22"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
@@ -278,13 +279,13 @@ onMounted(async () => {
       </div>
     </section>
 
-    <!-- ========== 技能 ========== -->
+    <!-- ========== 技术栈 ========== -->
     <section v-if="skills.length" class="section fade-section">
       <h2 class="section-title">
         <svg
           viewBox="0 0 24 24"
-          width="20"
-          height="20"
+          width="22"
+          height="22"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
@@ -295,45 +296,19 @@ onMounted(async () => {
         </svg>
         技术栈
       </h2>
-      <div class="skill-grid">
-        <div
-          v-for="s in skills"
-          :key="s.id"
-          class="skill-item"
-          :title="s.name"
-          @click="openSkill(s)"
-        >
-          <img v-if="s.icon" :src="s.icon" :alt="s.name" class="skill-icon" />
-          <div v-else class="skill-icon skill-icon--text">
+      <div class="skill-list">
+        <div v-for="s in skills" :key="s.id" class="skill-row">
+          <img v-if="s.icon" :src="s.icon" :alt="s.name" class="skill-logo" />
+          <div v-else class="skill-logo skill-logo--text">
             {{ s.name?.[0] }}
           </div>
-          <span class="skill-name">{{ s.name }}</span>
+          <div class="skill-info">
+            <h4>{{ s.name }}</h4>
+            <p v-if="s.description">{{ s.description }}</p>
+          </div>
         </div>
       </div>
     </section>
-
-    <!-- 技能描述弹窗 -->
-    <el-dialog
-      v-model="skillDialogVisible"
-      :title="activeSkill?.name"
-      width="420px"
-      class="skill-dialog"
-    >
-      <div class="skill-dialog-body">
-        <img
-          v-if="activeSkill?.icon"
-          :src="activeSkill.icon"
-          :alt="activeSkill.name"
-          class="skill-dialog-icon"
-        />
-        <p>{{ activeSkill?.description || '暂无描述' }}</p>
-      </div>
-    </el-dialog>
-
-    <!-- ========== 页脚 ========== -->
-    <footer class="footer fade-section">
-      <p>© {{ new Date().getFullYear() }} {{ info.nickname || 'FeiTwnd' }}</p>
-    </footer>
   </div>
 
   <!-- 加载动画 -->
@@ -345,14 +320,46 @@ onMounted(async () => {
 <style scoped>
 /* ====== 页面 ====== */
 .cv-page {
+  position: relative;
   max-width: 760px;
   margin: 0 auto;
-  padding: 48px 24px 32px;
+  padding: 52px 28px 40px;
   color: var(--cv-text);
   font-family:
     -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue',
     Arial, 'Noto Sans SC', sans-serif;
-  line-height: 1.6;
+  line-height: 1.7;
+}
+
+/* ====== 打印按钮 ====== */
+.print-btn {
+  position: fixed;
+  top: 20px;
+  right: 24px;
+  z-index: 100;
+  width: 40px;
+  height: 40px;
+  border: 1px solid var(--cv-border);
+  border-radius: 8px;
+  background: var(--cv-card);
+  color: var(--cv-text);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--cv-shadow);
+  transition:
+    background 0.2s,
+    transform 0.15s,
+    box-shadow 0.2s;
+}
+.print-btn:hover {
+  background: var(--cv-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+.print-btn:active {
+  transform: scale(0.95);
 }
 
 /* ====== 加载 ====== */
@@ -392,42 +399,15 @@ onMounted(async () => {
 /* ====== Hero ====== */
 .hero {
   text-align: center;
-  padding-bottom: 40px;
+  padding-bottom: 36px;
   border-bottom: 1px solid var(--cv-border);
-  margin-bottom: 36px;
-}
-.hero-avatar {
-  margin-bottom: 16px;
-}
-.hero-avatar img {
-  width: 96px;
-  height: 96px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid var(--cv-border);
-  transition: transform 0.3s;
-}
-.hero-avatar img:hover {
-  transform: scale(1.06);
+  margin-bottom: 40px;
 }
 .hero-name {
-  font-size: 28px;
-  font-weight: 700;
-  margin: 0 0 4px;
+  font-size: 32px;
+  font-weight: 800;
+  margin: 0 0 14px;
   letter-spacing: -0.5px;
-}
-.hero-tag {
-  font-size: 15px;
-  color: var(--cv-muted);
-  margin: 0 0 6px;
-}
-.hero-desc {
-  font-size: 14px;
-  color: var(--cv-muted);
-  margin: 0 0 18px;
-  max-width: 480px;
-  margin-left: auto;
-  margin-right: auto;
 }
 .hero-meta {
   list-style: none;
@@ -436,23 +416,26 @@ onMounted(async () => {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 16px 24px;
+  gap: 12px 28px;
 }
 .hero-meta li {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 5px;
-  font-size: 13px;
+  gap: 6px;
+  font-size: 14px;
   color: var(--cv-muted);
+  background: var(--cv-hover);
+  border: 1px solid var(--cv-border);
+  border-radius: 20px;
+  padding: 5px 14px;
+  transition: background 0.2s;
+}
+.hero-meta li:hover {
+  background: var(--cv-border);
 }
 .hero-meta a {
   color: var(--cv-text);
   text-decoration: none;
-  border-bottom: 1px solid transparent;
-  transition: border-color 0.2s;
-}
-.hero-meta a:hover {
-  border-bottom-color: var(--cv-text);
 }
 .hero-meta svg {
   flex-shrink: 0;
@@ -461,16 +444,16 @@ onMounted(async () => {
 
 /* ====== Section ====== */
 .section {
-  margin-bottom: 36px;
+  margin-bottom: 40px;
 }
 .section-title {
-  font-size: 18px;
-  font-weight: 700;
-  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 800;
+  margin: 0 0 22px;
+  letter-spacing: -0.3px;
   display: flex;
   align-items: center;
   gap: 8px;
-  letter-spacing: -0.3px;
 }
 .section-title svg {
   color: var(--cv-muted);
@@ -480,33 +463,33 @@ onMounted(async () => {
 /* ====== Timeline ====== */
 .timeline {
   position: relative;
-  padding-left: 24px;
+  padding-left: 28px;
 }
 .timeline::before {
   content: '';
   position: absolute;
   left: 5px;
-  top: 6px;
-  bottom: 6px;
-  width: 1px;
+  top: 8px;
+  bottom: 8px;
+  width: 1.5px;
   background: var(--cv-line);
 }
 .timeline-item {
   position: relative;
-  margin-bottom: 24px;
+  margin-bottom: 28px;
 }
 .timeline-item:last-child {
   margin-bottom: 0;
 }
 .tl-dot {
   position: absolute;
-  left: -24px;
-  top: 8px;
+  left: -28px;
+  top: 10px;
   width: 11px;
   height: 11px;
   border-radius: 50%;
   background: var(--cv-card);
-  border: 2px solid var(--cv-dot);
+  border: 2.5px solid var(--cv-dot);
   z-index: 1;
   transition:
     border-color 0.2s,
@@ -514,95 +497,100 @@ onMounted(async () => {
 }
 .timeline-item:hover .tl-dot {
   border-color: var(--cv-text);
-  transform: scale(1.25);
+  transform: scale(1.3);
 }
 .tl-card {
   background: var(--cv-card);
   border: 1px solid var(--cv-border);
-  border-radius: 8px;
-  padding: 16px 18px;
+  border-radius: 10px;
+  padding: 18px 22px;
   box-shadow: var(--cv-shadow);
   transition:
     box-shadow 0.25s,
     transform 0.25s;
 }
 .tl-card:hover {
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   transform: translateY(-2px);
 }
 .tl-head {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 6px;
+  align-items: flex-start;
+  gap: 14px;
 }
 .tl-logo {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
   object-fit: contain;
   flex-shrink: 0;
   background: var(--cv-hover);
-  padding: 2px;
+  padding: 3px;
 }
 .tl-info {
   flex: 1;
   min-width: 0;
 }
 .tl-info h3 {
-  font-size: 15px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
   margin: 0;
-  line-height: 1.3;
-}
-.tl-sub {
-  font-size: 13px;
-  color: var(--cv-muted);
-  margin: 2px 0 0;
+  line-height: 1.35;
 }
 .tl-date {
-  font-size: 12px;
+  font-size: 13px;
   color: var(--cv-muted);
   white-space: nowrap;
   flex-shrink: 0;
+  margin-left: auto;
+  padding-left: 12px;
+}
+.tl-sub {
+  font-size: 14.5px;
+  color: var(--cv-muted);
+  margin: 6px 0 0;
+  font-weight: 500;
 }
 .tl-content {
-  font-size: 13.5px;
+  font-size: 14.5px;
   color: var(--cv-muted);
-  margin: 4px 0 0;
-  line-height: 1.65;
+  margin: 10px 0 0;
+  line-height: 1.7;
   white-space: pre-line;
 }
 
-/* ====== 技能网格 ====== */
-.skill-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
-  gap: 14px;
-}
-.skill-item {
+/* ====== 技能列表 ====== */
+.skill-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  padding: 12px 4px;
-  border-radius: 8px;
+  gap: 12px;
+}
+.skill-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: var(--cv-card);
+  border: 1px solid var(--cv-border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  box-shadow: var(--cv-shadow);
   transition:
-    background 0.2s,
-    transform 0.2s;
+    box-shadow 0.25s,
+    transform 0.25s;
 }
-.skill-item:hover {
-  background: var(--cv-hover);
-  transform: translateY(-3px);
+.skill-row:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
 }
-.skill-icon {
+.skill-logo {
   width: 40px;
   height: 40px;
   border-radius: 8px;
   object-fit: contain;
+  flex-shrink: 0;
+  margin-top: 2px;
 }
-.skill-icon--text {
+.skill-logo--text {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -611,71 +599,76 @@ onMounted(async () => {
   font-size: 18px;
   color: var(--cv-text);
 }
-.skill-name {
-  font-size: 11.5px;
-  color: var(--cv-muted);
-  text-align: center;
-  line-height: 1.2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
+.skill-info {
+  flex: 1;
+  min-width: 0;
 }
-
-/* ====== 技能弹窗 ====== */
-.skill-dialog-body {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-}
-.skill-dialog-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 8px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-.skill-dialog-body p {
+.skill-info h4 {
+  font-size: 15px;
+  font-weight: 700;
   margin: 0;
-  font-size: 14px;
-  line-height: 1.7;
-  color: var(--cv-text);
+  line-height: 1.4;
 }
-
-/* ====== Footer ====== */
-.footer {
-  text-align: center;
-  padding-top: 28px;
-  border-top: 1px solid var(--cv-border);
-  margin-top: 8px;
-}
-.footer p {
-  font-size: 12px;
+.skill-info p {
+  font-size: 13.5px;
   color: var(--cv-muted);
-  margin: 0;
+  margin: 4px 0 0;
+  line-height: 1.6;
 }
 
 /* ====== 响应式 ====== */
 @media (max-width: 600px) {
   .cv-page {
-    padding: 28px 16px 24px;
+    padding: 32px 16px 28px;
   }
   .hero-name {
-    font-size: 24px;
+    font-size: 26px;
   }
   .hero-meta {
-    gap: 10px 16px;
+    gap: 8px 12px;
   }
   .tl-head {
     flex-wrap: wrap;
   }
-  .tl-date {
-    width: 100%;
-    margin-top: 2px;
+  .print-btn {
+    top: 12px;
+    right: 12px;
   }
-  .skill-grid {
-    grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
-    gap: 10px;
+}
+
+/* ====== 打印样式 ====== */
+@media print {
+  /* 隐藏打印按钮 */
+  .no-print {
+    display: none !important;
+  }
+  /* 取消动画 */
+  .fade-section {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  /* 页面布局 */
+  .cv-page {
+    max-width: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  /* 取消卡片悬停效果 */
+  .tl-card,
+  .skill-row {
+    box-shadow: none;
+    border-color: #ddd;
+  }
+  .tl-card:hover,
+  .skill-row:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  /* 页头页脚由浏览器自动生成（日期+URL） */
+  @page {
+    size: A4;
+    margin: 15mm 12mm;
   }
 }
 </style>
