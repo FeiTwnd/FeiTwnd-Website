@@ -41,7 +41,7 @@ const bgImage = computed(() => {
       <!-- 自定义标题 (文章/分类/标签等) -->
       <template v-else-if="title">
         <h1 class="hero-article-title">{{ title }}</h1>
-        <p v-if="meta" class="hero-article-meta">{{ meta }}</p>
+        <p v-if="meta" class="hero-article-meta" v-html="meta" />
       </template>
       <!-- 其他页面: 显示路由 meta 标题 -->
       <template v-else>
@@ -117,6 +117,23 @@ const bgImage = computed(() => {
   margin: 0;
   opacity: 0.85;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 4px 5px;
+}
+.hero-article-meta :deep(.meta-item) {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.hero-article-meta :deep(.meta-dot) {
+  opacity: 0.5;
+  margin: 0 1px;
+}
+.hero-article-meta :deep(.iconfont) {
+  font-size: 13px;
 }
 .hero-page-title {
   font-family: var(--blog-serif);

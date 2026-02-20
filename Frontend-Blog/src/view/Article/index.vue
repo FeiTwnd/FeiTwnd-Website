@@ -60,14 +60,20 @@ const loadArticle = async (slug) => {
     // 更新 Hero
     articleTitle.value = article.value.title
     articleCover.value = article.value.coverImage || ''
-    const parts = []
+    const items = []
     if (article.value.publishTime)
-      parts.push(article.value.publishTime.slice(0, 10))
-    if (article.value.categoryName) parts.push(article.value.categoryName)
-    if (article.value.wordCount) parts.push(`${article.value.wordCount} 字`)
+      items.push(`<span class="meta-item"><i class="iconfont icon-time"></i>${article.value.publishTime.slice(0, 16).replace('T', ' ')}</span>`)
+    if (article.value.viewCount != null)
+      items.push(`<span class="meta-item"><i class="iconfont icon-eye"></i>${article.value.viewCount} 浏览</span>`)
+    if (article.value.commentCount != null)
+      items.push(`<span class="meta-item"><i class="iconfont icon-pinglun"></i>${article.value.commentCount} 评论</span>`)
+    if (article.value.categoryName)
+      items.push(`<span class="meta-item"><i class="iconfont icon-folder"></i>${article.value.categoryName}</span>`)
+    if (article.value.wordCount)
+      items.push(`<span class="meta-item"><i class="iconfont icon-guidang"></i>${article.value.wordCount} 字</span>`)
     if (article.value.readingTime)
-      parts.push(`${article.value.readingTime} 分钟阅读`)
-    articleMeta.value = parts.join(' · ')
+      items.push(`<span class="meta-item"><i class="iconfont icon-time"></i>${article.value.readingTime} 分钟</span>`)
+    articleMeta.value = items.join('<span class="meta-dot">·</span>')
     loadComments()
     checkLike()
     loadCaptcha()
