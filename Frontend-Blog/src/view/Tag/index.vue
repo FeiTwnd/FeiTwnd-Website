@@ -61,6 +61,7 @@ watch(
 )
 
 onMounted(async () => {
+  await blogStore.init()
   resolveName()
   await load()
   resolveName()

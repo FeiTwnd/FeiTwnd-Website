@@ -188,7 +188,7 @@ const doEdit = async (c) => {
       id: c.id,
       visitorId: visitorStore.visitorId,
       content: editContent.value.trim(),
-      isMarkdown: commentForm.value.isMarkdown ? 1 : 0
+      isMarkdown: c.isMarkdown ?? 0
     })
     editingId.value = null
     ElMessage.success('修改成功')
@@ -260,7 +260,6 @@ onMounted(() => {
   commentForm.value.nickname = visitorStore.nickname
   commentForm.value.emailOrQq = visitorStore.email
   loadArticle(route.params.slug)
-  loadCaptcha()
 })
 </script>
 

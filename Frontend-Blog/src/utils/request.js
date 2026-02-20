@@ -4,7 +4,7 @@ const baseURL = '/api'
 
 const instance = axios.create({
   baseURL,
-  timeout: 100000
+  timeout: 15000
 })
 
 instance.interceptors.response.use(

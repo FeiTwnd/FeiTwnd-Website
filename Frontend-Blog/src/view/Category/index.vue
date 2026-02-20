@@ -44,7 +44,9 @@ const resolveName = () => {
   const desc = blogStore.getCategoryDescBySlug(slug)
   categoryName.value = name
   articleTitle.value = name || '分类'
-  articleMeta.value = desc ? `${desc} · 共 ${total.value} 篇文章` : `共 ${total.value} 篇文章`
+  articleMeta.value = desc
+    ? `${desc} · 共 ${total.value} 篇文章`
+    : `共 ${total.value} 篇文章`
 }
 
 const handlePage = (p) => {
@@ -63,6 +65,7 @@ watch(
 )
 
 onMounted(async () => {
+  await blogStore.init()
   resolveName()
   await load()
   resolveName()
