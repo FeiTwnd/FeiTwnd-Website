@@ -39,10 +39,12 @@ const load = async () => {
 }
 
 const resolveName = () => {
-  const name = blogStore.getCategoryNameBySlug(route.params.slug)
+  const slug = route.params.slug
+  const name = blogStore.getCategoryNameBySlug(slug)
+  const desc = blogStore.getCategoryDescBySlug(slug)
   categoryName.value = name
   articleTitle.value = name || '分类'
-  articleMeta.value = `共 ${total.value} 篇文章`
+  articleMeta.value = desc ? `${desc} · 共 ${total.value} 篇文章` : `共 ${total.value} 篇文章`
 }
 
 const handlePage = (p) => {
@@ -63,7 +65,7 @@ watch(
 onMounted(async () => {
   resolveName()
   await load()
-  articleMeta.value = `共 ${total.value} 篇文章`
+  resolveName()
 })
 </script>
 

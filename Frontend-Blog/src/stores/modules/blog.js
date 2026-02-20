@@ -32,6 +32,12 @@ export const useBlogStore = defineStore('blog', () => {
     return cat ? cat.name : ''
   }
 
+  /* 通过 slug 取分类描述 */
+  const getCategoryDescBySlug = (slug) => {
+    const cat = categories.value.find((c) => c.slug === slug)
+    return cat ? cat.description || '' : ''
+  }
+
   /* 通过 slug 取标签名 */
   const getTagNameBySlug = (slug) => {
     const tag = tags.value.find((t) => t.slug === slug)
@@ -70,6 +76,7 @@ export const useBlogStore = defineStore('blog', () => {
     getCategoryIdBySlug,
     getTagIdBySlug,
     getCategoryNameBySlug,
+    getCategoryDescBySlug,
     getTagNameBySlug
   }
 })

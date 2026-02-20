@@ -11,7 +11,7 @@ import java.util.Random;
 /**
  * 博客端公共接口
  */
-@RestController
+@RestController("blogCommonController")
 @RequestMapping("/blog/common")
 public class CommonController {
 
@@ -27,6 +27,11 @@ public class CommonController {
 
         String[] operators = {"+", "-", "×"};
         String operator = operators[random.nextInt(operators.length)];
+
+        // 确保减法不会产生负数
+        if ("-".equals(operator) && num1 < num2) {
+            int temp = num1; num1 = num2; num2 = temp;
+        }
 
         int result;
         switch (operator) {

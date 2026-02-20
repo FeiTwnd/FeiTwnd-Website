@@ -1,6 +1,8 @@
 package cc.feitwnd.mapper;
 
+import cc.feitwnd.annotation.AutoFill;
 import cc.feitwnd.entity.ArticleLikes;
+import cc.feitwnd.enumeration.OperationType;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;

@@ -95,7 +95,9 @@ public class MessageServiceImpl implements MessageService {
             geoInfo.getOrDefault("province", ""),
             geoInfo.getOrDefault("city", "")
         );
-        messages.setLocation(location);
+        if(location != null && !location.equals("--")) {
+            messages.setLocation(location);
+        }
 
         // 6. 解析UserAgent
         String userAgent = request.getHeader("User-Agent");
@@ -222,7 +224,9 @@ public class MessageServiceImpl implements MessageService {
                     geoInfo.getOrDefault("country", ""),
                     geoInfo.getOrDefault("province", ""),
                     geoInfo.getOrDefault("city", ""));
-            messages.setLocation(location);
+            if(location != null && !location.equals("--")) {
+                messages.setLocation(location);
+            }
             String userAgent = request.getHeader("User-Agent");
             messages.setUserAgentOs(userAgentService.getOsName(userAgent));
             messages.setUserAgentBrowser(userAgentService.getBrowserName(userAgent));

@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 /**
  * 管理端通用接口
  */
-@RestController
+@RestController("adminCommonController")
 @RequestMapping("/admin/common")
 @Slf4j
 public class CommonController {

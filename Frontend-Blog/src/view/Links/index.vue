@@ -1,6 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import { getFriendLinks } from '@/api/friendLink'
+import SidebarCard from '@/components/SidebarCard.vue'
+
+const { articleTitle, articleMeta } = inject('setHero')
 
 const links = ref([])
 const loading = ref(false)
@@ -17,12 +20,18 @@ const load = async () => {
   }
 }
 
-onMounted(load)
+onMounted(() => {
+  articleTitle.value = '友链'
+  articleMeta.value = '朋友们的小站'
+  load()
+})
 </script>
 
 <template>
   <div class="links-page">
-    <div class="content-card">
+    <div class="links-layout">
+      <div class="links-main">
+        <div class="content-card">
       <div class="card-header">
         <i class="iconfont icon-lianjie" />
         <span>共 {{ links.length }} 位朋友</span>
@@ -41,7 +50,8 @@ onMounted(load)
           rel="noopener noreferrer"
           class="link-card"
         >
-          <img v-if="link.avatar" :src="link.avatar" class="link-avatar" />
+          <img v-if="link.avatarUrl" :src="link.avatarUrl" class="link-avatar" />
+          <span v-else class="link-avatar-letter">{{ link.name ? link.name.charAt(0) : '?' }}</span>
           <div class="link-body">
             <p class="link-name">{{ link.name }}</p>
             <p class="link-desc">{{ link.description }}</p>
@@ -51,15 +61,17 @@ onMounted(load)
 
       <p v-else class="empty">暂无友链</p>
     </div>
+      </div>
+
+      <SidebarCard />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.links-page {
-  width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
-}
+.links-page { width: 100%; }
+.links-layout { display: flex; gap: 24px; align-items: flex-start; }
+.links-main { flex: 1; min-width: 0; }
 .content-card {
   background: #fff;
   border-radius: 8px;
@@ -95,7 +107,7 @@ onMounted(load)
 
 .link-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 14px;
 }
 .link-card {
@@ -126,6 +138,20 @@ onMounted(load)
   flex-shrink: 0;
   border: 2px solid #ebeef5;
 }
+.link-avatar-letter {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e4e7ed;
+  color: #606266;
+  font-size: 20px;
+  font-weight: 700;
+  user-select: none;
+}
 .link-body {
   min-width: 0;
 }
@@ -153,6 +179,9 @@ onMounted(load)
   margin: 0;
 }
 
+@media (max-width: 960px) {
+  .links-layout { flex-direction: column; }
+}
 @media (max-width: 600px) {
   .content-card {
     padding: 16px;

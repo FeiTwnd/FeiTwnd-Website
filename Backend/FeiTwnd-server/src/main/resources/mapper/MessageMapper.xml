@@ -57,7 +57,7 @@
 
     <select id="getApprovedList" resultType="cc.feitwnd.vo.MessageVO">
         select id, root_id, parent_id, parent_nickname, content_html,
-               visitor_id, nickname, location, user_agent_os, user_agent_browser,
+               visitor_id, nickname, email_or_qq, location, user_agent_os, user_agent_browser,
                is_approved, is_secret, is_admin_reply, create_time
         from messages
         where (is_approved = 1 or visitor_id = #{visitorId})

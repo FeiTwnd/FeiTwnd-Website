@@ -1,9 +1,12 @@
 package cc.feitwnd.mapper;
 
+import cc.feitwnd.annotation.AutoFill;
 import cc.feitwnd.dto.ArticleCommentPageQueryDTO;
 import cc.feitwnd.entity.ArticleComments;
+import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.vo.ArticleCommentVO;
 import org.apache.ibatis.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -14,6 +17,7 @@ public interface ArticleCommentMapper {
      * 保存评论
      * @param articleComments
      */
+    @AutoFill(value = OperationType.INSERT)
     void save(ArticleComments articleComments);
 
     /**
@@ -34,6 +38,7 @@ public interface ArticleCommentMapper {
      * 批量审核通过评论
      * @param ids
      */
+    @AutoFill(value = OperationType.UPDATE)
     void batchApprove(List<Long> ids);
 
     /**

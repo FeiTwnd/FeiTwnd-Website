@@ -442,8 +442,6 @@ const goTag = (slug) => {
 }
 
 /* 站点统计 */
-.stats-card {
-}
 .card-title {
   font-size: 14px;
   font-weight: 700;

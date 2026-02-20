@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, inject, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getArticleArchive } from '@/api/article'
 import SidebarCard from '@/components/SidebarCard.vue'
 
 const router = useRouter()
+const { articleTitle, articleMeta } = inject('setHero')
 const yearGroups = ref([])
 const loading = ref(false)
 const totalCount = ref(0)
@@ -47,7 +48,11 @@ const load = async () => {
 
 const goArticle = (slug) => router.push(`/article/${slug}`)
 
-onMounted(load)
+onMounted(() => {
+  articleTitle.value = '归档'
+  articleMeta.value = '时光轴上的足迹'
+  load()
+})
 </script>
 
 <template>

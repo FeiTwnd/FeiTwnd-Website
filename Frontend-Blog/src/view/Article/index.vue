@@ -40,6 +40,8 @@ const editContent = ref('')
 
 /* 验证码 */
 const captcha = ref({ question: '', result: null })
+const captchaHover = ref(false)
+const captchaFocus = ref(false)
 const loadCaptcha = async () => {
   try {
     const res = await generateCaptcha()
@@ -213,6 +215,19 @@ const doDelete = async (c) => {
 const fmtDate = (d) => (d ? d.slice(0, 16).replace('T', ' ') : '')
 const isOwn = (c) => c.visitorId && c.visitorId === visitorStore.visitorId
 
+/* 头像 */
+const getAvatarUrl = (c) => {
+  const eq = c.emailOrQq
+  if (!eq) return ''
+  // 纯数字 → QQ号
+  if (/^\d{5,11}$/.test(eq)) return `https://q1.qlogo.cn/g?b=qq&nk=${eq}&s=640`
+  // @qq.com → 提取QQ号
+  const m = eq.match(/^(\d{5,11})@qq\.com$/i)
+  if (m) return `https://q1.qlogo.cn/g?b=qq&nk=${m[1]}&s=640`
+  return ''
+}
+const getInitial = (name) => (name ? name.charAt(0).toUpperCase() : '?')
+
 const copyLink = async () => {
   try {
     await navigator.clipboard.writeText(window.location.href)
@@ -361,13 +376,25 @@ onMounted(() => {
                     class="form-input"
                   />
                 </div>
-                <div class="input-with-icon captcha-wrap">
+                <div
+                  class="input-with-icon captcha-wrap"
+                  @mouseenter="captchaHover = true"
+                  @mouseleave="captchaHover = false"
+                >
                   <i class="iconfont icon-lock input-icon" />
                   <input
                     v-model="commentForm.captchaAnswer"
-                    :placeholder="captcha.question || '验证码'"
+                    placeholder="验证码"
                     class="form-input"
+                    @focus="captchaFocus = true"
+                    @blur="captchaFocus = false"
                   />
+                  <span
+                    v-show="(captchaHover || captchaFocus) && captcha.question"
+                    class="captcha-tip"
+                  >
+                    {{ captcha.question }}
+                  </span>
                   <span
                     class="captcha-refresh"
                     @click="loadCaptcha"
@@ -403,69 +430,219 @@ onMounted(() => {
             <div class="comment-tree">
               <template v-for="c in comments" :key="c.id">
                 <div class="comment-item">
-                  <div class="c-head">
-                    <span class="c-nick">{{ c.nickname }}</span>
-                    <span v-if="c.isAdminReply" class="c-badge">博主</span>
-                    <span class="c-date">
-                      {{ fmtDate(c.createTime) }}
+                  <div class="c-avatar">
+                    <img
+                      v-if="getAvatarUrl(c)"
+                      :src="getAvatarUrl(c)"
+                      class="c-avatar-img"
+                    />
+                    <span v-else class="c-avatar-letter">{{
+                      getInitial(c.nickname)
+                    }}</span>
+                  </div>
+                  <div class="c-main">
+                    <div class="c-head">
+                      <span class="c-nick">{{ c.nickname }}</span>
+                      <span v-if="c.isAdminReply" class="c-badge">博主</span>
                       <span v-if="c.isApproved === 0" class="c-pending"
                         >未审核</span
                       >
-                    </span>
-                  </div>
-                  <div v-if="editingId === c.id" class="c-edit-wrap">
-                    <input v-model="editContent" class="form-input" />
-                    <button class="inline-btn" @click="doEdit(c)">保存</button>
-                    <button class="inline-btn" @click="editingId = null">
-                      取消
-                    </button>
-                  </div>
-                  <div v-else class="c-body" v-html="c.contentHtml" />
-                  <div class="c-actions">
-                    <a @click="startReply(c)">回复</a>
-                    <template v-if="isOwn(c)">
-                      <a @click="startEdit(c)">编辑</a>
-                      <a class="danger" @click="doDelete(c)">删除</a>
-                    </template>
-                  </div>
-                  <div v-if="c.children?.length" class="comment-children">
-                    <div
-                      v-for="child in c.children"
-                      :key="child.id"
-                      class="comment-item child"
-                    >
-                      <div class="c-head">
-                        <span class="c-nick">{{ child.nickname }}</span>
-                        <span v-if="child.isAdminReply" class="c-badge"
-                          >博主</span
+                      <span class="c-meta-item"
+                        ><svg
+                          class="c-meta-icon"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
                         >
-                        <span v-if="child.parentNickname" class="c-reply-to"
-                          ><i class="iconfont icon-zhuanfa reply-icon" />
-                          {{ child.parentNickname }}</span
+                          <path
+                            d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
+                          />
+                          <circle cx="12" cy="10" r="3" /></svg
+                        >{{ c.location || '未知' }}</span
+                      >
+                      <span class="c-meta-item"
+                        ><svg
+                          class="c-meta-icon"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
                         >
-                        <span class="c-date">
-                          {{ fmtDate(child.createTime) }}
-                          <span v-if="child.isApproved === 0" class="c-pending"
-                            >未审核</span
-                          >
-                        </span>
-                      </div>
-                      <div v-if="editingId === child.id" class="c-edit-wrap">
-                        <input v-model="editContent" class="form-input" />
-                        <button class="inline-btn" @click="doEdit(child)">
-                          保存
-                        </button>
-                        <button class="inline-btn" @click="editingId = null">
-                          取消
-                        </button>
-                      </div>
-                      <div v-else class="c-body" v-html="child.contentHtml" />
+                          <rect width="20" height="14" x="2" y="3" rx="2" />
+                          <path d="M8 21h8M12 17v4" /></svg
+                        >{{
+                          c.userAgentOs && c.userAgentOs !== 'Unknown'
+                            ? c.userAgentOs
+                            : '未知'
+                        }}</span
+                      >
+                      <span class="c-meta-item"
+                        ><svg
+                          class="c-meta-icon"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <circle cx="12" cy="12" r="4" />
+                          <path
+                            d="M21.17 8H2.83M21.17 16H2.83M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+                          /></svg
+                        >{{
+                          c.userAgentBrowser && c.userAgentBrowser !== 'Unknown'
+                            ? c.userAgentBrowser
+                            : '未知'
+                        }}</span
+                      >
+                      <span class="c-date">{{ fmtDate(c.createTime) }}</span>
+                    </div>
+                    <div v-if="editingId === c.id" class="c-edit-wrap">
+                      <input v-model="editContent" class="form-input" />
+                      <button class="inline-btn" @click="doEdit(c)">
+                        保存
+                      </button>
+                      <button class="inline-btn" @click="editingId = null">
+                        取消
+                      </button>
+                    </div>
+                    <div v-else class="c-body" v-html="c.contentHtml" />
+                    <div class="c-footer">
                       <div class="c-actions">
-                        <a @click="startReply(child)">回复</a>
-                        <template v-if="isOwn(child)">
-                          <a @click="startEdit(child)">编辑</a>
-                          <a class="danger" @click="doDelete(child)">删除</a>
+                        <a @click="startReply(c)">回复</a>
+                        <template v-if="isOwn(c)">
+                          <a @click="startEdit(c)">编辑</a>
+                          <a class="danger" @click="doDelete(c)">删除</a>
                         </template>
+                      </div>
+                    </div>
+
+                    <!-- 子评论 -->
+                    <div v-if="c.children?.length" class="comment-children">
+                      <div
+                        v-for="child in c.children"
+                        :key="child.id"
+                        class="comment-item child"
+                      >
+                        <div class="c-avatar c-avatar-sm">
+                          <img
+                            v-if="getAvatarUrl(child)"
+                            :src="getAvatarUrl(child)"
+                            class="c-avatar-img"
+                          />
+                          <span v-else class="c-avatar-letter">{{
+                            getInitial(child.nickname)
+                          }}</span>
+                        </div>
+                        <div class="c-main">
+                          <div class="c-head">
+                            <span class="c-nick">{{ child.nickname }}</span>
+                            <span v-if="child.isAdminReply" class="c-badge"
+                              >博主</span
+                            >
+                            <span v-if="child.parentNickname" class="c-reply-to"
+                              ><i class="iconfont icon-zhuanfa reply-icon" />
+                              {{ child.parentNickname }}</span
+                            >
+                            <span
+                              v-if="child.isApproved === 0"
+                              class="c-pending"
+                              >未审核</span
+                            >
+                            <span class="c-meta-item"
+                              ><svg
+                                class="c-meta-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                              >
+                                <path
+                                  d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
+                                />
+                                <circle cx="12" cy="10" r="3" /></svg
+                              >{{ child.location || '未知' }}</span
+                            >
+                            <span class="c-meta-item"
+                              ><svg
+                                class="c-meta-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                              >
+                                <rect
+                                  width="20"
+                                  height="14"
+                                  x="2"
+                                  y="3"
+                                  rx="2"
+                                />
+                                <path d="M8 21h8M12 17v4" /></svg
+                              >{{
+                                child.userAgentOs &&
+                                child.userAgentOs !== 'Unknown'
+                                  ? child.userAgentOs
+                                  : '未知'
+                              }}</span
+                            >
+                            <span class="c-meta-item"
+                              ><svg
+                                class="c-meta-icon"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                              >
+                                <circle cx="12" cy="12" r="10" />
+                                <circle cx="12" cy="12" r="4" />
+                                <path
+                                  d="M21.17 8H2.83M21.17 16H2.83M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+                                /></svg
+                              >{{
+                                child.userAgentBrowser &&
+                                child.userAgentBrowser !== 'Unknown'
+                                  ? child.userAgentBrowser
+                                  : '未知'
+                              }}</span
+                            >
+                            <span class="c-date">{{
+                              fmtDate(child.createTime)
+                            }}</span>
+                          </div>
+                          <div
+                            v-if="editingId === child.id"
+                            class="c-edit-wrap"
+                          >
+                            <input v-model="editContent" class="form-input" />
+                            <button class="inline-btn" @click="doEdit(child)">
+                              保存
+                            </button>
+                            <button
+                              class="inline-btn"
+                              @click="editingId = null"
+                            >
+                              取消
+                            </button>
+                          </div>
+                          <div
+                            v-else
+                            class="c-body"
+                            v-html="child.contentHtml"
+                          />
+                          <div class="c-footer">
+                            <div class="c-actions">
+                              <a @click="startReply(child)">回复</a>
+                              <template v-if="isOwn(child)">
+                                <a @click="startEdit(child)">编辑</a>
+                                <a class="danger" @click="doDelete(child)"
+                                  >删除</a
+                                >
+                              </template>
+                            </div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -806,6 +983,22 @@ onMounted(() => {
 .captcha-refresh:hover {
   color: #303133;
 }
+.captcha-tip {
+  position: absolute;
+  top: -28px;
+  left: 32px;
+  font-size: 12px;
+  color: #303133;
+  background: #fff;
+  padding: 2px 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 1px solid #ebeef5;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+  font-weight: 600;
+}
 .form-input {
   flex: 1;
   border: 1px solid #e4e7ed;
@@ -877,26 +1070,68 @@ onMounted(() => {
   margin-top: 4px;
 }
 .comment-item {
-  padding: 14px 0;
+  display: flex;
+  gap: 12px;
+  padding: 16px 0;
   border-bottom: 1px solid #ebeef5;
 }
 .comment-item.child {
-  padding: 10px 0 10px 16px;
+  padding: 12px 0;
   border-bottom: 1px dashed #ebeef5;
-  border-left: 2px solid #e4e7ed;
 }
 .comment-children {
-  margin-top: 4px;
+  margin-top: 8px;
+  padding-left: 4px;
+  border-left: 2px solid #ebeef5;
+}
+
+/* 头像 */
+.c-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+.c-avatar-sm {
+  width: 32px;
+  height: 32px;
+}
+.c-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ebeef5;
+}
+.c-avatar-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #e4e7ed;
+  color: #606266;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--blog-serif);
+  user-select: none;
+}
+.c-avatar-sm .c-avatar-letter {
+  font-size: 13px;
+}
+
+.c-main {
+  flex: 1;
+  min-width: 0;
 }
 .c-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 4px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 .c-nick {
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 700;
   color: #303133;
 }
@@ -912,14 +1147,6 @@ onMounted(() => {
   font-size: 12px;
   color: #909399;
 }
-.c-date {
-  font-size: 12px;
-  color: #c0c4cc;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 .c-pending {
   font-size: 10px;
   color: #e6a23c;
@@ -933,6 +1160,21 @@ onMounted(() => {
   transform: scaleX(-1);
   font-size: 12px;
 }
+
+/* 元信息（位置、系统、浏览器）— 与昵称同行 */
+.c-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: #b0b4bb;
+}
+.c-meta-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
 .c-body {
   font-size: 14px;
   color: #444;
@@ -941,10 +1183,27 @@ onMounted(() => {
 .c-body :deep(p) {
   margin: 0;
 }
+
+.c-date {
+  font-size: 12px;
+  color: #c0c4cc;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+/* 底部：hover操作在右下角 */
+.c-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
 .c-actions {
   display: flex;
   gap: 10px;
-  margin-top: 4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.comment-item:hover .c-actions {
+  opacity: 1;
 }
 .c-actions a {
   font-size: 12px;

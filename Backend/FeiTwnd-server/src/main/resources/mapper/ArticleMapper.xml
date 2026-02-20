@@ -119,7 +119,9 @@
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where a.is_published = 1
-          and match(a.title, a.summary, a.content_markdown) against(#{keyword} in boolean mode)
+          and (a.title like concat('%', #{keyword}, '%')
+               or a.summary like concat('%', #{keyword}, '%')
+               or a.content_markdown like concat('%', #{keyword}, '%'))
         order by a.publish_time desc
     </select>
 

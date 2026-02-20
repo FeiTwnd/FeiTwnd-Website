@@ -25,7 +25,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -125,8 +124,6 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         articleComments.setIsApproved(StatusConstant.ENABLE);
         articleComments.setIsEdited(StatusConstant.DISABLE);
         articleComments.setNickname(websiteProperties.getTitle());
-        articleComments.setCreateTime(LocalDateTime.now());
-        articleComments.setUpdateTime(LocalDateTime.now());
 
         // 捕获 IP / 地理位置 / UserAgent
         if (request != null) {
@@ -136,7 +133,9 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
                     geoInfo.getOrDefault("country", ""),
                     geoInfo.getOrDefault("province", ""),
                     geoInfo.getOrDefault("city", ""));
-            articleComments.setLocation(location);
+            if(location != null && !location.equals("--")) {
+                articleComments.setLocation(location);
+            }
             String userAgent = request.getHeader("User-Agent");
             articleComments.setUserAgentOs(userAgentService.getOsName(userAgent));
             articleComments.setUserAgentBrowser(userAgentService.getBrowserName(userAgent));
@@ -215,7 +214,9 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
                 geoInfo.getOrDefault("province", ""),
                 geoInfo.getOrDefault("city", "")
         );
-        articleComments.setLocation(location);
+        if(location != null && !location.equals("--")) {
+            articleComments.setLocation(location);
+        }
 
         // 6. 解析UserAgent
         String userAgent = request.getHeader("User-Agent");
@@ -228,8 +229,6 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         articleComments.setIsApproved(0);
         articleComments.setIsEdited(0);
         articleComments.setIsAdminReply(0);
-        articleComments.setCreateTime(LocalDateTime.now());
-        articleComments.setUpdateTime(LocalDateTime.now());
 
         // 8. 保存到数据库
         articleCommentMapper.save(articleComments);

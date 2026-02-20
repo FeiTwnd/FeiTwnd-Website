@@ -27,6 +27,7 @@ public class ArticleCommentVO implements Serializable {
     private String contentHtml;
     private Long visitorId;
     private String nickname;
+    private String emailOrQq;
     private String location;
     private String userAgentOs;
     private String userAgentBrowser;

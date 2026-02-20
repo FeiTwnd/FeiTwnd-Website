@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, inject } from 'vue'
 import {
   getMessageTree,
   submitMessage,
@@ -8,8 +8,10 @@ import {
 } from '@/api/message'
 import { generateCaptcha } from '@/api/captcha'
 import { useVisitorStore } from '@/stores'
+import SidebarCard from '@/components/SidebarCard.vue'
 
 const visitorStore = useVisitorStore()
+const { articleTitle, articleMeta } = inject('setHero')
 
 const messages = ref([])
 const loading = ref(false)
@@ -29,6 +31,8 @@ const submitting = ref(false)
 
 /* 验证码 */
 const captcha = ref({ question: '', result: null })
+const captchaHover = ref(false)
+const captchaFocus = ref(false)
 const loadCaptcha = async () => {
   try {
     const res = await generateCaptcha()
@@ -139,6 +143,17 @@ const resetForm = () => {
 const isMine = (msg) =>
   msg.visitorId && msg.visitorId === visitorStore.visitorId
 
+/* 头像 */
+const getAvatarUrl = (msg) => {
+  const eq = msg.emailOrQq
+  if (!eq) return ''
+  if (/^\d{5,11}$/.test(eq)) return `https://q1.qlogo.cn/g?b=qq&nk=${eq}&s=640`
+  const m = eq.match(/^(\d{5,11})@qq\.com$/i)
+  if (m) return `https://q1.qlogo.cn/g?b=qq&nk=${m[1]}&s=640`
+  return ''
+}
+const getInitial = (name) => (name ? name.charAt(0).toUpperCase() : '?')
+
 const fmtDate = (d) => {
   if (!d) return ''
   const dt = new Date(d)
@@ -158,6 +173,8 @@ const totalCount = computed(() => {
 })
 
 onMounted(() => {
+  articleTitle.value = '留言板'
+  articleMeta.value = '说点什么吧'
   form.value.nickname = visitorStore.nickname || ''
   form.value.emailOrQq = visitorStore.email || ''
   load()
@@ -167,6 +184,7 @@ onMounted(() => {
 
 <template>
   <div class="message-page">
+    <div class="message-layout">
     <div class="message-inner">
       <!-- 留言表单 -->
       <div class="msg-form form-card">
@@ -211,13 +229,26 @@ onMounted(() => {
               :disabled="!!editTarget"
             />
           </div>
-          <div v-if="!editTarget" class="input-with-icon captcha-wrap">
+          <div
+            v-if="!editTarget"
+            class="input-with-icon captcha-wrap"
+            @mouseenter="captchaHover = true"
+            @mouseleave="captchaHover = false"
+          >
             <i class="iconfont icon-lock input-icon" />
             <input
               v-model="form.captchaAnswer"
-              :placeholder="captcha.question || '验证码'"
+              placeholder="验证码"
               class="form-input"
+              @focus="captchaFocus = true"
+              @blur="captchaFocus = false"
             />
+            <span
+              v-show="(captchaHover || captchaFocus) && captcha.question"
+              class="captcha-tip"
+            >
+              {{ captcha.question }}
+            </span>
             <span class="captcha-refresh" @click="loadCaptcha" title="换一题"
               >↻</span
             >
@@ -259,55 +290,60 @@ onMounted(() => {
       <div v-else class="msg-list">
         <template v-for="msg in messages" :key="msg.id">
           <div class="msg-item-card">
-            <div class="msg-head">
-              <span class="msg-nick">{{ msg.nickname }}</span>
-              <span v-if="msg.isAdmin" class="badge-admin">博主</span>
-              <span class="msg-date">
-                {{ fmtDate(msg.createTime) }}
-                <span v-if="msg.isApproved === 0" class="msg-pending"
-                  >未审核</span
-                >
-              </span>
+            <div class="msg-avatar">
+              <img v-if="getAvatarUrl(msg)" :src="getAvatarUrl(msg)" class="msg-avatar-img" />
+              <span v-else class="msg-avatar-letter">{{ getInitial(msg.nickname) }}</span>
             </div>
-            <div class="msg-body" v-html="msg.contentHtml" />
-            <div class="msg-actions">
-              <span class="act" @click="startReply(msg)">回复</span>
-              <template v-if="isMine(msg)">
-                <span class="act" @click="startEdit(msg)">编辑</span>
-                <span class="act del" @click="handleDelete(msg)">删除</span>
-              </template>
-            </div>
-
-            <!-- 子留言 -->
-            <div v-if="msg.children?.length" class="msg-children">
-              <div
-                v-for="child in msg.children"
-                :key="child.id"
-                class="msg-child"
-              >
-                <div class="msg-head">
-                  <span class="msg-nick">{{ child.nickname }}</span>
-                  <span v-if="child.isAdmin" class="badge-admin">博主</span>
-                  <span v-if="child.parentNickname" class="reply-to">
-                    <i class="iconfont icon-zhuanfa reply-icon" />
-                    {{ child.parentNickname }}
-                  </span>
-                  <span class="msg-date">
-                    {{ fmtDate(child.createTime) }}
-                    <span v-if="child.isApproved === 0" class="msg-pending"
-                      >未审核</span
-                    >
-                  </span>
-                </div>
-                <div class="msg-body" v-html="child.contentHtml" />
+            <div class="msg-main">
+              <div class="msg-head">
+                <span class="msg-nick">{{ msg.nickname }}</span>
+                <span v-if="msg.isAdminReply" class="badge-admin">博主</span>
+                <span v-if="msg.isApproved === 0" class="msg-pending">未审核</span>
+                <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ msg.location || '未知' }}</span>
+                <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg>{{ (msg.userAgentOs && msg.userAgentOs !== 'Unknown') ? msg.userAgentOs : '未知' }}</span>
+                <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M21.17 8H2.83M21.17 16H2.83M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>{{ (msg.userAgentBrowser && msg.userAgentBrowser !== 'Unknown') ? msg.userAgentBrowser : '未知' }}</span>
+                <span class="msg-date">{{ fmtDate(msg.createTime) }}</span>
+              </div>
+              <div class="msg-body" v-html="msg.contentHtml" />
+              <div class="msg-footer">
                 <div class="msg-actions">
-                  <span class="act" @click="startReply(child)">回复</span>
-                  <template v-if="isMine(child)">
-                    <span class="act" @click="startEdit(child)">编辑</span>
-                    <span class="act del" @click="handleDelete(child)"
-                      >删除</span
-                    >
+                  <span class="act" @click="startReply(msg)">回复</span>
+                  <template v-if="isMine(msg)">
+                    <span class="act" @click="startEdit(msg)">编辑</span>
+                    <span class="act del" @click="handleDelete(msg)">删除</span>
                   </template>
+                </div>
+              </div>
+
+              <!-- 子留言 -->
+              <div v-if="msg.children?.length" class="msg-children">
+                <div v-for="child in msg.children" :key="child.id" class="msg-child">
+                  <div class="msg-avatar msg-avatar-sm">
+                    <img v-if="getAvatarUrl(child)" :src="getAvatarUrl(child)" class="msg-avatar-img" />
+                    <span v-else class="msg-avatar-letter">{{ getInitial(child.nickname) }}</span>
+                  </div>
+                  <div class="msg-main">
+                    <div class="msg-head">
+                      <span class="msg-nick">{{ child.nickname }}</span>
+                      <span v-if="child.isAdminReply" class="badge-admin">博主</span>
+                      <span v-if="child.parentNickname" class="reply-to"><i class="iconfont icon-zhuanfa reply-icon" /> {{ child.parentNickname }}</span>
+                      <span v-if="child.isApproved === 0" class="msg-pending">未审核</span>
+                      <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ child.location || '未知' }}</span>
+                      <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg>{{ (child.userAgentOs && child.userAgentOs !== 'Unknown') ? child.userAgentOs : '未知' }}</span>
+                      <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M21.17 8H2.83M21.17 16H2.83M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>{{ (child.userAgentBrowser && child.userAgentBrowser !== 'Unknown') ? child.userAgentBrowser : '未知' }}</span>
+                      <span class="msg-date">{{ fmtDate(child.createTime) }}</span>
+                    </div>
+                    <div class="msg-body" v-html="child.contentHtml" />
+                    <div class="msg-footer">
+                      <div class="msg-actions">
+                        <span class="act" @click="startReply(child)">回复</span>
+                        <template v-if="isMine(child)">
+                          <span class="act" @click="startEdit(child)">编辑</span>
+                          <span class="act del" @click="handleDelete(child)">删除</span>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -319,16 +355,24 @@ onMounted(() => {
         还没有留言，来写第一条吧
       </p>
     </div>
+
+      <SidebarCard />
+    </div>
   </div>
 </template>
 
 <style scoped>
 .message-page {
   width: 100%;
-  max-width: 900px;
-  margin: 0 auto;
+}
+.message-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
 .message-inner {
+  flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -409,6 +453,22 @@ onMounted(() => {
 .captcha-refresh:hover {
   color: #303133;
 }
+.captcha-tip {
+  position: absolute;
+  top: -28px;
+  left: 32px;
+  font-size: 12px;
+  color: #303133;
+  background: #fff;
+  padding: 2px 10px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  border: 1px solid #ebeef5;
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+  font-weight: 600;
+}
 .form-input {
   flex: 1;
   padding: 9px 12px;
@@ -484,6 +544,8 @@ onMounted(() => {
 
 /* 留言卡片 */
 .msg-item-card {
+  display: flex;
+  gap: 12px;
   background: #fff;
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
@@ -491,11 +553,50 @@ onMounted(() => {
   padding: 18px 22px;
   margin-bottom: 12px;
 }
+
+/* 头像 */
+.msg-avatar {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+.msg-avatar-sm {
+  width: 32px;
+  height: 32px;
+}
+.msg-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ebeef5;
+}
+.msg-avatar-letter {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #e4e7ed;
+  color: #606266;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: var(--blog-serif);
+  user-select: none;
+}
+.msg-avatar-sm .msg-avatar-letter {
+  font-size: 13px;
+}
+
+.msg-main {
+  flex: 1;
+  min-width: 0;
+}
 .msg-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
+  gap: 6px;
   flex-wrap: wrap;
 }
 .msg-nick {
@@ -515,14 +616,6 @@ onMounted(() => {
   font-size: 12px;
   color: #909399;
 }
-.msg-date {
-  font-size: 12px;
-  color: #c0c4cc;
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
 .msg-pending {
   font-size: 10px;
   color: #e6a23c;
@@ -536,6 +629,27 @@ onMounted(() => {
   transform: scaleX(-1);
   font-size: 12px;
 }
+
+/* 元信息 — 与昵称同行 */
+.msg-meta-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 12px;
+  color: #b0b4bb;
+}
+.msg-meta-icon {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+.msg-date {
+  font-size: 12px;
+  color: #c0c4cc;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .msg-body {
   font-size: 14px;
   color: #444;
@@ -544,10 +658,22 @@ onMounted(() => {
 .msg-body :deep(p) {
   margin: 0;
 }
+
+/* 底部：hover操作在右下角 */
+.msg-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 4px;
+}
 .msg-actions {
-  margin-top: 6px;
   display: flex;
   gap: 12px;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.msg-item-card:hover .msg-actions,
+.msg-child:hover > .msg-main > .msg-footer > .msg-actions {
+  opacity: 1;
 }
 .act {
   font-size: 12px;
@@ -564,11 +690,13 @@ onMounted(() => {
 
 /* 子留言 */
 .msg-children {
-  margin-top: 10px;
-  padding-left: 16px;
+  margin-top: 8px;
+  padding-left: 4px;
   border-left: 2px solid #ebeef5;
 }
 .msg-child {
+  display: flex;
+  gap: 10px;
   padding: 10px 0;
 }
 .msg-child + .msg-child {
@@ -592,6 +720,9 @@ onMounted(() => {
   font-size: 14px;
 }
 
+@media (max-width: 960px) {
+  .message-layout { flex-direction: column; }
+}
 @media (max-width: 600px) {
   .form-card,
   .msg-item-card {

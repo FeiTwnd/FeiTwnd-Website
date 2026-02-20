@@ -63,7 +63,7 @@ watch(
 onMounted(async () => {
   resolveName()
   await load()
-  articleMeta.value = `共 ${total.value} 篇文章`
+  resolveName()
 })
 </script>
 
