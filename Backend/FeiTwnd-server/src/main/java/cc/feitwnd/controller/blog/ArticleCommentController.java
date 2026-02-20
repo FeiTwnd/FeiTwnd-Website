@@ -26,12 +26,13 @@ public class ArticleCommentController {
     private ArticleCommentService articleCommentService;
 
     /**
-     * 根据文章ID获取评论列表（树形结构）
+     * 根据文章ID获取评论列表（树形结构，含当前访客的未审核评论）
      */
     @GetMapping("/article/{articleId}")
-    public Result<List<ArticleCommentVO>> getCommentTree(@PathVariable Long articleId) {
-        log.info("博客端获取文章评论树: articleId={}", articleId);
-        List<ArticleCommentVO> commentTree = articleCommentService.getCommentTree(articleId);
+    public Result<List<ArticleCommentVO>> getCommentTree(@PathVariable Long articleId,
+                                                         @RequestParam(required = false) Long visitorId) {
+        log.info("博客端获取文章评论树: articleId={}, visitorId={}", articleId, visitorId);
+        List<ArticleCommentVO> commentTree = articleCommentService.getCommentTree(articleId, visitorId);
         return Result.success(commentTree);
     }
 

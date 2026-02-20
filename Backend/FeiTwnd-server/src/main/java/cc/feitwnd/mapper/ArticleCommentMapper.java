@@ -3,10 +3,7 @@ package cc.feitwnd.mapper;
 import cc.feitwnd.dto.ArticleCommentPageQueryDTO;
 import cc.feitwnd.entity.ArticleComments;
 import cc.feitwnd.vo.ArticleCommentVO;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -48,9 +45,9 @@ public interface ArticleCommentMapper {
     // ===== 博客端方法 =====
 
     /**
-     * 根据文章ID获取已审核的评论列表（用于构建树形结构）
+     * 根据文章ID获取评论列表（已审核 + 指定访客的未审核评论）
      */
-    List<ArticleCommentVO> getApprovedByArticleId(Long articleId);
+    List<ArticleCommentVO> getApprovedByArticleId(@Param("articleId") Long articleId, @Param("visitorId") Long visitorId);
 
     /**
      * 评论数+1

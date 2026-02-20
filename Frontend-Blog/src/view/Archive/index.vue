@@ -2,6 +2,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { getArticleArchive } from '@/api/article'
+import SidebarCard from '@/components/SidebarCard.vue'
 
 const router = useRouter()
 const yearGroups = ref([])
@@ -13,7 +14,6 @@ const load = async () => {
   try {
     const res = await getArticleArchive()
     const list = res.data.data ?? []
-    /* 后端返回按年月分组: [{ year, month, articles: [{ id, title, slug, publishDay, publishTime }] }] */
     const map = new Map()
     let count = 0
     list.forEach((group) => {
@@ -52,86 +52,125 @@ onMounted(load)
 
 <template>
   <div class="archive-page">
-    <header class="page-header">
-      <i class="iconfont icon-guidang" />
-      <h1 class="page-title">归档</h1>
-      <p class="page-count">共 {{ totalCount }} 篇文章</p>
-    </header>
+    <div class="archive-layout">
+      <div class="archive-main">
+        <div class="content-card">
+          <div class="card-header">
+            <i class="iconfont icon-guidang" />
+            <span>共 {{ totalCount }} 篇文章</span>
+          </div>
 
-    <div v-if="loading" class="placeholder">
-      <div v-for="i in 4" :key="i" class="sk-line" />
-    </div>
+          <div v-if="loading" class="placeholder">
+            <div v-for="i in 4" :key="i" class="sk-line" />
+          </div>
 
-    <div v-else class="timeline">
-      <div v-for="g in yearGroups" :key="g.year" class="year-group">
-        <h2 class="year-label">{{ g.year }}</h2>
-        <ul class="year-list">
-          <li
-            v-for="a in g.items"
-            :key="a.id"
-            class="archive-item"
-            @click="goArticle(a.slug)"
-          >
-            <span class="item-date">{{ a.displayDate }}</span>
-            <span class="item-title">{{ a.title }}</span>
-          </li>
-        </ul>
+          <div v-else class="timeline">
+            <div v-for="g in yearGroups" :key="g.year" class="year-group">
+              <h2 class="year-label">
+                <span class="year-dot" />
+                {{ g.year }}
+              </h2>
+              <ul class="year-list">
+                <li
+                  v-for="a in g.items"
+                  :key="a.id"
+                  class="archive-item"
+                  @click="goArticle(a.slug)"
+                >
+                  <span class="item-dot" />
+                  <span class="item-date">{{ a.displayDate }}</span>
+                  <span class="item-title">{{ a.title }}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <p v-if="!loading && !yearGroups.length" class="empty">暂无归档</p>
+        </div>
       </div>
-    </div>
 
-    <p v-if="!loading && !yearGroups.length" class="empty">暂无归档</p>
+      <SidebarCard />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.page-header {
-  text-align: center;
-  padding: 28px 0 20px;
-  border-bottom: 2px solid #303133;
-  margin-bottom: 28px;
+.archive-page {
+  width: 100%;
 }
-.page-header .iconfont {
-  font-size: 22px;
-  color: #303133;
+.archive-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
-.page-title {
-  font-family: var(--blog-serif);
-  font-size: 26px;
-  font-weight: 700;
-  margin: 6px 0 4px;
-  color: #303133;
-  letter-spacing: 1px;
+.archive-main {
+  flex: 1;
+  min-width: 0;
 }
-.page-count {
-  font-size: 13px;
-  color: #888;
-  margin: 0;
+
+.content-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #ebeef5;
+  padding: 24px 28px;
 }
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #909399;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ebeef5;
+}
+.card-header .iconfont {
+  font-size: 16px;
+  color: #606266;
+}
+
 .placeholder {
-  padding: 30px 0;
+  padding: 20px 0;
 }
 .sk-line {
   height: 14px;
   background: #ebeef5;
-  border-radius: 2px;
+  border-radius: 4px;
   margin-bottom: 12px;
   width: 60%;
 }
 
 .timeline {
-  padding-bottom: 40px;
+  position: relative;
+  padding-left: 20px;
+  border-left: 2px solid #e4e7ed;
 }
 .year-group {
-  margin-bottom: 28px;
+  margin-bottom: 24px;
+}
+.year-group:last-child {
+  margin-bottom: 0;
 }
 .year-label {
   font-family: var(--blog-serif);
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 700;
   color: #303133;
   margin: 0 0 12px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid #e4e7ed;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+.year-dot {
+  position: absolute;
+  left: -27px;
+  width: 12px;
+  height: 12px;
+  background: #303133;
+  border-radius: 50%;
+  border: 2px solid #fff;
 }
 .year-list {
   list-style: none;
@@ -140,18 +179,31 @@ onMounted(load)
 }
 .archive-item {
   display: flex;
-  align-items: baseline;
-  gap: 14px;
-  padding: 7px 0;
-  border-bottom: 1px dashed #ebeef5;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
   cursor: pointer;
-  transition: color 0.15s;
+  position: relative;
+  transition: background 0.15s;
+  border-radius: 6px;
+  padding-left: 4px;
 }
-.archive-item:last-child {
-  border-bottom: none;
+.archive-item:hover {
+  background: #f5f7fa;
 }
 .archive-item:hover .item-title {
   color: #303133;
+}
+.item-dot {
+  position: absolute;
+  left: -24px;
+  width: 6px;
+  height: 6px;
+  background: #c0c4cc;
+  border-radius: 50%;
+}
+.archive-item:hover .item-dot {
+  background: #303133;
 }
 .item-date {
   flex-shrink: 0;
@@ -159,16 +211,29 @@ onMounted(load)
   color: #909399;
   font-family: var(--blog-serif);
   font-variant-numeric: tabular-nums;
+  min-width: 48px;
 }
 .item-title {
-  font-size: 15px;
+  font-size: 14px;
   color: #606266;
+  transition: color 0.15s;
 }
 
 .empty {
   text-align: center;
   color: #909399;
-  padding: 60px 0;
+  padding: 40px 0;
   font-size: 14px;
+}
+
+@media (max-width: 960px) {
+  .archive-layout {
+    flex-direction: column;
+  }
+}
+@media (max-width: 600px) {
+  .content-card {
+    padding: 16px;
+  }
 }
 </style>

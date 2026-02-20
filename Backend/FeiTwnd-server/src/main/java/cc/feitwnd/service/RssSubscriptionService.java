@@ -4,8 +4,7 @@ import cc.feitwnd.dto.RssSubscriptionDTO;
 import cc.feitwnd.dto.RssSubscriptionPageQueryDTO;
 import cc.feitwnd.entity.RssSubscriptions;
 import cc.feitwnd.result.PageResult;
-
-import java.util.List;
+import cc.feitwnd.vo.RssSubscriptionStatusVO;
 
 import java.util.List;
 
@@ -53,4 +52,18 @@ public interface RssSubscriptionService {
      * @param email
      */
     void unsubscribeByEmail(String email);
+
+    /**
+     * 检查访客是否已订阅
+     * @param visitorId
+     * @return
+     */
+    boolean hasSubscribed(Long visitorId);
+
+    /**
+     * 获取访客订阅详情
+     * @param visitorId
+     * @return
+     */
+    RssSubscriptionStatusVO getSubscriptionStatus(Long visitorId);
 }

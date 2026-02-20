@@ -65,4 +65,20 @@ public interface RssSubscriptionMapper {
      */
     @Select("select * from rss_subscriptions where email = #{email}")
     RssSubscriptions getByEmail(String email);
+
+    /**
+     * 检查访客是否有激活的订阅
+     * @param visitorId
+     * @return
+     */
+    @Select("select count(*) > 0 from rss_subscriptions where visitor_id = #{visitorId} and is_active = 1")
+    boolean hasActiveByVisitorId(Long visitorId);
+
+    /**
+     * 根据访客ID获取激活的订阅记录
+     * @param visitorId
+     * @return
+     */
+    @Select("select * from rss_subscriptions where visitor_id = #{visitorId} and is_active = 1 limit 1")
+    RssSubscriptions getActiveByVisitorId(Long visitorId);
 }

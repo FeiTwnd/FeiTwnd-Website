@@ -156,8 +156,8 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      * @param articleId
      * @return
      */
-    public List<ArticleCommentVO> getCommentTree(Long articleId) {
-        List<ArticleCommentVO> allComments = articleCommentMapper.getApprovedByArticleId(articleId);
+    public List<ArticleCommentVO> getCommentTree(Long articleId, Long visitorId) {
+        List<ArticleCommentVO> allComments = articleCommentMapper.getApprovedByArticleId(articleId, visitorId);
         // 构建树形结构：根评论（rootId为null或0）作为一级，其余挂到根评论下
         List<ArticleCommentVO> rootComments = new ArrayList<>();
         Map<Long, ArticleCommentVO> commentMap = allComments.stream()

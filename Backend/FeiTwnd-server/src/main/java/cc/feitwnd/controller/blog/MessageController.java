@@ -41,12 +41,12 @@ public class MessageController {
     }
 
     /**
-     * 获取已审核留言列表（树形结构）
+     * 获取留言列表（树形结构，含当前访客的未审核留言）
      */
     @GetMapping
-    public Result<List<MessageVO>> getMessageTree() {
-        log.info("博客端获取留言树");
-        List<MessageVO> messageTree = messageService.getMessageTree();
+    public Result<List<MessageVO>> getMessageTree(@RequestParam(required = false) Long visitorId) {
+        log.info("博客端获取留言树: visitorId={}", visitorId);
+        List<MessageVO> messageTree = messageService.getMessageTree(visitorId);
         return Result.success(messageTree);
     }
 

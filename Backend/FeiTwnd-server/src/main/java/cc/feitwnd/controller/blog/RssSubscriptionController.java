@@ -4,6 +4,7 @@ import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.dto.RssSubscriptionDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.RssSubscriptionService;
+import cc.feitwnd.vo.RssSubscriptionStatusVO;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,5 +45,15 @@ public class RssSubscriptionController {
         log.info("取消RSS订阅,{}", email);
         rssSubscriptionService.unsubscribeByEmail(email);
         return Result.success();
+    }
+
+    /**
+     * 检查访客订阅状态（返回订阅详情）
+     */
+    @GetMapping("/check")
+    public Result<RssSubscriptionStatusVO> checkSubscription(@RequestParam Long visitorId) {
+        log.info("检查订阅状态: visitorId={}", visitorId);
+        RssSubscriptionStatusVO status = rssSubscriptionService.getSubscriptionStatus(visitorId);
+        return Result.success(status);
     }
 }

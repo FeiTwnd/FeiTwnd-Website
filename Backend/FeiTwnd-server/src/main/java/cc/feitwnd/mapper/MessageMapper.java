@@ -3,9 +3,7 @@ package cc.feitwnd.mapper;
 import cc.feitwnd.dto.MessagePageQueryDTO;
 import cc.feitwnd.entity.Messages;
 import cc.feitwnd.vo.MessageVO;
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -50,9 +48,9 @@ public interface MessageMapper {
     // ===== 博客端方法 =====
 
     /**
-     * 获取已审核的留言列表（用于构建树形结构）
+     * 获取留言列表（已审核 + 指定访客的未审核留言）
      */
-    List<MessageVO> getApprovedList();
+    List<MessageVO> getApprovedList(@Param("visitorId") Long visitorId);
 
     /**
      * 更新留言内容（访客编辑）

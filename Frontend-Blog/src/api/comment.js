@@ -1,8 +1,10 @@
 import request from '@/utils/request'
 
-/** 根据文章ID获取评论树 */
-export const getCommentTree = (articleId) =>
-  request.get(`/blog/articleComment/article/${articleId}`)
+/** 根据文章ID获取评论树（含当前访客的未审核评论） */
+export const getCommentTree = (articleId, visitorId) =>
+  request.get(`/blog/articleComment/article/${articleId}`, {
+    params: { visitorId }
+  })
 
 /** 提交评论 */
 export const submitComment = (data) =>

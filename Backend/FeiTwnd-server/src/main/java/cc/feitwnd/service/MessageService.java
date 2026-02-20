@@ -51,7 +51,7 @@ public interface MessageService {
     /**
      * 获取已审核留言列表（树形结构）
      */
-    List<MessageVO> getMessageTree();
+    List<MessageVO> getMessageTree(Long visitorId);
 
     /**
      * 访客编辑留言

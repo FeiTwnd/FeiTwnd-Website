@@ -2,11 +2,7 @@
 defineProps({
   article: { type: Object, required: true }
 })
-
-const fmtDate = (d) => {
-  if (!d) return ''
-  return d.slice(0, 10)
-}
+const fmtDate = (d) => (d ? d.slice(0, 10) : '')
 </script>
 
 <template>
@@ -15,22 +11,33 @@ const fmtDate = (d) => {
       <img :src="article.coverImage" :alt="article.title" loading="lazy" />
     </div>
     <div class="card-body">
-      <span v-if="article.categoryName" class="card-category">{{
-        article.categoryName
-      }}</span>
-      <h3 class="card-title">{{ article.title }}</h3>
-      <p v-if="article.summary" class="card-summary">{{ article.summary }}</p>
-      <div class="card-meta">
-        <span
+      <div class="card-top">
+        <span v-if="article.categoryName" class="card-category">
+          <i class="iconfont icon-folder" /> {{ article.categoryName }}
+        </span>
+        <span class="card-date"
           ><i class="iconfont icon-time" />
           {{ fmtDate(article.publishTime) }}</span
         >
+      </div>
+      <h3 class="card-title">{{ article.title }}</h3>
+      <p v-if="article.summary" class="card-summary">{{ article.summary }}</p>
+      <div class="card-tags" v-if="article.tagNames?.length">
+        <span v-for="t in article.tagNames" :key="t" class="card-tag"
+          ># {{ t }}</span
+        >
+      </div>
+      <div class="card-meta">
         <span
           ><i class="iconfont icon-eye" /> {{ article.viewCount ?? 0 }}</span
         >
         <span
           ><i class="iconfont icon-pinglun" />
           {{ article.commentCount ?? 0 }}</span
+        >
+        <span
+          ><i class="iconfont icon-dianzan" />
+          {{ article.likeCount ?? 0 }}</span
         >
       </div>
     </div>
@@ -40,51 +47,66 @@ const fmtDate = (d) => {
 <style scoped>
 .article-card {
   display: flex;
-  gap: 20px;
-  padding: 22px 0;
-  border-bottom: 1px solid #e4e7ed;
+  gap: 0;
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #ebeef5;
   text-decoration: none;
   color: inherit;
-  transition: background 0.15s;
-}
-.article-card:first-child {
-  padding-top: 0;
+  transition:
+    box-shadow 0.2s,
+    transform 0.2s;
+  margin-bottom: 16px;
 }
 .article-card:hover {
-  background: var(--blog-hover);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
 }
 .card-cover {
   flex-shrink: 0;
-  width: 180px;
-  height: 120px;
+  width: 230px;
+  min-height: 170px;
   overflow: hidden;
-  border-radius: 3px;
-  border: 1px solid #e4e7ed;
 }
 .card-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.3s;
 }
+.article-card:hover .card-cover img {
+  transform: scale(1.05);
+}
+
 .card-body {
   flex: 1;
   min-width: 0;
+  padding: 16px 20px;
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
+.card-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+  font-size: 12px;
+  color: #909399;
+}
+.card-top .iconfont {
+  font-size: 12px;
+  margin-right: 2px;
+}
 .card-category {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: #888;
-  font-weight: 600;
-  margin-bottom: 4px;
+  color: #606266;
+  font-weight: 500;
 }
 .card-title {
   font-family: var(--blog-serif);
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 700;
   margin: 0 0 6px;
   line-height: 1.4;
@@ -104,11 +126,25 @@ const fmtDate = (d) => {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+.card-tag {
+  font-size: 11px;
+  color: #909399;
+  padding: 1px 6px;
+  background: #f5f7fa;
+  border-radius: 3px;
+}
 .card-meta {
   display: flex;
   gap: 14px;
   font-size: 12px;
   color: #909399;
+  margin-top: auto;
 }
 .card-meta .iconfont {
   font-size: 12px;
@@ -118,11 +154,10 @@ const fmtDate = (d) => {
 @media (max-width: 600px) {
   .article-card {
     flex-direction: column;
-    gap: 10px;
   }
   .card-cover {
     width: 100%;
-    height: 160px;
+    min-height: 180px;
   }
 }
 </style>

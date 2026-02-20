@@ -22,124 +22,143 @@ onMounted(load)
 
 <template>
   <div class="links-page">
-    <header class="page-header">
-      <i class="iconfont icon-lianjie" />
-      <h1 class="page-title">友链</h1>
-      <p class="page-count">共 {{ links.length }} 位朋友</p>
-    </header>
+    <div class="content-card">
+      <div class="card-header">
+        <i class="iconfont icon-lianjie" />
+        <span>共 {{ links.length }} 位朋友</span>
+      </div>
 
-    <div v-if="loading" class="placeholder">
-      <div v-for="i in 6" :key="i" class="sk-card" />
+      <div v-if="loading" class="placeholder-grid">
+        <div v-for="i in 6" :key="i" class="sk-card" />
+      </div>
+
+      <div v-else-if="links.length" class="link-grid">
+        <a
+          v-for="link in links"
+          :key="link.id"
+          :href="link.url"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="link-card"
+        >
+          <img v-if="link.avatar" :src="link.avatar" class="link-avatar" />
+          <div class="link-body">
+            <p class="link-name">{{ link.name }}</p>
+            <p class="link-desc">{{ link.description }}</p>
+          </div>
+        </a>
+      </div>
+
+      <p v-else class="empty">暂无友链</p>
     </div>
-
-    <div v-else class="link-grid">
-      <a
-        v-for="link in links"
-        :key="link.id"
-        :href="link.url"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="link-card"
-      >
-        <img v-if="link.avatar" :src="link.avatar" class="link-avatar" />
-        <div class="link-body">
-          <p class="link-name">{{ link.name }}</p>
-          <p class="link-desc">{{ link.description }}</p>
-        </div>
-      </a>
-    </div>
-
-    <p v-if="!loading && !links.length" class="empty">暂无友链</p>
   </div>
 </template>
 
 <style scoped>
-.page-header {
-  text-align: center;
-  padding: 28px 0 20px;
-  border-bottom: 2px solid #303133;
-  margin-bottom: 28px;
+.links-page {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
 }
-.page-header .iconfont {
-  font-size: 22px;
-  color: #303133;
+.content-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #ebeef5;
+  padding: 24px 28px;
 }
-.page-title {
-  font-family: var(--blog-serif);
-  font-size: 26px;
-  font-weight: 700;
-  margin: 6px 0 4px;
-  color: #303133;
-  letter-spacing: 1px;
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #909399;
+  margin-bottom: 20px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid #ebeef5;
 }
-.page-count {
-  font-size: 13px;
-  color: #888;
-  margin: 0;
+.card-header .iconfont {
+  font-size: 16px;
+  color: #606266;
 }
 
-.placeholder {
+.placeholder-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 14px;
 }
 .sk-card {
   height: 80px;
   background: #ebeef5;
-  border-radius: 3px;
+  border-radius: 8px;
 }
 
 .link-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 14px;
-  padding-bottom: 40px;
 }
 .link-card {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 14px;
-  border: 1px solid #e4e7ed;
-  border-radius: 3px;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid #ebeef5;
+  border-radius: 8px;
   text-decoration: none;
   color: inherit;
-  transition: border-color 0.15s;
-  background: #fff;
+  background: #fafafa;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s,
+    border-color 0.15s;
 }
 .link-card:hover {
-  border-color: #303133;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  border-color: #c0c4cc;
 }
 .link-avatar {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   object-fit: cover;
   flex-shrink: 0;
-  border: 1px solid #e4e7ed;
+  border: 2px solid #ebeef5;
 }
 .link-body {
   min-width: 0;
 }
 .link-name {
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 600;
-  margin: 0 0 2px;
+  margin: 0 0 3px;
   color: #303133;
 }
 .link-desc {
   font-size: 12px;
-  color: #888;
+  color: #909399;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.5;
 }
 
 .empty {
   text-align: center;
   color: #909399;
-  padding: 60px 0;
+  padding: 40px 0;
   font-size: 14px;
+  margin: 0;
+}
+
+@media (max-width: 600px) {
+  .content-card {
+    padding: 16px;
+  }
+  .link-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

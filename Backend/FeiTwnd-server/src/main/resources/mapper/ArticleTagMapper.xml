@@ -47,10 +47,11 @@
     </delete>
 
     <select id="getVisibleTags" resultType="cc.feitwnd.entity.ArticleTags">
-        select distinct t.* from article_tags t
+        select t.*, count(a.id) as article_count from article_tags t
         inner join article_tag_relations atr on t.id = atr.tag_id
         inner join articles a on atr.article_id = a.id
         where a.is_published = 1
+        group by t.id
         order by t.id
     </select>
 

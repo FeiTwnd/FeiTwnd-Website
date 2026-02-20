@@ -15,6 +15,16 @@
   line-height: 1;
 }
 
+.icon-lock:before {
+  content: "\e676";
+}
+
+
+.icon-zhuanfa:before {
+  content: "\e63e";
+}
+
+
 .icon-dianzan:before {
   content: "\e600";
 }

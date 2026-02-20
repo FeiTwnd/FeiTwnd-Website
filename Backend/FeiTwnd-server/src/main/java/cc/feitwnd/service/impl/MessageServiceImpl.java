@@ -240,8 +240,8 @@ public class MessageServiceImpl implements MessageService {
 
     // ===== 博客端方法 =====
 
-    public List<MessageVO> getMessageTree() {
-        List<MessageVO> allMessages = messageMapper.getApprovedList();
+    public List<MessageVO> getMessageTree(Long visitorId) {
+        List<MessageVO> allMessages = messageMapper.getApprovedList(visitorId);
         // 构建树形结构：根留言（rootId为null或0）作为一级，其余挂到根留言下
         List<MessageVO> rootMessages = new ArrayList<>();
         Map<Long, MessageVO> messageMap = allMessages.stream()

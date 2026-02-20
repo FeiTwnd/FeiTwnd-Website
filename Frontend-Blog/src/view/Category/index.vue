@@ -1,18 +1,20 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, inject, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { getArticlesByCategory } from '@/api/article'
 import { useBlogStore } from '@/stores'
 import ArticleCard from '@/components/ArticleCard.vue'
+import SidebarCard from '@/components/SidebarCard.vue'
 
 const route = useRoute()
 const blogStore = useBlogStore()
+const { articleTitle, articleMeta } = inject('setHero')
+
 const articles = ref([])
 const total = ref(0)
 const page = ref(1)
 const pageSize = 10
 const loading = ref(false)
-
 const categoryName = ref('')
 
 const load = async () => {
@@ -37,7 +39,10 @@ const load = async () => {
 }
 
 const resolveName = () => {
-  categoryName.value = blogStore.getCategoryNameBySlug(route.params.slug)
+  const name = blogStore.getCategoryNameBySlug(route.params.slug)
+  categoryName.value = name
+  articleTitle.value = name || '分类'
+  articleMeta.value = `共 ${total.value} 篇文章`
 }
 
 const handlePage = (p) => {
@@ -54,84 +59,125 @@ watch(
     load()
   }
 )
-onMounted(() => {
+
+onMounted(async () => {
   resolveName()
-  load()
+  await load()
+  articleMeta.value = `共 ${total.value} 篇文章`
 })
 </script>
 
 <template>
   <div class="category-page">
-    <header class="page-header">
-      <i class="iconfont icon-folder" />
-      <h1 class="page-title">{{ categoryName || '分类' }}</h1>
-      <p class="page-count">共 {{ total }} 篇文章</p>
-    </header>
+    <div class="category-layout">
+      <div class="category-main">
+        <div v-if="loading" class="loading-placeholder">
+          <div v-for="i in 3" :key="i" class="skeleton-card">
+            <div class="skeleton-cover" />
+            <div class="skeleton-body">
+              <div class="skeleton-line w60" />
+              <div class="skeleton-line w90" />
+              <div class="skeleton-line w40" />
+            </div>
+          </div>
+        </div>
 
-    <div v-if="loading" class="placeholder">
-      <div v-for="i in 3" :key="i" class="sk-line" />
-    </div>
+        <template v-else-if="articles.length">
+          <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
+          <div v-if="total > pageSize" class="pager">
+            <el-pagination
+              :current-page="page"
+              :page-size="pageSize"
+              :total="total"
+              layout="prev, pager, next"
+              background
+              @current-change="handlePage"
+            />
+          </div>
+        </template>
 
-    <template v-else-if="articles.length">
-      <ArticleCard v-for="a in articles" :key="a.id" :article="a" />
-      <div v-if="total > pageSize" class="pager">
-        <el-pagination
-          :current-page="page"
-          :page-size="pageSize"
-          :total="total"
-          layout="prev, pager, next"
-          background
-          @current-change="handlePage"
-        />
+        <div v-else class="empty-card">
+          <p class="empty">该分类下暂无文章</p>
+        </div>
       </div>
-    </template>
-    <p v-else class="empty">该分类下暂无文章</p>
+
+      <SidebarCard />
+    </div>
   </div>
 </template>
 
 <style scoped>
-.page-header {
-  text-align: center;
-  padding: 28px 0 20px;
-  border-bottom: 2px solid #303133;
-  margin-bottom: 4px;
+.category-page {
+  width: 100%;
 }
-.page-header .iconfont {
-  font-size: 22px;
-  color: #303133;
+.category-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
-.page-title {
-  font-family: var(--blog-serif);
-  font-size: 26px;
-  font-weight: 700;
-  margin: 6px 0 4px;
-  color: #303133;
-  letter-spacing: 1px;
+.category-main {
+  flex: 1;
+  min-width: 0;
 }
-.page-count {
-  font-size: 13px;
-  color: #888;
-  margin: 0;
+
+/* 骨架屏 */
+.skeleton-card {
+  display: flex;
+  gap: 16px;
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  border: 1px solid #ebeef5;
 }
-.placeholder {
-  padding: 30px 0;
+.skeleton-cover {
+  width: 200px;
+  height: 130px;
+  background: #ebeef5;
+  border-radius: 6px;
+  flex-shrink: 0;
 }
-.sk-line {
+.skeleton-body {
+  flex: 1;
+}
+.skeleton-line {
   height: 14px;
   background: #ebeef5;
-  border-radius: 2px;
-  margin-bottom: 12px;
-  width: 70%;
+  border-radius: 4px;
+  margin-bottom: 10px;
 }
+.w60 {
+  width: 60%;
+}
+.w90 {
+  width: 90%;
+}
+.w40 {
+  width: 40%;
+}
+
 .pager {
-  margin-top: 24px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
+}
+
+.empty-card {
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #ebeef5;
 }
 .empty {
   text-align: center;
   color: #909399;
   padding: 60px 0;
   font-size: 14px;
+  margin: 0;
+}
+
+@media (max-width: 960px) {
+  .category-layout {
+    flex-direction: column;
+  }
 }
 </style>

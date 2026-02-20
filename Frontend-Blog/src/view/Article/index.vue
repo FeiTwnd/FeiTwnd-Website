@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { ref, inject, onMounted, watch, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useVisitorStore } from '@/stores'
 import { getArticleBySlug } from '@/api/article'
 import {
@@ -10,33 +10,65 @@ import {
   deleteComment
 } from '@/api/comment'
 import { likeArticle, unlikeArticle, hasLiked } from '@/api/like'
+import { generateCaptcha } from '@/api/captcha'
+import TableOfContents from '@/components/TableOfContents.vue'
 
 const route = useRoute()
-const router = useRouter()
 const visitorStore = useVisitorStore()
+const { articleCover, articleTitle, articleMeta } = inject('setHero')
 
 const article = ref(null)
 const loading = ref(true)
 const liked = ref(false)
 const liking = ref(false)
 
-/* ---- 评论 ---- */
+/* 评论 */
 const comments = ref([])
-const commentForm = ref({ nickname: '', email: '', content: '' })
+const commentForm = ref({
+  nickname: '',
+  emailOrQq: '',
+  content: '',
+  captchaAnswer: '',
+  isSecret: false,
+  isNotice: true,
+  isMarkdown: true
+})
 const replyTarget = ref(null)
 const submitting = ref(false)
 const editingId = ref(null)
 const editContent = ref('')
 
-/* ---- 加载文章 ---- */
+/* 验证码 */
+const captcha = ref({ question: '', result: null })
+const loadCaptcha = async () => {
+  try {
+    const res = await generateCaptcha()
+    captcha.value = res.data.data
+  } catch {
+    /* ignore */
+  }
+}
+
 const loadArticle = async (slug) => {
   loading.value = true
   try {
     const res = await getArticleBySlug(slug)
     article.value = res.data.data
     document.title = `${article.value.title} - FeiTwnd`
+    // 更新 Hero
+    articleTitle.value = article.value.title
+    articleCover.value = article.value.coverImage || ''
+    const parts = []
+    if (article.value.publishTime)
+      parts.push(article.value.publishTime.slice(0, 10))
+    if (article.value.categoryName) parts.push(article.value.categoryName)
+    if (article.value.wordCount) parts.push(`${article.value.wordCount} 字`)
+    if (article.value.readingTime)
+      parts.push(`${article.value.readingTime} 分钟阅读`)
+    articleMeta.value = parts.join(' · ')
     loadComments()
     checkLike()
+    loadCaptcha()
   } catch {
     article.value = null
   } finally {
@@ -47,7 +79,7 @@ const loadArticle = async (slug) => {
 const loadComments = async () => {
   if (!article.value) return
   try {
-    const res = await getCommentTree(article.value.id)
+    const res = await getCommentTree(article.value.id, visitorStore.visitorId)
     comments.value = res.data.data ?? []
   } catch {
     comments.value = []
@@ -82,12 +114,19 @@ const toggleLike = async () => {
   }
 }
 
-/* ---- 评论操作 ---- */
+/* 评论操作 */
 const handleSubmitComment = async () => {
   const nick = commentForm.value.nickname.trim() || visitorStore.nickname
   const content = commentForm.value.content.trim()
   if (!nick || !content) {
     ElMessage.warning('请填写昵称和内容')
+    return
+  }
+  // 验证码校验
+  const answer = parseInt(commentForm.value.captchaAnswer, 10)
+  if (isNaN(answer) || answer !== captcha.value.result) {
+    ElMessage.warning('验证码错误，请重新计算')
+    loadCaptcha()
     return
   }
   submitting.value = true
@@ -96,25 +135,32 @@ const handleSubmitComment = async () => {
       articleId: article.value.id,
       rootId: replyTarget.value?.rootId ?? replyTarget.value?.id ?? null,
       parentId: replyTarget.value?.id ?? null,
-      contentHtml: `<p>${content}</p>`,
+      parentNickname: replyTarget.value?.nickname ?? null,
+      content: content,
       nickname: nick,
       visitorId: visitorStore.visitorId,
-      email: commentForm.value.email || visitorStore.email || '',
-      deviceMemory: navigator.deviceMemory || null,
-      hardwareConcurrency: navigator.hardwareConcurrency || null
+      emailOrQq: commentForm.value.emailOrQq || visitorStore.email || '',
+      isMarkdown: commentForm.value.isMarkdown ? 1 : 0,
+      isSecret: commentForm.value.isSecret ? 1 : 0,
+      isNotice: commentForm.value.isNotice ? 1 : 0
     }
     await submitComment(payload)
-    // 保存昵称和邮箱
     visitorStore.nickname = nick
-    if (commentForm.value.email) visitorStore.email = commentForm.value.email
+    if (commentForm.value.emailOrQq)
+      visitorStore.email = commentForm.value.emailOrQq
     commentForm.value = {
       nickname: nick,
-      email: commentForm.value.email,
-      content: ''
+      emailOrQq: commentForm.value.emailOrQq,
+      content: '',
+      captchaAnswer: '',
+      isSecret: false,
+      isNotice: true,
+      isMarkdown: true
     }
     replyTarget.value = null
-    ElMessage.success('评论成功')
+    ElMessage.success('评论成功，审核通过后将展示')
     loadComments()
+    loadCaptcha()
   } finally {
     submitting.value = false
   }
@@ -123,9 +169,8 @@ const handleSubmitComment = async () => {
 const startReply = (c) => {
   replyTarget.value = c
   commentForm.value.nickname = visitorStore.nickname
-  commentForm.value.email = visitorStore.email
+  commentForm.value.emailOrQq = visitorStore.email
 }
-
 const cancelReply = () => {
   replyTarget.value = null
 }
@@ -134,14 +179,14 @@ const startEdit = (c) => {
   editingId.value = c.id
   editContent.value = c.contentHtml?.replace(/<[^>]+>/g, '') ?? ''
 }
-
 const doEdit = async (c) => {
   if (!editContent.value.trim()) return
   try {
     await editComment({
       id: c.id,
       visitorId: visitorStore.visitorId,
-      contentHtml: `<p>${editContent.value.trim()}</p>`
+      content: editContent.value.trim(),
+      isMarkdown: commentForm.value.isMarkdown ? 1 : 0
     })
     editingId.value = null
     ElMessage.success('修改成功')
@@ -150,7 +195,6 @@ const doEdit = async (c) => {
     ElMessage.error('修改失败')
   }
 }
-
 const doDelete = async (c) => {
   try {
     await ElMessageBox.confirm('确定删除这条评论？', '提示', {
@@ -168,6 +212,15 @@ const doDelete = async (c) => {
 
 const fmtDate = (d) => (d ? d.slice(0, 16).replace('T', ' ') : '')
 const isOwn = (c) => c.visitorId && c.visitorId === visitorStore.visitorId
+
+const copyLink = async () => {
+  try {
+    await navigator.clipboard.writeText(window.location.href)
+    ElMessage.success('链接已复制')
+  } catch {
+    ElMessage.error('复制失败')
+  }
+}
 
 const flatCommentCount = computed(() => {
   let count = 0
@@ -190,8 +243,9 @@ watch(
 
 onMounted(() => {
   commentForm.value.nickname = visitorStore.nickname
-  commentForm.value.email = visitorStore.email
+  commentForm.value.emailOrQq = visitorStore.email
   loadArticle(route.params.slug)
+  loadCaptcha()
 })
 </script>
 
@@ -207,185 +261,227 @@ onMounted(() => {
     </div>
 
     <template v-else-if="article">
-      <!-- 文章头 -->
-      <header class="article-header">
-        <span v-if="article.categoryName" class="article-category">{{
-          article.categoryName
-        }}</span>
-        <h1 class="article-title">{{ article.title }}</h1>
-        <div class="article-meta">
-          <span
-            ><i class="iconfont icon-time" />
-            {{ fmtDate(article.publishTime) }}</span
-          >
-          <span><i class="iconfont icon-eye" /> {{ article.viewCount }}</span>
-          <span v-if="article.wordCount"
-            ><i class="iconfont icon-biaoqian" />
-            {{ article.wordCount }} 字</span
-          >
-          <span v-if="article.readingTime"
-            >{{ article.readingTime }} 分钟阅读</span
-          >
-        </div>
-        <div v-if="article.tagNames?.length" class="article-tags">
-          <span v-for="t in article.tagNames" :key="t" class="atag"
-            ># {{ t }}</span
-          >
-        </div>
-      </header>
+      <div class="article-layout">
+        <!-- 左侧: 文章内容 -->
+        <div class="article-main">
+          <div class="article-card">
+            <!-- 文章概要 -->
+            <div v-if="article.summary" class="article-summary-block">
+              <i class="iconfont icon-guidang" />
+              <p>{{ article.summary }}</p>
+            </div>
 
-      <!-- 封面图 -->
-      <div v-if="article.coverImage" class="article-cover">
-        <img :src="article.coverImage" :alt="article.title" />
-      </div>
+            <!-- 正文 -->
+            <div class="article-content" v-html="article.contentHtml" />
 
-      <!-- 正文 -->
-      <div class="article-content" v-html="article.contentHtml" />
+            <!-- 点赞 + 转发 -->
+            <div class="article-actions-inline">
+              <button
+                class="action-icon"
+                :class="{ liked }"
+                @click="toggleLike"
+                title="点赞"
+              >
+                <i class="iconfont icon-dianzan" />
+                <span>{{ article.likeCount ?? 0 }}</span>
+              </button>
+              <button class="action-icon" @click="copyLink" title="复制链接">
+                <i class="iconfont icon-zhuanfa" />
+              </button>
+            </div>
 
-      <!-- 点赞 + 上下篇 -->
-      <div class="article-actions">
-        <button class="like-btn" :class="{ liked }" @click="toggleLike">
-          <i class="iconfont icon-dianzan" />
-          {{ liked ? '已赞' : '赞' }} {{ article.likeCount ?? 0 }}
-        </button>
-      </div>
-
-      <div
-        v-if="article.prevArticle || article.nextArticle"
-        class="article-nav"
-      >
-        <router-link
-          v-if="article.prevArticle"
-          :to="`/article/${article.prevArticle.slug}`"
-          class="nav-prev"
-        >
-          <i class="iconfont icon-arrow-left" />
-          <span>{{ article.prevArticle.title }}</span>
-        </router-link>
-        <div v-else />
-        <router-link
-          v-if="article.nextArticle"
-          :to="`/article/${article.nextArticle.slug}`"
-          class="nav-next"
-        >
-          <span>{{ article.nextArticle.title }}</span>
-          <i class="iconfont icon-arrow-right" />
-        </router-link>
-      </div>
-
-      <!-- 相关文章 -->
-      <div v-if="article.relatedArticles?.length" class="related-section">
-        <h3 class="related-title">相关文章</h3>
-        <ul class="related-list">
-          <li v-for="r in article.relatedArticles" :key="r.id">
-            <router-link :to="`/article/${r.slug}`">{{ r.title }}</router-link>
-          </li>
-        </ul>
-      </div>
-
-      <!-- 评论区 -->
-      <div class="comment-section">
-        <h3 class="comment-title">
-          <i class="iconfont icon-pinglun" /> 评论 ({{ flatCommentCount }})
-        </h3>
-
-        <!-- 评论表单 -->
-        <div class="comment-form">
-          <div v-if="replyTarget" class="reply-hint">
-            回复 <strong>{{ replyTarget.nickname }}</strong>
-            <a class="cancel-reply" @click="cancelReply">&times;</a>
+            <!-- 上下篇 -->
+            <div
+              v-if="article.prevArticle || article.nextArticle"
+              class="article-nav"
+            >
+              <router-link
+                v-if="article.prevArticle"
+                :to="`/article/${article.prevArticle.slug}`"
+                class="nav-prev"
+              >
+                <i class="iconfont icon-arrow-left" />
+                <span>{{ article.prevArticle.title }}</span>
+              </router-link>
+              <div v-else />
+              <router-link
+                v-if="article.nextArticle"
+                :to="`/article/${article.nextArticle.slug}`"
+                class="nav-next"
+              >
+                <span>{{ article.nextArticle.title }}</span>
+                <i class="iconfont icon-arrow-right" />
+              </router-link>
+            </div>
           </div>
-          <div class="form-row">
-            <input
-              v-model="commentForm.nickname"
-              placeholder="昵称 *"
-              class="form-input"
-            />
-            <input
-              v-model="commentForm.email"
-              placeholder="邮箱（可选）"
-              class="form-input"
-            />
-          </div>
-          <textarea
-            v-model="commentForm.content"
-            placeholder="写下你的想法..."
-            class="form-textarea"
-            rows="3"
-          />
-          <button
-            class="form-submit"
-            :disabled="submitting"
-            @click="handleSubmitComment"
-          >
-            {{ submitting ? '提交中...' : '发表评论' }}
-          </button>
-        </div>
 
-        <!-- 评论树 -->
-        <div class="comment-tree">
-          <template v-for="c in comments" :key="c.id">
-            <div class="comment-item">
-              <div class="c-head">
-                <span class="c-nick">{{ c.nickname }}</span>
-                <span v-if="c.isAdminReply" class="c-badge">博主</span>
-                <span class="c-date">{{ fmtDate(c.createTime) }}</span>
+          <!-- 相关文章 -->
+          <div v-if="article.relatedArticles?.length" class="related-card">
+            <h3 class="section-title">相关文章</h3>
+            <ul class="related-list">
+              <li v-for="r in article.relatedArticles" :key="r.id">
+                <router-link :to="`/article/${r.slug}`">{{
+                  r.title
+                }}</router-link>
+              </li>
+            </ul>
+          </div>
+
+          <!-- 评论区 -->
+          <div class="comment-card">
+            <h3 class="section-title">
+              <i class="iconfont icon-pinglun" /> 评论 ({{ flatCommentCount }})
+            </h3>
+
+            <div class="comment-form">
+              <div v-if="replyTarget" class="reply-hint">
+                回复 <strong>{{ replyTarget.nickname }}</strong>
+                <a class="cancel-reply" @click="cancelReply">&times;</a>
               </div>
-              <div v-if="editingId === c.id" class="c-edit-wrap">
-                <input v-model="editContent" class="form-input" />
-                <button class="inline-btn" @click="doEdit(c)">保存</button>
-                <button class="inline-btn" @click="editingId = null">
-                  取消
+              <textarea
+                v-model="commentForm.content"
+                placeholder="写下你的想法..."
+                class="form-textarea"
+                rows="4"
+              />
+              <div class="form-row">
+                <div class="input-with-icon">
+                  <i class="iconfont icon-user input-icon" />
+                  <input
+                    v-model="commentForm.nickname"
+                    placeholder="昵称 *"
+                    class="form-input"
+                  />
+                </div>
+                <div class="input-with-icon">
+                  <i class="iconfont icon-youxiang input-icon" />
+                  <input
+                    v-model="commentForm.emailOrQq"
+                    placeholder="邮箱/QQ号"
+                    class="form-input"
+                  />
+                </div>
+                <div class="input-with-icon captcha-wrap">
+                  <i class="iconfont icon-lock input-icon" />
+                  <input
+                    v-model="commentForm.captchaAnswer"
+                    :placeholder="captcha.question || '验证码'"
+                    class="form-input"
+                  />
+                  <span
+                    class="captcha-refresh"
+                    @click="loadCaptcha"
+                    title="换一题"
+                    >↻</span
+                  >
+                </div>
+              </div>
+              <div class="form-options">
+                <label class="option-check">
+                  <input type="checkbox" v-model="commentForm.isSecret" />
+                  悄悄话
+                </label>
+                <label class="option-check">
+                  <input type="checkbox" v-model="commentForm.isNotice" />
+                  邮件提醒
+                </label>
+                <label class="option-check">
+                  <input type="checkbox" v-model="commentForm.isMarkdown" />
+                  Markdown
+                </label>
+                <button
+                  class="form-submit"
+                  :disabled="submitting"
+                  @click="handleSubmitComment"
+                >
+                  {{ submitting ? '提交中...' : '发表评论' }}
                 </button>
               </div>
-              <div v-else class="c-body" v-html="c.contentHtml" />
-              <div class="c-actions">
-                <a @click="startReply(c)">回复</a>
-                <template v-if="isOwn(c)">
-                  <a @click="startEdit(c)">编辑</a>
-                  <a class="danger" @click="doDelete(c)">删除</a>
-                </template>
-              </div>
-              <!-- 子评论 -->
-              <div v-if="c.children?.length" class="comment-children">
-                <div
-                  v-for="child in c.children"
-                  :key="child.id"
-                  class="comment-item child"
-                >
+            </div>
+
+            <!-- 评论树 -->
+            <div class="comment-tree">
+              <template v-for="c in comments" :key="c.id">
+                <div class="comment-item">
                   <div class="c-head">
-                    <span class="c-nick">{{ child.nickname }}</span>
-                    <span v-if="child.isAdminReply" class="c-badge">博主</span>
-                    <span v-if="child.parentNickname" class="c-reply-to">
-                      回复 {{ child.parentNickname }}
+                    <span class="c-nick">{{ c.nickname }}</span>
+                    <span v-if="c.isAdminReply" class="c-badge">博主</span>
+                    <span class="c-date">
+                      {{ fmtDate(c.createTime) }}
+                      <span v-if="c.isApproved === 0" class="c-pending"
+                        >未审核</span
+                      >
                     </span>
-                    <span class="c-date">{{ fmtDate(child.createTime) }}</span>
                   </div>
-                  <div v-if="editingId === child.id" class="c-edit-wrap">
+                  <div v-if="editingId === c.id" class="c-edit-wrap">
                     <input v-model="editContent" class="form-input" />
-                    <button class="inline-btn" @click="doEdit(child)">
-                      保存
-                    </button>
+                    <button class="inline-btn" @click="doEdit(c)">保存</button>
                     <button class="inline-btn" @click="editingId = null">
                       取消
                     </button>
                   </div>
-                  <div v-else class="c-body" v-html="child.contentHtml" />
+                  <div v-else class="c-body" v-html="c.contentHtml" />
                   <div class="c-actions">
-                    <a @click="startReply(child)">回复</a>
-                    <template v-if="isOwn(child)">
-                      <a @click="startEdit(child)">编辑</a>
-                      <a class="danger" @click="doDelete(child)">删除</a>
+                    <a @click="startReply(c)">回复</a>
+                    <template v-if="isOwn(c)">
+                      <a @click="startEdit(c)">编辑</a>
+                      <a class="danger" @click="doDelete(c)">删除</a>
                     </template>
                   </div>
+                  <div v-if="c.children?.length" class="comment-children">
+                    <div
+                      v-for="child in c.children"
+                      :key="child.id"
+                      class="comment-item child"
+                    >
+                      <div class="c-head">
+                        <span class="c-nick">{{ child.nickname }}</span>
+                        <span v-if="child.isAdminReply" class="c-badge"
+                          >博主</span
+                        >
+                        <span v-if="child.parentNickname" class="c-reply-to"
+                          ><i class="iconfont icon-zhuanfa reply-icon" />
+                          {{ child.parentNickname }}</span
+                        >
+                        <span class="c-date">
+                          {{ fmtDate(child.createTime) }}
+                          <span v-if="child.isApproved === 0" class="c-pending"
+                            >未审核</span
+                          >
+                        </span>
+                      </div>
+                      <div v-if="editingId === child.id" class="c-edit-wrap">
+                        <input v-model="editContent" class="form-input" />
+                        <button class="inline-btn" @click="doEdit(child)">
+                          保存
+                        </button>
+                        <button class="inline-btn" @click="editingId = null">
+                          取消
+                        </button>
+                      </div>
+                      <div v-else class="c-body" v-html="child.contentHtml" />
+                      <div class="c-actions">
+                        <a @click="startReply(child)">回复</a>
+                        <template v-if="isOwn(child)">
+                          <a @click="startEdit(child)">编辑</a>
+                          <a class="danger" @click="doDelete(child)">删除</a>
+                        </template>
+                      </div>
+                    </div>
+                  </div>
                 </div>
+              </template>
+              <div v-if="!comments.length" class="empty-comment">
+                暂无评论，来抢沙发
               </div>
             </div>
-          </template>
-          <div v-if="!comments.length" class="empty-comment">
-            暂无评论，来抢沙发
           </div>
         </div>
+
+        <!-- 右侧: 目录 -->
+        <aside class="article-sidebar">
+          <TableOfContents :content-html="article.contentHtml" />
+        </aside>
       </div>
     </template>
 
@@ -395,18 +491,16 @@ onMounted(() => {
 
 <style scoped>
 .article-page {
-  max-width: 740px;
-  margin: 0 auto;
+  width: 100%;
 }
 
-/* 骨架 */
 .loading-wrap {
   padding: 20px 0;
 }
 .skeleton-line {
   height: 14px;
   background: #ebeef5;
-  border-radius: 2px;
+  border-radius: 4px;
   margin-bottom: 10px;
 }
 .w60 {
@@ -419,62 +513,57 @@ onMounted(() => {
   width: 90%;
 }
 
-/* 头部 */
-.article-header {
-  margin-bottom: 24px;
-}
-.article-category {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 1.5px;
-  color: #888;
-  font-weight: 600;
-  display: inline-block;
-  margin-bottom: 6px;
-}
-.article-title {
-  font-family: var(--blog-serif);
-  font-size: 30px;
-  font-weight: 800;
-  margin: 0 0 12px;
-  line-height: 1.35;
-  color: #303133;
-}
-.article-meta {
+/* 双栏布局 */
+.article-layout {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 13px;
-  color: #888;
+  gap: 24px;
+  align-items: flex-start;
 }
-.article-meta .iconfont {
-  font-size: 13px;
-  margin-right: 3px;
+.article-main {
+  flex: 1;
+  min-width: 0;
 }
-.article-tags {
-  margin-top: 10px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.atag {
-  font-size: 12px;
-  color: #606266;
-  padding: 2px 8px;
-  border: 1px solid #e4e7ed;
-  border-radius: 2px;
+.article-sidebar {
+  width: 260px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 74px;
 }
 
-/* 封面 */
-.article-cover {
-  margin-bottom: 24px;
-  border: 1px solid #e4e7ed;
-  border-radius: 3px;
-  overflow: hidden;
+/* 卡片 */
+.article-card,
+.related-card,
+.comment-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid #ebeef5;
+  padding: 28px;
+  margin-bottom: 16px;
 }
-.article-cover img {
-  width: 100%;
-  display: block;
+
+/* 文章概要 */
+.article-summary-block {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 16px 20px;
+  background: #f5f7fa;
+  border-radius: 6px;
+  border-left: 3px solid #303133;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: #606266;
+  line-height: 1.7;
+}
+.article-summary-block .iconfont {
+  font-size: 16px;
+  color: #909399;
+  margin-top: 2px;
+  flex-shrink: 0;
+}
+.article-summary-block p {
+  margin: 0;
 }
 
 /* 正文 */
@@ -511,7 +600,7 @@ onMounted(() => {
 .article-content :deep(img) {
   max-width: 100%;
   border: 1px solid #e4e7ed;
-  border-radius: 3px;
+  border-radius: 6px;
   margin: 8px 0;
 }
 .article-content :deep(blockquote) {
@@ -525,14 +614,14 @@ onMounted(() => {
 .article-content :deep(code) {
   background: #f5f7fa;
   padding: 2px 5px;
-  border-radius: 2px;
+  border-radius: 3px;
   font-size: 14px;
 }
 .article-content :deep(pre) {
   background: #303133;
   color: #e4e7ed;
   padding: 16px;
-  border-radius: 3px;
+  border-radius: 6px;
   overflow-x: auto;
   margin: 14px 0;
   font-size: 13.5px;
@@ -565,32 +654,40 @@ onMounted(() => {
   font-weight: 600;
 }
 
-/* 操作 */
-.article-actions {
-  margin: 32px 0;
-  text-align: center;
-  padding: 20px 0;
-  border-top: 1px solid #e4e7ed;
-  border-bottom: 1px solid #e4e7ed;
+/* 点赞+转发 */
+.article-actions-inline {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #ebeef5;
 }
-.like-btn {
+.action-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   background: none;
-  border: 1px solid #e4e7ed;
-  border-radius: 2px;
-  padding: 8px 24px;
-  font-size: 14px;
-  color: #606266;
+  border: none;
   cursor: pointer;
-  transition: all 0.15s;
+  font-size: 13px;
+  color: #909399;
+  padding: 4px 8px;
+  border-radius: 4px;
   font-family: inherit;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
-.like-btn:hover,
-.like-btn.liked {
+.action-icon:hover {
   color: #303133;
-  border-color: #303133;
+  background: #f5f7fa;
 }
-.like-btn .iconfont {
-  margin-right: 4px;
+.action-icon.liked {
+  color: #303133;
+}
+.action-icon .iconfont {
+  font-size: 16px;
 }
 
 /* 上下篇 */
@@ -598,7 +695,9 @@ onMounted(() => {
   display: flex;
   justify-content: space-between;
   gap: 16px;
-  margin: 24px 0;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ebeef5;
   font-size: 14px;
 }
 .nav-prev,
@@ -621,18 +720,17 @@ onMounted(() => {
 }
 
 /* 相关文章 */
-.related-section {
-  margin: 24px 0;
-  padding: 16px 0;
-  border-top: 1px solid #e4e7ed;
-}
-.related-title {
-  font-size: 14px;
+.section-title {
+  font-size: 16px;
   font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin: 0 0 10px;
+  margin: 0 0 14px;
   color: #303133;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.section-title .iconfont {
+  font-size: 16px;
 }
 .related-list {
   list-style: none;
@@ -640,7 +738,7 @@ onMounted(() => {
   margin: 0;
 }
 .related-list li {
-  padding: 5px 0;
+  padding: 6px 0;
   border-bottom: 1px dashed #ebeef5;
   font-size: 14px;
 }
@@ -652,24 +750,7 @@ onMounted(() => {
   color: #303133;
 }
 
-/* ===== 评论区 ===== */
-.comment-section {
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 2px solid #303133;
-}
-.comment-title {
-  font-size: 16px;
-  font-weight: 700;
-  margin: 0 0 18px;
-  color: #303133;
-}
-.comment-title .iconfont {
-  font-size: 16px;
-  margin-right: 4px;
-}
-
-/* 表单 */
+/* 评论表单 */
 .comment-form {
   margin-bottom: 24px;
 }
@@ -677,9 +758,9 @@ onMounted(() => {
   font-size: 13px;
   color: #606266;
   margin-bottom: 8px;
-  padding: 6px 10px;
-  background: #f7f7f4;
-  border-radius: 2px;
+  padding: 8px 12px;
+  background: #f5f7fa;
+  border-radius: 6px;
 }
 .cancel-reply {
   cursor: pointer;
@@ -692,15 +773,49 @@ onMounted(() => {
   gap: 8px;
   margin-bottom: 8px;
 }
+.input-with-icon {
+  flex: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.input-icon {
+  position: absolute;
+  left: 10px;
+  font-size: 14px;
+  color: #c0c4cc;
+  pointer-events: none;
+  z-index: 1;
+}
+.input-with-icon .form-input {
+  padding-left: 32px;
+  width: 100%;
+}
+.captcha-wrap {
+  min-width: 0;
+}
+.captcha-refresh {
+  position: absolute;
+  right: 8px;
+  font-size: 16px;
+  color: #909399;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+}
+.captcha-refresh:hover {
+  color: #303133;
+}
 .form-input {
   flex: 1;
   border: 1px solid #e4e7ed;
-  border-radius: 2px;
-  padding: 7px 10px;
+  border-radius: 6px;
+  padding: 8px 12px;
   font-size: 13px;
   outline: none;
   font-family: inherit;
   background: #fff;
+  box-sizing: border-box;
 }
 .form-input:focus {
   border-color: #303133;
@@ -708,8 +823,8 @@ onMounted(() => {
 .form-textarea {
   width: 100%;
   border: 1px solid #e4e7ed;
-  border-radius: 2px;
-  padding: 8px 10px;
+  border-radius: 6px;
+  padding: 10px 12px;
   font-size: 13px;
   resize: vertical;
   outline: none;
@@ -721,15 +836,37 @@ onMounted(() => {
 .form-textarea:focus {
   border-color: #303133;
 }
+.form-options {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.option-check {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #606266;
+  cursor: pointer;
+}
+.option-check input[type='checkbox'] {
+  accent-color: #303133;
+}
 .form-submit {
   background: #303133;
   color: #fff;
   border: none;
-  padding: 8px 20px;
+  padding: 8px 24px;
   font-size: 13px;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: 6px;
   font-family: inherit;
+  margin-left: auto;
+  transition: background 0.15s;
+}
+.form-submit:hover {
+  background: #000;
 }
 .form-submit:disabled {
   opacity: 0.5;
@@ -768,17 +905,33 @@ onMounted(() => {
   background: #303133;
   color: #fff;
   padding: 1px 5px;
-  border-radius: 2px;
+  border-radius: 3px;
   font-weight: 600;
 }
 .c-reply-to {
   font-size: 12px;
-  color: #888;
+  color: #909399;
 }
 .c-date {
   font-size: 12px;
   color: #c0c4cc;
   margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.c-pending {
+  font-size: 10px;
+  color: #e6a23c;
+  background: #fdf6ec;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+.reply-icon {
+  display: inline-block;
+  transform: scaleX(-1);
+  font-size: 12px;
 }
 .c-body {
   font-size: 14px;
@@ -795,7 +948,7 @@ onMounted(() => {
 }
 .c-actions a {
   font-size: 12px;
-  color: #888;
+  color: #909399;
   cursor: pointer;
   text-decoration: none;
 }
@@ -817,7 +970,7 @@ onMounted(() => {
   padding: 3px 10px;
   font-size: 12px;
   cursor: pointer;
-  border-radius: 2px;
+  border-radius: 4px;
   font-family: inherit;
 }
 .inline-btn:hover {
@@ -836,9 +989,20 @@ onMounted(() => {
   font-size: 16px;
 }
 
+@media (max-width: 960px) {
+  .article-layout {
+    flex-direction: column;
+  }
+  .article-sidebar {
+    width: 100%;
+    position: static;
+  }
+}
 @media (max-width: 600px) {
-  .article-title {
-    font-size: 24px;
+  .article-card,
+  .related-card,
+  .comment-card {
+    padding: 16px;
   }
   .article-nav {
     flex-direction: column;

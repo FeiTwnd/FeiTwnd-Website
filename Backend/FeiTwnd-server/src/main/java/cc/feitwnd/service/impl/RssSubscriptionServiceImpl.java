@@ -9,6 +9,7 @@ import cc.feitwnd.exception.RssSubscriptionException;
 import cc.feitwnd.mapper.RssSubscriptionMapper;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.RssSubscriptionService;
+import cc.feitwnd.vo.RssSubscriptionStatusVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,5 +115,31 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
         subscription.setIsActive(0);
         subscription.setUnSubscribeTime(LocalDateTime.now());
         rssSubscriptionMapper.update(subscription);
+    }
+
+    /**
+     * 检查访客是否已订阅
+     */
+    public boolean hasSubscribed(Long visitorId) {
+        if (visitorId == null) return false;
+        return rssSubscriptionMapper.hasActiveByVisitorId(visitorId);
+    }
+
+    /**
+     * 获取访客订阅详情
+     */
+    public RssSubscriptionStatusVO getSubscriptionStatus(Long visitorId) {
+        if (visitorId == null) {
+            return RssSubscriptionStatusVO.builder().subscribed(false).build();
+        }
+        RssSubscriptions sub = rssSubscriptionMapper.getActiveByVisitorId(visitorId);
+        if (sub == null) {
+            return RssSubscriptionStatusVO.builder().subscribed(false).build();
+        }
+        return RssSubscriptionStatusVO.builder()
+                .subscribed(true)
+                .nickname(sub.getNickname())
+                .email(sub.getEmail())
+                .build();
     }
 }

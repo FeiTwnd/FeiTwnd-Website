@@ -50,9 +50,10 @@ public interface ArticleCategoryMapper {
     /**
      * 获取所有有已发布文章的分类
      */
-    @Select("select distinct ac.* from article_categories ac " +
+    @Select("select ac.*, count(a.id) as article_count from article_categories ac " +
             "inner join articles a on ac.id = a.category_id " +
             "where a.is_published = 1 " +
+            "group by ac.id " +
             "order by ac.sort asc, ac.id desc")
     List<ArticleCategories> getVisibleCategories();
 

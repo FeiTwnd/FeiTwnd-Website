@@ -1,11 +1,32 @@
 <script setup>
+import { ref, provide, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { onMounted } from 'vue'
 import BlogHeader from '@/components/BlogHeader.vue'
 import BlogFooter from '@/components/BlogFooter.vue'
+import HeroBanner from '@/components/HeroBanner.vue'
 import { useBlogStore, useVisitorStore } from '@/stores'
-import { onMounted } from 'vue'
 
+const route = useRoute()
 const blogStore = useBlogStore()
 const visitorStore = useVisitorStore()
+
+/* 文章详情页会通过 provide/inject 传递封面和标题 */
+const articleCover = ref('')
+const articleTitle = ref('')
+const articleMeta = ref('')
+
+provide('setHero', { articleCover, articleTitle, articleMeta })
+
+/* 路由切换时重置 hero 数据，子页面的 onMounted 会重新设置 */
+watch(
+  () => route.fullPath,
+  () => {
+    articleCover.value = ''
+    articleTitle.value = ''
+    articleMeta.value = ''
+  }
+)
 
 onMounted(() => {
   blogStore.init()
@@ -16,8 +37,15 @@ onMounted(() => {
 <template>
   <div class="blog-layout">
     <BlogHeader />
+    <HeroBanner
+      :cover-image="articleCover"
+      :title="articleTitle"
+      :meta="articleMeta"
+    />
     <main class="blog-main">
-      <router-view />
+      <div class="main-inner">
+        <router-view />
+      </div>
     </main>
     <BlogFooter />
   </div>
@@ -28,17 +56,19 @@ onMounted(() => {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  padding-top: 56px;
 }
 .blog-main {
   flex: 1;
   width: 100%;
-  max-width: 1060px;
+  background: var(--blog-bg);
+}
+.main-inner {
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 32px 24px;
+  padding: 32px 28px;
 }
 @media (max-width: 768px) {
-  .blog-main {
+  .main-inner {
     padding: 20px 16px;
   }
 }

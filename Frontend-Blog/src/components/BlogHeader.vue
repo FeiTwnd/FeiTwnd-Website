@@ -1,11 +1,21 @@
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useBlogStore } from '@/stores'
 
 const router = useRouter()
 const route = useRoute()
 const blogStore = useBlogStore()
+
+/* 滚动检测 */
+const scrolled = ref(false)
+const handleScroll = () => {
+  scrolled.value = window.scrollY > 60
+}
+onMounted(() =>
+  window.addEventListener('scroll', handleScroll, { passive: true })
+)
+onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 
 /* 搜索 */
 const searchVisible = ref(false)
@@ -102,9 +112,8 @@ const navTo = (item) => {
 </script>
 
 <template>
-  <header class="site-header">
+  <header class="site-header" :class="{ scrolled }">
     <div class="header-inner">
-      <!-- 左侧: 站名 + 导航 -->
       <div class="header-left">
         <router-link to="/" class="site-title">FeiTwnd's Blog</router-link>
         <nav class="nav-desktop">
@@ -130,9 +139,7 @@ const navTo = (item) => {
         </nav>
       </div>
 
-      <!-- 右侧: 音乐播放器 + 搜索 -->
       <div class="header-right">
-        <!-- 迷你音乐播放器 -->
         <div v-if="currentTrack" class="mini-player-wrap">
           <div class="mini-player" @click="toggleMusicList">
             <img
@@ -158,8 +165,6 @@ const navTo = (item) => {
             preload="none"
             @ended="nextTrack"
           />
-
-          <!-- 音乐列表面板 -->
           <transition name="fade">
             <div v-show="musicListVisible" class="music-panel">
               <div class="music-panel-header">
@@ -195,7 +200,6 @@ const navTo = (item) => {
           </transition>
         </div>
 
-        <!-- 搜索 -->
         <div class="search-area">
           <div class="search-box" :class="{ expanded: searchVisible }">
             <input
@@ -214,14 +218,12 @@ const navTo = (item) => {
           </button>
         </div>
 
-        <!-- 移动端汉堡 -->
         <button class="mobile-menu-btn" @click="toggleMobileNav">
           <span :class="['bar', { open: mobileNavVisible }]" />
         </button>
       </div>
     </div>
 
-    <!-- 移动端导航 -->
     <nav v-show="mobileNavVisible" class="nav-mobile">
       <a
         v-for="item in navItems"
@@ -240,25 +242,31 @@ const navTo = (item) => {
 
 <style scoped>
 .site-header {
-  background: var(--blog-bg);
-  border-bottom: 1px solid #e4e7ed;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 100;
+  background: transparent;
+  border-bottom: none;
+  transition:
+    background 0.3s,
+    box-shadow 0.3s;
+}
+.site-header.scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
 }
 .header-inner {
-  max-width: 1060px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 24px;
-  height: 56px;
+  padding: 0 28px;
+  height: 58px;
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
-
-/* 左侧 */
 .header-left {
   display: flex;
   align-items: center;
@@ -268,10 +276,18 @@ const navTo = (item) => {
   font-family: var(--blog-serif);
   font-size: 18px;
   font-weight: 800;
-  color: #303133;
+  color: #fff;
   text-decoration: none;
   letter-spacing: 0.5px;
   white-space: nowrap;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition:
+    color 0.3s,
+    text-shadow 0.3s;
+}
+.scrolled .site-title {
+  color: #303133;
+  text-shadow: none;
 }
 .nav-desktop {
   display: flex;
@@ -280,32 +296,44 @@ const navTo = (item) => {
 }
 .nav-link {
   font-size: 13px;
-  color: #606266;
+  color: rgba(255, 255, 255, 0.9);
   text-decoration: none;
   padding: 6px 10px;
   border-radius: 4px;
-  transition:
-    color 0.15s,
-    background 0.15s;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition:
+    color 0.2s,
+    background 0.2s,
+    text-shadow 0.3s;
 }
 .nav-link .iconfont {
   font-size: 14px;
 }
 .nav-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
+}
+.nav-link.active {
+  color: #fff;
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.2);
+}
+.scrolled .nav-link {
+  color: #606266;
+  text-shadow: none;
+}
+.scrolled .nav-link:hover {
   color: #303133;
   background: #f5f7fa;
 }
-.nav-link.active {
+.scrolled .nav-link.active {
   color: #000;
-  font-weight: 600;
   background: #f5f7fa;
 }
-
-/* 右侧 */
 .header-right {
   display: flex;
   align-items: center;
@@ -325,12 +353,22 @@ const navTo = (item) => {
   gap: 8px;
   padding: 4px 10px 4px 4px;
   border-radius: 20px;
-  background: #f5f7fa;
-  border: 1px solid #e4e7ed;
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   cursor: pointer;
-  transition: border-color 0.15s;
+  backdrop-filter: blur(4px);
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.scrolled .mini-player {
+  background: #f5f7fa;
+  border-color: #e4e7ed;
 }
 .mini-player:hover {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.scrolled .mini-player:hover {
   border-color: #909399;
 }
 .player-cover {
@@ -338,8 +376,11 @@ const navTo = (item) => {
   height: 28px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #e4e7ed;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   flex-shrink: 0;
+}
+.scrolled .player-cover {
+  border-color: #e4e7ed;
 }
 .player-cover.spinning {
   animation: spin 8s linear infinite;
@@ -354,28 +395,38 @@ const navTo = (item) => {
 }
 .player-title {
   font-size: 12px;
-  color: #606266;
+  color: rgba(255, 255, 255, 0.9);
   max-width: 80px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 0.3s;
+}
+.scrolled .player-title {
+  color: #606266;
 }
 .player-btn {
   background: none;
   border: none;
   cursor: pointer;
   padding: 4px;
-  color: #606266;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 15px;
-  transition: color 0.15s;
+  transition: color 0.2s;
   display: flex;
   align-items: center;
 }
 .player-btn:hover {
+  color: #fff;
+}
+.scrolled .player-btn {
+  color: #606266;
+}
+.scrolled .player-btn:hover {
   color: #000;
 }
 
-/* 音乐列表面板 */
+/* 音乐列表 */
 .music-panel {
   position: absolute;
   top: calc(100% + 8px);
@@ -384,8 +435,8 @@ const navTo = (item) => {
   max-height: 360px;
   background: #fff;
   border: 1px solid #e4e7ed;
-  border-radius: 6px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
   z-index: 200;
   overflow: hidden;
 }
@@ -466,7 +517,6 @@ const navTo = (item) => {
   color: #000;
   flex-shrink: 0;
 }
-
 .fade-enter-active,
 .fade-leave-active {
   transition:
@@ -483,7 +533,6 @@ const navTo = (item) => {
 .search-area {
   display: flex;
   align-items: center;
-  gap: 0;
 }
 .search-box {
   overflow: hidden;
@@ -499,7 +548,7 @@ const navTo = (item) => {
   border-radius: 4px;
   padding: 5px 10px;
   font-size: 13px;
-  background: #fff;
+  background: rgba(255, 255, 255, 0.95);
   color: #303133;
   outline: none;
   font-family: inherit;
@@ -512,13 +561,19 @@ const navTo = (item) => {
   border: none;
   cursor: pointer;
   padding: 6px;
-  color: #606266;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
-  transition: color 0.15s;
+  transition: color 0.2s;
   display: flex;
   align-items: center;
 }
 .search-toggle:hover {
+  color: #fff;
+}
+.scrolled .search-toggle {
+  color: #606266;
+}
+.scrolled .search-toggle:hover {
   color: #000;
 }
 
@@ -538,10 +593,17 @@ const navTo = (item) => {
   display: block;
   width: 18px;
   height: 2px;
-  background: #303133;
+  background: #fff;
   position: absolute;
   left: 5px;
-  transition: transform 0.2s;
+  transition:
+    transform 0.2s,
+    background 0.3s;
+}
+.scrolled .bar,
+.scrolled .bar::before,
+.scrolled .bar::after {
+  background: #303133;
 }
 .bar {
   top: 13px;
@@ -565,12 +627,12 @@ const navTo = (item) => {
   top: 0;
   transform: rotate(-45deg);
 }
-
 .nav-mobile {
   display: none;
-  border-top: 1px solid #ebeef5;
-  background: var(--blog-bg);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(8px);
   padding: 8px 24px 12px;
+  border-top: 1px solid #ebeef5;
 }
 .nav-mobile-link {
   display: flex;

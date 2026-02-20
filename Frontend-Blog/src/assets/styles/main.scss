@@ -50,6 +50,7 @@ html {
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -59,6 +60,7 @@ body {
   color: var(--blog-text);
   font-family: var(--blog-sans);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 a {
@@ -161,4 +163,26 @@ img {
 }
 .el-overlay {
   backdrop-filter: blur(2px);
+}
+
+/* === Element Plus Dialog 黑白风 === */
+.el-dialog {
+  border-radius: 10px !important;
+}
+.el-dialog__header {
+  border-bottom: 1px solid #ebeef5;
+}
+.el-dialog__title {
+  font-weight: 700 !important;
+  font-size: 16px !important;
+}
+
+/* === 页面过渡 === */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.page-fade-enter-from,
+.page-fade-leave-to {
+  opacity: 0;
 }

@@ -34,6 +34,9 @@ public class ArticleCategories implements Serializable {
     // 排序，越小越靠前
     private Integer sort;
 
+    // 文章数量（非数据库字段，查询时计算）
+    private Integer articleCount;
+
     // 创建时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

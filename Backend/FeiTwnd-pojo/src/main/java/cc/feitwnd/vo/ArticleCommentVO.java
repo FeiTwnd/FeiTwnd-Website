@@ -25,10 +25,12 @@ public class ArticleCommentVO implements Serializable {
     private Long parentId;
     private String parentNickname;
     private String contentHtml;
+    private Long visitorId;
     private String nickname;
     private String location;
     private String userAgentOs;
     private String userAgentBrowser;
+    private Integer isApproved;
     private Integer isSecret;
     private Integer isAdminReply;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")

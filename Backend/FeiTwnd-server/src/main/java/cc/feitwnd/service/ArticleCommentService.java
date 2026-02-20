@@ -51,9 +51,9 @@ public interface ArticleCommentService {
     // ===== 博客端方法 =====
 
     /**
-     * 根据文章ID获取评论列表（树形结构，仅已审核）
+     * 根据文章ID获取评论列表（树形结构，已审核 + 当前访客的未审核）
      */
-    List<ArticleCommentVO> getCommentTree(Long articleId);
+    List<ArticleCommentVO> getCommentTree(Long articleId, Long visitorId);
 
     /**
      * 访客提交评论

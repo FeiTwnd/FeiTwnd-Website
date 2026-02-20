@@ -28,6 +28,9 @@ public class ArticleTags implements Serializable {
     // URL标识
     private String slug;
 
+    // 文章数量（非数据库字段，查询时计算）
+    private Integer articleCount;
+
     // 创建时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

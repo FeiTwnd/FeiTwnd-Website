@@ -1,13 +1,11 @@
 package cc.feitwnd.wesocket;
 
-import jakarta.websocket.OnClose;
-import jakarta.websocket.OnMessage;
-import jakarta.websocket.OnOpen;
-import jakarta.websocket.Session;
+import jakarta.websocket.*;
 import jakarta.websocket.server.ServerEndpoint;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -36,7 +34,7 @@ public class OnlineCount {
         log.info("新连接: {}, 当前在线: {} 人", session.getId(), count);
 
         // 发送当前在线人数给新用户
-        sendMessage(session, count);
+        sendMessage(session, String.valueOf(count));
 
         // 广播更新给所有用户
         broadcastCount();
@@ -68,16 +66,24 @@ public class OnlineCount {
     }
 
     /**
-     * 发送消息给单个用户
+     * 连接出错
      */
-    private void sendMessage(Session session, Object data) {
+    @OnError
+    public void onError(Session session, Throwable error) {
+        sessions.remove(session.getId());
+        log.debug("WebSocket 连接异常: {}", session.getId());
+    }
+
+    /**
+     * 发送消息给单个用户（使用 getAsyncRemote 避免并发写冲突）
+     */
+    private void sendMessage(Session session, String message) {
         try {
             if (session.isOpen()) {
-                String message = data instanceof String ? (String) data : String.valueOf(data);
-                session.getBasicRemote().sendText(message);
+                session.getAsyncRemote().sendText(message);
             }
         } catch (Exception e) {
-            log.error("发送消息失败", e);
+            log.debug("发送消息失败: {}", session.getId());
         }
     }
 
@@ -85,17 +91,17 @@ public class OnlineCount {
      * 广播在线人数给所有用户
      */
     private void broadcastCount() {
-        int count = onlineCount.get();
-        String message = String.valueOf(count);
+        String message = String.valueOf(onlineCount.get());
 
-        sessions.values().forEach(session -> {
+        sessions.forEach((id, session) -> {
             try {
                 if (session.isOpen()) {
-                    session.getBasicRemote().sendText(message);
+                    session.getAsyncRemote().sendText(message);
                 }
             } catch (Exception e) {
-                log.error("发送消息失败", e);
+                log.debug("广播消息失败: {}", id);
             }
         });
     }
+}
 }
