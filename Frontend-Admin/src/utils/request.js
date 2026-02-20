@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '@/router'
 
 const baseURL = '/api'
 
@@ -44,7 +45,7 @@ http.interceptors.response.use(
     if (status === 401) {
       ElMessage.warning('登录状态失效，请重新登录')
       localStorage.removeItem('admin_token')
-      import('@/router').then((m) => m.default.push('/login'))
+      router.push('/login')
     } else if (status === 403) {
       ElMessage.error('权限不足，无法执行该操作')
     } else {

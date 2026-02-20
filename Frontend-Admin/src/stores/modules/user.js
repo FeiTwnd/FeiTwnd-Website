@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { login, getProfile, logout } from '@/api/auth'
+import router from '@/router'
 
 export const useUserStore = defineStore(
   'user',
@@ -36,8 +37,7 @@ export const useUserStore = defineStore(
       } catch {
         // 个人信息获取失败不影响登录跳转
       }
-      const r = await import('@/router')
-      r.default.push('/dashboard')
+      router.push('/dashboard')
     }
 
     /** 拉取当前管理员信息 */
@@ -56,8 +56,7 @@ export const useUserStore = defineStore(
       } finally {
         clearUserInfo()
         ElMessage.success('已退出登录')
-        const r = await import('@/router')
-        r.default.push('/login')
+        router.push('/login')
       }
     }
 

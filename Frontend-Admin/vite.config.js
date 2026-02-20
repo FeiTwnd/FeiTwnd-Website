@@ -71,6 +71,17 @@ export default defineConfig({
             if (id.includes('element-plus')) {
               return 'element'
             }
+            if (id.includes('echarts') || id.includes('zrender')) {
+              return 'echarts'
+            }
+            if (
+              id.includes('md-editor-v3') ||
+              id.includes('@codemirror') ||
+              id.includes('codemirror') ||
+              id.includes('highlight.js')
+            ) {
+              return 'md-editor'
+            }
             return 'vendor'
           }
         },

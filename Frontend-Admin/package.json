@@ -21,13 +21,8 @@
     "lint-staged": "lint-staged"
   },
   "dependencies": {
-    "@bytemd/plugin-gfm": "^1.22.0",
-    "@bytemd/plugin-highlight": "^1.22.0",
-    "@bytemd/vue-next": "1.22.0",
     "@element-plus/icons-vue": "^2.3.2",
-    "@vueup/vue-quill": "^1.2.0",
     "axios": "^1.13.1",
-    "bytemd": "1.22.0",
     "dayjs": "^1.11.13",
     "echarts": "^5.6.0",
     "element-plus": "^2.11.5",

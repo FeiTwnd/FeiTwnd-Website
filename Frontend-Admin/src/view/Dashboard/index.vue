@@ -8,8 +8,27 @@ import {
   getProvinceDistribution
 } from '@/api/report'
 import { getConfigByKey } from '@/api/settings'
-import * as echarts from 'echarts'
+import * as echarts from 'echarts/core'
+import { LineChart, BarChart, PieChart } from 'echarts/charts'
+import {
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  LegendComponent
+} from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
 import dayjs from 'dayjs'
+
+echarts.use([
+  LineChart,
+  BarChart,
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  GridComponent,
+  LegendComponent,
+  CanvasRenderer
+])
 
 /* ---- 概览数据 ---- */
 const overview = ref({})
