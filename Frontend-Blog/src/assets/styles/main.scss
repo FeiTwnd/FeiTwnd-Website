@@ -52,6 +52,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 body {
@@ -61,7 +62,7 @@ body {
   color: var(--blog-text);
   font-family: var(--blog-sans);
   line-height: 1.6;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 a {
@@ -178,6 +179,12 @@ img {
   font-size: 16px !important;
 }
 
+/* 阻止 Element Plus 弹窗补偿滚动条宽度（已由 html overflow-y:scroll 处理） */
+body.el-popup-parent--hidden {
+  width: 100% !important;
+  overflow: hidden !important;
+}
+
 /* === 页面过渡 === */
 .page-fade-enter-active,
 .page-fade-leave-active {
@@ -186,4 +193,331 @@ img {
 .page-fade-enter-from,
 .page-fade-leave-to {
   opacity: 0;
+}
+
+/* === 暗色模式 === */
+html.dark {
+  color-scheme: dark;
+
+  --blog-bg: #181818;
+  --blog-card: #232323;
+  --blog-text: #e5e5e5;
+  --blog-text2: #b0b0b0;
+  --blog-text3: #808080;
+  --blog-border: #333;
+  --blog-border-light: #2c2c2c;
+  --blog-hover: #2a2a2a;
+
+  --el-bg-color: #232323;
+  --el-bg-color-page: #181818;
+  --el-bg-color-overlay: #2a2a2a;
+  --el-fill-color: #2a2a2a;
+  --el-fill-color-light: #303030;
+  --el-fill-color-blank: #232323;
+  --el-text-color-primary: #e5e5e5;
+  --el-text-color-regular: #b0b0b0;
+  --el-text-color-secondary: #808080;
+  --el-text-color-placeholder: #555;
+  --el-border-color: #3a3a3a;
+  --el-border-color-light: #333;
+  --el-border-color-lighter: #2c2c2c;
+  --el-color-primary: #e5e5e5;
+  --el-color-primary-light-3: #b0b0b0;
+  --el-color-primary-light-5: #808080;
+  --el-color-primary-light-7: #555;
+  --el-color-primary-light-8: #3a3a3a;
+  --el-color-primary-light-9: #2c2c2c;
+  --el-color-primary-dark-2: #fff;
+  --el-mask-color: rgba(0, 0, 0, 0.6);
+}
+
+html.dark body {
+  background-color: var(--blog-bg);
+  color: var(--blog-text);
+}
+
+html.dark .el-dialog {
+  background: var(--blog-card) !important;
+}
+html.dark .el-dialog__header {
+  border-bottom-color: var(--blog-border) !important;
+}
+html.dark .el-dialog__title {
+  color: var(--blog-text) !important;
+}
+html.dark .el-dialog__headerbtn .el-dialog__close {
+  color: var(--blog-text3) !important;
+}
+html.dark .el-overlay {
+  background-color: rgba(0, 0, 0, 0.55) !important;
+}
+html.dark .el-pagination .btn-prev,
+html.dark .el-pagination .btn-next,
+html.dark .el-pagination .el-pager li {
+  background: var(--blog-card) !important;
+  color: var(--blog-text2) !important;
+  border-color: var(--blog-border) !important;
+}
+html.dark .el-pagination .el-pager li.is-active {
+  background: #e5e5e5 !important;
+  color: #181818 !important;
+  border-color: #e5e5e5 !important;
+}
+
+/* 暗色模式 - 滚动条 */
+html.dark ::-webkit-scrollbar-thumb {
+  background: #555;
+}
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+/* 暗色模式 - 文本选择 */
+html.dark ::selection {
+  background: #e5e5e5;
+  color: #181818;
+}
+
+/* 暗色模式 - Message / MessageBox */
+html.dark .el-message {
+  background: var(--blog-card) !important;
+  border-color: var(--blog-border) !important;
+}
+html.dark .el-message-box {
+  background: var(--blog-card) !important;
+  border-color: var(--blog-border) !important;
+}
+html.dark .el-message-box__title {
+  color: var(--blog-text) !important;
+}
+html.dark .el-message-box__content {
+  color: var(--blog-text2) !important;
+}
+html.dark .el-input__inner {
+  background: var(--blog-card) !important;
+  color: var(--blog-text) !important;
+}
+html.dark .el-input__wrapper {
+  background: var(--blog-card) !important;
+  box-shadow: 0 0 0 1px var(--blog-border) inset !important;
+}
+
+/* === 暗色模式 — 全局 scoped 组件覆盖 === */
+html.dark .side-card,
+html.dark .article-card,
+html.dark .content-card,
+html.dark .about-card,
+html.dark .search-result-tip,
+html.dark .empty-tip,
+html.dark .comment-card,
+html.dark .form-card,
+html.dark .skeleton-card,
+html.dark .related-card,
+html.dark .article-content-card,
+html.dark .article-nav,
+html.dark .msg-item-card {
+  background: var(--blog-card) !important;
+  border-color: var(--blog-border) !important;
+}
+
+html.dark .info-name,
+html.dark .card-title,
+html.dark .stat-num,
+html.dark .sg-val,
+html.dark .modal-item,
+html.dark .link-name,
+html.dark .profile-name,
+html.dark .stat-val,
+html.dark .archive-item .item-title,
+html.dark .year-label,
+html.dark .music-panel-name {
+  color: var(--blog-text) !important;
+}
+
+html.dark .info-tag,
+html.dark .stat-label,
+html.dark .sg-label,
+html.dark .card-meta,
+html.dark .card-date,
+html.dark .card-summary,
+html.dark .modal-count,
+html.dark .link-desc,
+html.dark .item-date,
+html.dark .profile-tag,
+html.dark .meta-item,
+html.dark .card-top,
+html.dark .profile-desc,
+html.dark .music-panel-artist,
+html.dark .music-panel-count,
+html.dark .card-header {
+  color: var(--blog-text3) !important;
+}
+
+html.dark .card-category,
+html.dark .nav-mobile-link,
+html.dark .social-link,
+html.dark .card-tag {
+  color: var(--blog-text2) !important;
+}
+
+html.dark .info-stat + .info-stat,
+html.dark .card-header,
+html.dark .music-panel-header {
+  border-color: var(--blog-border) !important;
+}
+html.dark .year-dot {
+  border-color: var(--blog-card) !important;
+}
+
+html.dark .info-stat:hover,
+html.dark .modal-item:hover,
+html.dark .archive-item:hover,
+html.dark .music-panel-item:hover,
+html.dark .music-panel-item.active {
+  background: var(--blog-hover) !important;
+}
+
+html.dark .link-card {
+  background: var(--blog-hover) !important;
+  border-color: var(--blog-border) !important;
+}
+html.dark .link-card:hover {
+  border-color: #555 !important;
+}
+html.dark .link-avatar {
+  border-color: var(--blog-border) !important;
+}
+html.dark .link-avatar-letter {
+  background: #333 !important;
+  color: #aaa !important;
+}
+
+html.dark .modal-tag {
+  border-color: var(--blog-border) !important;
+  color: var(--blog-text2) !important;
+}
+html.dark .modal-tag:hover {
+  border-color: #888 !important;
+  color: var(--blog-text) !important;
+  background: var(--blog-hover) !important;
+}
+html.dark .tag-count {
+  background: #333 !important;
+  color: #888 !important;
+}
+
+html.dark .skeleton-cover,
+html.dark .skeleton-line,
+html.dark .sk-card,
+html.dark .sk-line {
+  background: #333 !important;
+}
+
+html.dark .card-tag {
+  background: #333 !important;
+}
+html.dark .timeline {
+  border-left-color: var(--blog-border) !important;
+}
+html.dark .item-dot {
+  background: #555 !important;
+}
+html.dark .archive-item:hover .item-dot {
+  background: #e5e5e5 !important;
+}
+
+html.dark .form-input,
+html.dark .form-textarea,
+html.dark .msg-form-input,
+html.dark .msg-form-textarea,
+html.dark .rss-form-input,
+html.dark .rss-feed-url {
+  background: #2a2a2a !important;
+  border-color: var(--blog-border) !important;
+  color: var(--blog-text) !important;
+}
+html.dark .form-input:focus,
+html.dark .form-textarea:focus,
+html.dark .msg-form-input:focus,
+html.dark .msg-form-textarea:focus {
+  border-color: #888 !important;
+}
+
+html.dark .c-body,
+html.dark .msg-body {
+  color: var(--blog-text2) !important;
+}
+html.dark .c-nick,
+html.dark .msg-nick {
+  color: var(--blog-text) !important;
+}
+html.dark .c-date,
+html.dark .msg-date,
+html.dark .c-meta-item,
+html.dark .msg-meta-item {
+  color: #666 !important;
+}
+html.dark .c-children,
+html.dark .msg-children {
+  border-left-color: var(--blog-border) !important;
+}
+html.dark .c-child + .c-child,
+html.dark .msg-child + .msg-child {
+  border-top-color: var(--blog-border) !important;
+}
+
+html.dark .rss-submit-btn {
+  background: #e5e5e5 !important;
+  color: #181818 !important;
+}
+html.dark .rss-submit-btn:hover {
+  background: #fff !important;
+}
+html.dark .rss-edit-btn,
+html.dark .rss-cancel-btn,
+html.dark .rss-copy-btn {
+  background: #2a2a2a !important;
+  border-color: var(--blog-border) !important;
+  color: var(--blog-text2) !important;
+}
+html.dark .rss-unsub-btn {
+  background: #2a2a2a !important;
+  color: #888 !important;
+}
+html.dark .rss-unsub-btn:hover {
+  background: #3a2020 !important;
+  color: #e55 !important;
+}
+
+html.dark .profile-avatar,
+html.dark .info-avatar {
+  border-color: var(--blog-border) !important;
+}
+
+html.dark .site-footer {
+  background: #111 !important;
+}
+
+html.dark .article-card:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark .nav-item:hover {
+  background: var(--blog-hover) !important;
+}
+
+html.dark .captcha-box,
+html.dark .captcha-inner {
+  background: #2a2a2a !important;
+  border-color: var(--blog-border) !important;
+}
+
+html.dark .form-submit-btn,
+html.dark .msg-submit-btn {
+  background: #e5e5e5 !important;
+  color: #181818 !important;
+}
+html.dark .form-submit-btn:hover,
+html.dark .msg-submit-btn:hover {
+  background: #fff !important;
 }

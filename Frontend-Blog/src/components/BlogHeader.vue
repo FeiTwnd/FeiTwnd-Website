@@ -1,11 +1,18 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { useBlogStore } from '@/stores'
+import { useBlogStore, useThemeStore } from '@/stores'
 
 const router = useRouter()
 const route = useRoute()
 const blogStore = useBlogStore()
+const themeStore = useThemeStore()
+
+const isDark = computed(() => {
+  if (themeStore.mode === 'dark') return true
+  if (themeStore.mode === 'light') return false
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+})
 
 /* 滚动检测 */
 const scrolled = ref(false)
@@ -73,6 +80,7 @@ const navItems = [
     href: 'https://feitwnd.cc',
     external: true
   },
+  { label: '博客', icon: 'icon-boke', to: '/' },
   { label: '归档', icon: 'icon-guidang', to: '/archive' },
   { label: '友链', icon: 'icon-lianjie', to: '/links' },
   { label: '留言', icon: 'icon-liuyan', to: '/message' },
@@ -112,7 +120,7 @@ const navTo = (item) => {
 </script>
 
 <template>
-  <header class="site-header" :class="{ scrolled }">
+  <header class="site-header" :class="{ scrolled, dark: isDark }">
     <div class="header-inner">
       <div class="header-left">
         <router-link to="/" class="site-title">FeiTwnd's Blog</router-link>
@@ -131,7 +139,6 @@ const navTo = (item) => {
               v-else
               :to="item.to"
               class="nav-link"
-              :class="{ active: route.path === item.to }"
             >
               <i :class="['iconfont', item.icon]" /> {{ item.label }}
             </router-link>
@@ -200,6 +207,50 @@ const navTo = (item) => {
           </transition>
         </div>
 
+        <!-- 暗色模式切换 -->
+        <button
+          class="theme-toggle"
+          :title="isDark ? '切换到浅色模式' : '切换到暗色模式'"
+          @click="themeStore.toggle"
+        >
+          <!-- 太阳图标（暗色时显示，点击切换到亮色） -->
+          <svg
+            v-if="isDark"
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+          <!-- 月亮图标（亮色时显示，点击切换到暗色） -->
+          <svg
+            v-else
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+          </svg>
+        </button>
+
         <div class="search-area">
           <div class="search-box" :class="{ expanded: searchVisible }">
             <input
@@ -236,6 +287,48 @@ const navTo = (item) => {
       <a class="nav-mobile-link" @click="toggleSearch">
         <i class="iconfont icon-sousuo" /> 搜索
       </a>
+      <a class="nav-mobile-link" @click="themeStore.toggle">
+        <template v-if="isDark">
+          <svg
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: -2px; margin-right: 4px"
+          >
+            <circle cx="12" cy="12" r="5" />
+            <line x1="12" y1="1" x2="12" y2="3" />
+            <line x1="12" y1="21" x2="12" y2="23" />
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+            <line x1="1" y1="12" x2="3" y2="12" />
+            <line x1="21" y1="12" x2="23" y2="12" />
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+          </svg>
+          浅色模式
+        </template>
+        <template v-else>
+          <svg
+            viewBox="0 0 24 24"
+            width="15"
+            height="15"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            style="vertical-align: -2px; margin-right: 4px"
+          >
+            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+          </svg>
+          暗色模式
+        </template>
+      </a>
     </nav>
   </header>
 </template>
@@ -257,6 +350,10 @@ const navTo = (item) => {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
   box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+}
+.site-header.dark.scrolled {
+  background: rgba(35, 35, 35, 0.95);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.3);
 }
 .header-inner {
   max-width: 1200px;
@@ -289,6 +386,9 @@ const navTo = (item) => {
   color: #303133;
   text-shadow: none;
 }
+.dark.scrolled .site-title {
+  color: #e5e5e5;
+}
 .nav-desktop {
   display: flex;
   align-items: center;
@@ -317,11 +417,6 @@ const navTo = (item) => {
   color: #fff;
   background: rgba(255, 255, 255, 0.15);
 }
-.nav-link.active {
-  color: #fff;
-  font-weight: 600;
-  background: rgba(255, 255, 255, 0.2);
-}
 .scrolled .nav-link {
   color: #606266;
   text-shadow: none;
@@ -330,9 +425,12 @@ const navTo = (item) => {
   color: #303133;
   background: #f5f7fa;
 }
-.scrolled .nav-link.active {
-  color: #000;
-  background: #f5f7fa;
+.dark.scrolled .nav-link {
+  color: #b0b0b0;
+}
+.dark.scrolled .nav-link:hover {
+  color: #e5e5e5;
+  background: #333;
 }
 .header-right {
   display: flex;
@@ -365,11 +463,18 @@ const navTo = (item) => {
   background: #f5f7fa;
   border-color: #e4e7ed;
 }
+.dark.scrolled .mini-player {
+  background: #333;
+  border-color: #444;
+}
 .mini-player:hover {
   border-color: rgba(255, 255, 255, 0.5);
 }
 .scrolled .mini-player:hover {
   border-color: #909399;
+}
+.dark.scrolled .mini-player:hover {
+  border-color: #666;
 }
 .player-cover {
   width: 28px;
@@ -381,6 +486,9 @@ const navTo = (item) => {
 }
 .scrolled .player-cover {
   border-color: #e4e7ed;
+}
+.dark.scrolled .player-cover {
+  border-color: #444;
 }
 .player-cover.spinning {
   animation: spin 8s linear infinite;
@@ -405,6 +513,9 @@ const navTo = (item) => {
 .scrolled .player-title {
   color: #606266;
 }
+.dark.scrolled .player-title {
+  color: #b0b0b0;
+}
 .player-btn {
   background: none;
   border: none;
@@ -425,6 +536,12 @@ const navTo = (item) => {
 .scrolled .player-btn:hover {
   color: #000;
 }
+.dark.scrolled .player-btn {
+  color: #b0b0b0;
+}
+.dark.scrolled .player-btn:hover {
+  color: #fff;
+}
 
 /* 音乐列表 */
 .music-panel {
@@ -433,8 +550,8 @@ const navTo = (item) => {
   right: 0;
   width: 280px;
   max-height: 360px;
-  background: #fff;
-  border: 1px solid #e4e7ed;
+  background: var(--blog-card);
+  border: 1px solid var(--blog-border);
   border-radius: 8px;
   box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
   z-index: 200;
@@ -449,6 +566,10 @@ const navTo = (item) => {
   font-size: 13px;
   font-weight: 600;
   color: #303133;
+}
+.dark .music-panel-header {
+  border-bottom-color: #333;
+  color: #e5e5e5;
 }
 .music-panel-header .iconfont {
   font-size: 14px;
@@ -477,12 +598,21 @@ const navTo = (item) => {
 .music-panel-item:hover {
   background: #f5f7fa;
 }
+.dark .music-panel-item:hover {
+  background: #333;
+}
 .music-panel-item.active {
   background: #f5f7fa;
+}
+.dark .music-panel-item.active {
+  background: #333;
 }
 .music-panel-item.active .music-panel-name {
   color: #000;
   font-weight: 600;
+}
+.dark .music-panel-item.active .music-panel-name {
+  color: #fff;
 }
 .music-panel-cover {
   width: 36px;
@@ -491,6 +621,9 @@ const navTo = (item) => {
   object-fit: cover;
   flex-shrink: 0;
   border: 1px solid #ebeef5;
+}
+.dark .music-panel-cover {
+  border-color: #444;
 }
 .music-panel-info {
   flex: 1;
@@ -503,6 +636,9 @@ const navTo = (item) => {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.dark .music-panel-name {
+  color: #e5e5e5;
 }
 .music-panel-artist {
   display: block;
@@ -517,6 +653,9 @@ const navTo = (item) => {
   color: #000;
   flex-shrink: 0;
 }
+.dark .playing-icon {
+  color: #fff;
+}
 .fade-enter-active,
 .fade-leave-active {
   transition:
@@ -527,6 +666,33 @@ const navTo = (item) => {
 .fade-leave-to {
   opacity: 0;
   transform: translateY(-4px);
+}
+
+/* 暗色模式切换 */
+.theme-toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  transition: color 0.2s;
+}
+.theme-toggle:hover {
+  color: #fff;
+}
+.scrolled .theme-toggle {
+  color: #606266;
+}
+.scrolled .theme-toggle:hover {
+  color: #000;
+}
+.dark.scrolled .theme-toggle {
+  color: #b0b0b0;
+}
+.dark.scrolled .theme-toggle:hover {
+  color: #fff;
 }
 
 /* 搜索 */
@@ -544,17 +710,20 @@ const navTo = (item) => {
 }
 .search-input {
   width: 100%;
-  border: 1px solid #e4e7ed;
+  border: 1px solid var(--blog-border);
   border-radius: 4px;
   padding: 5px 10px;
   font-size: 13px;
-  background: rgba(255, 255, 255, 0.95);
-  color: #303133;
+  background: var(--blog-card);
+  color: var(--blog-text);
   outline: none;
   font-family: inherit;
 }
 .search-input:focus {
   border-color: #000;
+}
+.dark .search-input:focus {
+  border-color: #aaa;
 }
 .search-toggle {
   background: none;
@@ -575,6 +744,12 @@ const navTo = (item) => {
 }
 .scrolled .search-toggle:hover {
   color: #000;
+}
+.dark.scrolled .search-toggle {
+  color: #b0b0b0;
+}
+.dark.scrolled .search-toggle:hover {
+  color: #fff;
 }
 
 /* 移动端 */
@@ -605,6 +780,11 @@ const navTo = (item) => {
 .scrolled .bar::after {
   background: #303133;
 }
+.dark.scrolled .bar,
+.dark.scrolled .bar::before,
+.dark.scrolled .bar::after {
+  background: #e5e5e5;
+}
 .bar {
   top: 13px;
 }
@@ -633,6 +813,11 @@ const navTo = (item) => {
   backdrop-filter: blur(8px);
   padding: 8px 24px 12px;
   border-top: 1px solid #ebeef5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+}
+.dark .nav-mobile {
+  background: rgba(35, 35, 35, 0.96);
+  border-top-color: #333;
 }
 .nav-mobile-link {
   display: flex;
@@ -651,12 +836,22 @@ const navTo = (item) => {
 .nav-mobile-link:hover {
   color: #303133;
 }
+.dark .nav-mobile-link {
+  color: #b0b0b0;
+  border-bottom-color: #333;
+}
+.dark .nav-mobile-link:hover {
+  color: #e5e5e5;
+}
 
 @media (max-width: 768px) {
   .nav-desktop {
     display: none;
   }
   .mini-player-wrap {
+    display: none;
+  }
+  .theme-toggle {
     display: none;
   }
   .search-box.expanded {

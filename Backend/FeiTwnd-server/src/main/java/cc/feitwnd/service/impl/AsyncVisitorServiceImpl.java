@@ -41,7 +41,7 @@ public class AsyncVisitorServiceImpl implements AsyncVisitorService {
                     || !equalsNullSafe(visitor.getProvince(), geoInfo.get("province"))
                     || !equalsNullSafe(visitor.getCity(), geoInfo.get("city"));
 
-            if (geoChanged) {
+            if (geoChanged && !geoInfo.get("country").equals("")) {
                 visitor.setCountry(geoInfo.get("country"));
                 visitor.setProvince(geoInfo.get("province"));
                 visitor.setCity(geoInfo.get("city"));

@@ -182,4 +182,9 @@ onMounted(async () => {
     flex-direction: column;
   }
 }
+@media (max-width: 600px) {
+  .content-card {
+    padding: 16px;
+  }
+}
 </style>

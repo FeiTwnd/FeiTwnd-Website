@@ -27,13 +27,16 @@ const bgImage = computed(() => {
 <template>
   <div class="hero-banner" :style="{ backgroundImage: `url(${bgImage})` }">
     <div class="hero-overlay" />
+    <div class="hero-fade" />
     <div class="hero-content">
       <!-- 主页: 显示个人信息 -->
       <template v-if="isHome">
         <h1 class="hero-title">
           {{ blogStore.personalInfo.nickname }}
         </h1>
-        <p class="hero-desc">{{ blogStore.personalInfo.description || '' }}</p>
+        <p class="hero-desc">
+          随便坐坐，看看我写的字 —— 些许技术、心得、生活日常和胡思乱想。
+        </p>
       </template>
       <!-- 自定义标题 (文章/分类/标签等) -->
       <template v-else-if="title">
@@ -68,9 +71,19 @@ const bgImage = computed(() => {
   background: rgba(0, 0, 0, 0.35);
   z-index: 1;
 }
+.hero-fade {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  background: linear-gradient(to bottom, transparent, var(--blog-bg));
+  z-index: 2;
+  pointer-events: none;
+}
 .hero-content {
   position: relative;
-  z-index: 2;
+  z-index: 3;
   text-align: center;
   color: #fff;
   padding: 0 24px;
@@ -111,5 +124,27 @@ const bgImage = computed(() => {
   font-weight: 800;
   margin: 0;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+@media (max-width: 768px) {
+  .hero-banner {
+    height: 30vh;
+    min-height: 200px;
+  }
+  .hero-title {
+    font-size: 24px;
+  }
+  .hero-desc {
+    font-size: 14px;
+  }
+  .hero-article-title {
+    font-size: 22px;
+  }
+  .hero-page-title {
+    font-size: 24px;
+  }
+  .hero-fade {
+    height: 50px;
+  }
 }
 </style>

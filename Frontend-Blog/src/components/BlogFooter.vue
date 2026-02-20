@@ -57,8 +57,9 @@ onMounted(async () => {
 
 <style scoped>
 .site-footer {
-  background: #303133;
-  color: rgba(255, 255, 255, 0.85);
+  background: var(--blog-card, #fff);
+  border-top: 1px solid var(--blog-border-light, #ebeef5);
+  color: var(--blog-text3, #909399);
   margin-top: auto;
 }
 .footer-inner {
@@ -67,17 +68,17 @@ onMounted(async () => {
 }
 .footer-beian {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--blog-text3, #b0b0b0);
   margin-bottom: 4px;
 }
 .footer-beian a {
-  color: rgba(255, 255, 255, 0.5);
+  color: var(--blog-text3, #b0b0b0);
   text-decoration: none;
-  border-bottom: 1px dotted rgba(255, 255, 255, 0.3);
+  border-bottom: 1px dotted var(--blog-border, #dcdfe6);
   transition: color 0.2s;
 }
 .footer-beian a:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--blog-text2, #606266);
 }
 .divider {
   margin: 0 8px;
@@ -85,20 +86,20 @@ onMounted(async () => {
 }
 .footer-copy {
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.4);
+  color: var(--blog-text3, #c0c4cc);
 }
 .footer-links {
   font-size: 12px;
   margin-top: 4px;
-  color: rgba(255, 255, 255, 0.35);
+  color: var(--blog-text3, #c0c4cc);
 }
 .footer-links a {
-  color: rgba(255, 255, 255, 0.45);
+  color: var(--blog-text3, #b0b0b0);
   text-decoration: none;
-  border-bottom: 1px dotted rgba(255, 255, 255, 0.25);
+  border-bottom: 1px dotted var(--blog-border, #dcdfe6);
   transition: color 0.2s;
 }
 .footer-links a:hover {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--blog-text2, #606266);
 }
 </style>

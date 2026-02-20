@@ -8,3 +8,4 @@ export default pinia
 
 export * from './modules/visitor'
 export * from './modules/blog'
+export * from './modules/theme'

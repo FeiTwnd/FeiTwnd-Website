@@ -197,4 +197,10 @@ onMounted(() => {
     flex-direction: column;
   }
 }
+@media (max-width: 600px) {
+  .search-result-tip {
+    font-size: 13px;
+    padding: 10px 12px;
+  }
+}
 </style>

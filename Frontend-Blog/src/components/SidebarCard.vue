@@ -139,6 +139,10 @@ const goTag = (slug) => {
       </div>
       <h3 class="info-name">{{ info.nickname || 'FeiTwnd' }}</h3>
       <p v-if="info.tag" class="info-tag">{{ info.tag }}</p>
+      <p v-if="info.location" class="info-location">
+        <i class="iconfont icon-position" />
+        {{ info.location }}
+      </p>
 
       <!-- 数据统计行 -->
       <div class="info-stats">
@@ -342,10 +346,10 @@ const goTag = (slug) => {
   top: 74px;
 }
 .side-card {
-  background: #fff;
+  background: var(--blog-card);
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  border: 1px solid #ebeef5;
+  border: 1px solid var(--blog-border-light);
   padding: 20px;
   margin-bottom: 16px;
 }
@@ -374,7 +378,19 @@ const goTag = (slug) => {
 .info-tag {
   font-size: 12px;
   color: #909399;
+  margin: 0 0 6px;
+}
+.info-location {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  font-size: 12px;
+  color: #b0b0b0;
   margin: 0 0 14px;
+}
+.info-location .iconfont {
+  font-size: 13px;
 }
 
 .info-stats {
