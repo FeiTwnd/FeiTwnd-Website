@@ -105,6 +105,12 @@ const router = createRouter({
           meta: { title: '浏览记录' }
         }
       ]
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      component: () => import('@/view/NotFound/index.vue'),
+      meta: { title: '页面不存在' }
     }
   ]
 })

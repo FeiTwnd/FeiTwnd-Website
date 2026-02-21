@@ -89,7 +89,7 @@ const connectWs = () => {
   const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
   const host = import.meta.env.DEV ? 'localhost:5922' : location.host
   try {
-    ws = new WebSocket(`${protocol}://${host}/ws/online`)
+    ws = new WebSocket(`${protocol}://${host}/api/ws/online`)
     ws.onmessage = (e) => {
       const msg = e.data
       if (msg === 'pong') return
@@ -135,7 +135,12 @@ const goTag = (slug) => {
     <!-- 个人信息卡片 -->
     <div class="side-card info-card">
       <div class="info-avatar-wrap">
-        <img v-if="info.avatar" :src="info.avatar" class="info-avatar" />
+        <img
+          v-if="info.avatar"
+          :src="info.avatar"
+          class="info-avatar"
+          loading="lazy"
+        />
       </div>
       <h3 class="info-name">{{ info.nickname || 'FeiTwnd' }}</h3>
       <p v-if="info.tag" class="info-tag">{{ info.tag }}</p>

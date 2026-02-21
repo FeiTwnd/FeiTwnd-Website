@@ -185,176 +185,304 @@ onMounted(() => {
 <template>
   <div class="message-page">
     <div class="message-layout">
-    <div class="message-inner">
-      <!-- 留言表单 -->
-      <div class="msg-form form-card">
-        <h3 class="form-title">
-          <i class="iconfont icon-liuyan" />
-          {{ editTarget ? '修改留言' : '写留言' }}
-        </h3>
+      <div class="message-inner">
+        <!-- 留言表单 -->
+        <div class="msg-form form-card">
+          <h3 class="form-title">
+            <i class="iconfont icon-liuyan" />
+            {{ editTarget ? '修改留言' : '写留言' }}
+          </h3>
 
-        <div v-if="replyTarget" class="reply-tip">
-          回复 <strong>{{ replyTarget.nickname }}</strong>
-          <span class="cancel" @click="resetForm">&times;</span>
-        </div>
-        <div v-if="editTarget" class="reply-tip">
-          修改留言
-          <span class="cancel" @click="resetForm">&times;</span>
-        </div>
-
-        <textarea
-          v-model="form.content"
-          class="form-textarea"
-          placeholder="写点什么..."
-          rows="4"
-        />
-        <div class="form-row">
-          <div class="input-with-icon">
-            <i class="iconfont icon-user input-icon" />
-            <input
-              v-model="form.nickname"
-              type="text"
-              placeholder="昵称 *"
-              class="form-input"
-              :disabled="!!editTarget"
-            />
+          <div v-if="replyTarget" class="reply-tip">
+            回复 <strong>{{ replyTarget.nickname }}</strong>
+            <span class="cancel" @click="resetForm">&times;</span>
           </div>
-          <div class="input-with-icon">
-            <i class="iconfont icon-youxiang input-icon" />
-            <input
-              v-model="form.emailOrQq"
-              type="text"
-              placeholder="邮箱/QQ号"
-              class="form-input"
-              :disabled="!!editTarget"
-            />
+          <div v-if="editTarget" class="reply-tip">
+            修改留言
+            <span class="cancel" @click="resetForm">&times;</span>
           </div>
-          <div
-            v-if="!editTarget"
-            class="input-with-icon captcha-wrap"
-            @mouseenter="captchaHover = true"
-            @mouseleave="captchaHover = false"
-          >
-            <i class="iconfont icon-lock input-icon" />
-            <input
-              v-model="form.captchaAnswer"
-              placeholder="验证码"
-              class="form-input"
-              @focus="captchaFocus = true"
-              @blur="captchaFocus = false"
-            />
-            <span
-              v-show="(captchaHover || captchaFocus) && captcha.question"
-              class="captcha-tip"
-            >
-              {{ captcha.question }}
-            </span>
-            <span class="captcha-refresh" @click="loadCaptcha" title="换一题"
-              >↻</span
-            >
-          </div>
-        </div>
-        <div class="form-options">
-          <label class="option-check">
-            <input type="checkbox" v-model="form.isSecret" />
-            悄悄话
-          </label>
-          <label class="option-check">
-            <input type="checkbox" v-model="form.isNotice" />
-            邮件提醒
-          </label>
-          <label class="option-check">
-            <input type="checkbox" v-model="form.isMarkdown" />
-            Markdown
-          </label>
-          <button
-            class="btn-submit"
-            :disabled="submitting"
-            @click="handleSubmit"
-          >
-            {{ editTarget ? '修改' : '留言' }}
-          </button>
-        </div>
-      </div>
 
-      <!-- 留言数 -->
-      <div class="msg-count">
-        <span>共 {{ totalCount }} 条留言</span>
-      </div>
-
-      <!-- 留言列表 -->
-      <div v-if="loading" class="placeholder">
-        <div v-for="i in 3" :key="i" class="sk-line" />
-      </div>
-
-      <div v-else class="msg-list">
-        <template v-for="msg in messages" :key="msg.id">
-          <div class="msg-item-card">
-            <div class="msg-avatar">
-              <img v-if="getAvatarUrl(msg)" :src="getAvatarUrl(msg)" class="msg-avatar-img" />
-              <span v-else class="msg-avatar-letter">{{ getInitial(msg.nickname) }}</span>
+          <textarea
+            v-model="form.content"
+            class="form-textarea"
+            placeholder="写点什么..."
+            rows="4"
+          />
+          <div class="form-row">
+            <div class="input-with-icon">
+              <i class="iconfont icon-user input-icon" />
+              <input
+                v-model="form.nickname"
+                type="text"
+                placeholder="昵称 *"
+                class="form-input"
+                :disabled="!!editTarget"
+              />
             </div>
-            <div class="msg-main">
-              <div class="msg-head">
-                <span class="msg-nick">{{ msg.nickname }}</span>
-                <span v-if="msg.isAdminReply" class="badge-admin">博主</span>
-                <span v-if="msg.isApproved === 0" class="msg-pending">未审核</span>
-                <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ msg.location || '未知' }}</span>
-                <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg>{{ (msg.userAgentOs && msg.userAgentOs !== 'Unknown') ? msg.userAgentOs : '未知' }}</span>
-                <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M21.17 8H2.83M21.17 16H2.83M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>{{ (msg.userAgentBrowser && msg.userAgentBrowser !== 'Unknown') ? msg.userAgentBrowser : '未知' }}</span>
-                <span class="msg-date">{{ fmtDate(msg.createTime) }}</span>
-              </div>
-              <div class="msg-body" v-html="msg.contentHtml" />
-              <div class="msg-footer">
-                <div class="msg-actions">
-                  <span class="act" @click="startReply(msg)">回复</span>
-                  <template v-if="isMine(msg)">
-                    <span class="act" @click="startEdit(msg)">编辑</span>
-                    <span class="act del" @click="handleDelete(msg)">删除</span>
-                  </template>
-                </div>
-              </div>
+            <div class="input-with-icon">
+              <i class="iconfont icon-youxiang input-icon" />
+              <input
+                v-model="form.emailOrQq"
+                type="text"
+                placeholder="邮箱/QQ号"
+                class="form-input"
+                :disabled="!!editTarget"
+              />
+            </div>
+            <div
+              v-if="!editTarget"
+              class="input-with-icon captcha-wrap"
+              @mouseenter="captchaHover = true"
+              @mouseleave="captchaHover = false"
+            >
+              <i class="iconfont icon-lock input-icon" />
+              <input
+                v-model="form.captchaAnswer"
+                placeholder="验证码"
+                class="form-input"
+                @focus="captchaFocus = true"
+                @blur="captchaFocus = false"
+              />
+              <span
+                v-show="(captchaHover || captchaFocus) && captcha.question"
+                class="captcha-tip"
+              >
+                {{ captcha.question }}
+              </span>
+              <span class="captcha-refresh" @click="loadCaptcha" title="换一题"
+                >↻</span
+              >
+            </div>
+          </div>
+          <div class="form-options">
+            <label class="option-check">
+              <input type="checkbox" v-model="form.isSecret" />
+              悄悄话
+            </label>
+            <label class="option-check">
+              <input type="checkbox" v-model="form.isNotice" />
+              邮件提醒
+            </label>
+            <label class="option-check">
+              <input type="checkbox" v-model="form.isMarkdown" />
+              Markdown
+            </label>
+            <button
+              class="btn-submit"
+              :disabled="submitting"
+              @click="handleSubmit"
+            >
+              {{ editTarget ? '修改' : '留言' }}
+            </button>
+          </div>
+        </div>
 
-              <!-- 子留言 -->
-              <div v-if="msg.children?.length" class="msg-children">
-                <div v-for="child in msg.children" :key="child.id" class="msg-child">
-                  <div class="msg-avatar msg-avatar-sm">
-                    <img v-if="getAvatarUrl(child)" :src="getAvatarUrl(child)" class="msg-avatar-img" />
-                    <span v-else class="msg-avatar-letter">{{ getInitial(child.nickname) }}</span>
+        <!-- 留言数 -->
+        <div class="msg-count">
+          <span>共 {{ totalCount }} 条留言</span>
+        </div>
+
+        <!-- 留言列表 -->
+        <div v-if="loading" class="placeholder">
+          <div v-for="i in 3" :key="i" class="sk-line" />
+        </div>
+
+        <div v-else class="msg-list">
+          <template v-for="msg in messages" :key="msg.id">
+            <div class="msg-item-card">
+              <div class="msg-avatar">
+                <img
+                  v-if="getAvatarUrl(msg)"
+                  :src="getAvatarUrl(msg)"
+                  class="msg-avatar-img"
+                  loading="lazy"
+                />
+                <span v-else class="msg-avatar-letter">{{
+                  getInitial(msg.nickname)
+                }}</span>
+              </div>
+              <div class="msg-main">
+                <div class="msg-head">
+                  <span class="msg-nick">{{ msg.nickname }}</span>
+                  <span v-if="msg.isAdminReply" class="badge-admin">博主</span>
+                  <span v-if="msg.isApproved === 0" class="msg-pending"
+                    >未审核</span
+                  >
+                  <span class="msg-meta-item"
+                    ><svg
+                      class="msg-meta-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
+                      <circle cx="12" cy="10" r="3" /></svg
+                    >{{ msg.location || '未知' }}</span
+                  >
+                  <span class="msg-meta-item"
+                    ><svg
+                      class="msg-meta-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <rect width="20" height="14" x="2" y="3" rx="2" />
+                      <path d="M8 21h8M12 17v4" /></svg
+                    >{{
+                      msg.userAgentOs && msg.userAgentOs !== 'Unknown'
+                        ? msg.userAgentOs
+                        : '未知'
+                    }}</span
+                  >
+                  <span class="msg-meta-item"
+                    ><svg
+                      class="msg-meta-icon"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <circle cx="12" cy="12" r="4" />
+                      <path
+                        d="M21.17 8H2.83M21.17 16H2.83M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+                      /></svg
+                    >{{
+                      msg.userAgentBrowser && msg.userAgentBrowser !== 'Unknown'
+                        ? msg.userAgentBrowser
+                        : '未知'
+                    }}</span
+                  >
+                  <span class="msg-date">{{ fmtDate(msg.createTime) }}</span>
+                </div>
+                <div class="msg-body" v-html="msg.contentHtml" />
+                <div class="msg-footer">
+                  <div class="msg-actions">
+                    <span class="act" @click="startReply(msg)">回复</span>
+                    <template v-if="isMine(msg)">
+                      <span class="act" @click="startEdit(msg)">编辑</span>
+                      <span class="act del" @click="handleDelete(msg)"
+                        >删除</span
+                      >
+                    </template>
                   </div>
-                  <div class="msg-main">
-                    <div class="msg-head">
-                      <span class="msg-nick">{{ child.nickname }}</span>
-                      <span v-if="child.isAdminReply" class="badge-admin">博主</span>
-                      <span v-if="child.parentNickname" class="reply-to"><i class="iconfont icon-zhuanfa reply-icon" /> {{ child.parentNickname }}</span>
-                      <span v-if="child.isApproved === 0" class="msg-pending">未审核</span>
-                      <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{{ child.location || '未知' }}</span>
-                      <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></svg>{{ (child.userAgentOs && child.userAgentOs !== 'Unknown') ? child.userAgentOs : '未知' }}</span>
-                      <span class="msg-meta-item"><svg class="msg-meta-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="M21.17 8H2.83M21.17 16H2.83M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>{{ (child.userAgentBrowser && child.userAgentBrowser !== 'Unknown') ? child.userAgentBrowser : '未知' }}</span>
-                      <span class="msg-date">{{ fmtDate(child.createTime) }}</span>
+                </div>
+
+                <!-- 子留言 -->
+                <div v-if="msg.children?.length" class="msg-children">
+                  <div
+                    v-for="child in msg.children"
+                    :key="child.id"
+                    class="msg-child"
+                  >
+                    <div class="msg-avatar msg-avatar-sm">
+                      <img
+                        v-if="getAvatarUrl(child)"
+                        :src="getAvatarUrl(child)"
+                        class="msg-avatar-img"
+                        loading="lazy"
+                      />
+                      <span v-else class="msg-avatar-letter">{{
+                        getInitial(child.nickname)
+                      }}</span>
                     </div>
-                    <div class="msg-body" v-html="child.contentHtml" />
-                    <div class="msg-footer">
-                      <div class="msg-actions">
-                        <span class="act" @click="startReply(child)">回复</span>
-                        <template v-if="isMine(child)">
-                          <span class="act" @click="startEdit(child)">编辑</span>
-                          <span class="act del" @click="handleDelete(child)">删除</span>
-                        </template>
+                    <div class="msg-main">
+                      <div class="msg-head">
+                        <span class="msg-nick">{{ child.nickname }}</span>
+                        <span v-if="child.isAdminReply" class="badge-admin"
+                          >博主</span
+                        >
+                        <span v-if="child.parentNickname" class="reply-to"
+                          ><i class="iconfont icon-zhuanfa reply-icon" />
+                          {{ child.parentNickname }}</span
+                        >
+                        <span v-if="child.isApproved === 0" class="msg-pending"
+                          >未审核</span
+                        >
+                        <span class="msg-meta-item"
+                          ><svg
+                            class="msg-meta-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path
+                              d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
+                            />
+                            <circle cx="12" cy="10" r="3" /></svg
+                          >{{ child.location || '未知' }}</span
+                        >
+                        <span class="msg-meta-item"
+                          ><svg
+                            class="msg-meta-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <rect width="20" height="14" x="2" y="3" rx="2" />
+                            <path d="M8 21h8M12 17v4" /></svg
+                          >{{
+                            child.userAgentOs && child.userAgentOs !== 'Unknown'
+                              ? child.userAgentOs
+                              : '未知'
+                          }}</span
+                        >
+                        <span class="msg-meta-item"
+                          ><svg
+                            class="msg-meta-icon"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="12" cy="12" r="4" />
+                            <path
+                              d="M21.17 8H2.83M21.17 16H2.83M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"
+                            /></svg
+                          >{{
+                            child.userAgentBrowser &&
+                            child.userAgentBrowser !== 'Unknown'
+                              ? child.userAgentBrowser
+                              : '未知'
+                          }}</span
+                        >
+                        <span class="msg-date">{{
+                          fmtDate(child.createTime)
+                        }}</span>
+                      </div>
+                      <div class="msg-body" v-html="child.contentHtml" />
+                      <div class="msg-footer">
+                        <div class="msg-actions">
+                          <span class="act" @click="startReply(child)"
+                            >回复</span
+                          >
+                          <template v-if="isMine(child)">
+                            <span class="act" @click="startEdit(child)"
+                              >编辑</span
+                            >
+                            <span class="act del" @click="handleDelete(child)"
+                              >删除</span
+                            >
+                          </template>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </template>
-      </div>
+          </template>
+        </div>
 
-      <p v-if="!loading && !messages.length" class="empty">
-        还没有留言，来写第一条吧
-      </p>
-    </div>
+        <p v-if="!loading && !messages.length" class="empty">
+          还没有留言，来写第一条吧
+        </p>
+      </div>
 
       <SidebarCard />
     </div>
@@ -721,7 +849,9 @@ onMounted(() => {
 }
 
 @media (max-width: 960px) {
-  .message-layout { flex-direction: column; }
+  .message-layout {
+    flex-direction: column;
+  }
 }
 @media (max-width: 600px) {
   .form-card,
@@ -730,6 +860,12 @@ onMounted(() => {
   }
   .form-row {
     flex-direction: column;
+  }
+  .msg-meta-item {
+    display: none;
+  }
+  .msg-child {
+    gap: 8px;
   }
 }
 </style>

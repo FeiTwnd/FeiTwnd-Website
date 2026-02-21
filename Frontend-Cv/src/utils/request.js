@@ -1,4 +1,5 @@
 import axios from 'axios'
+import router from '@/router'
 
 const baseURL = '/api'
 
@@ -21,6 +22,9 @@ instance.interceptors.response.use(
   },
   (err) => {
     console.error(err)
+    if (err?.response?.status === 403) {
+      router.replace('/403')
+    }
     return Promise.reject(err)
   }
 )

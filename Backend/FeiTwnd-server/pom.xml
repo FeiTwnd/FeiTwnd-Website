@@ -175,7 +175,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <!-- 指定启动类 -->
-                    <mainClass>cc.feitwnd.FeiTwndApplication</mainClass>
+                    <mainClass>cc.feitwnd.FeiTwndBackendApplication</mainClass>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>

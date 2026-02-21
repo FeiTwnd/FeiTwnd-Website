@@ -62,17 +62,29 @@ const loadArticle = async (slug) => {
     articleCover.value = article.value.coverImage || ''
     const items = []
     if (article.value.publishTime)
-      items.push(`<span class="meta-item"><i class="iconfont icon-time"></i>${article.value.publishTime.slice(0, 16).replace('T', ' ')}</span>`)
+      items.push(
+        `<span class="meta-item"><i class="iconfont icon-time"></i>${article.value.publishTime.slice(0, 16).replace('T', ' ')}</span>`
+      )
     if (article.value.viewCount != null)
-      items.push(`<span class="meta-item"><i class="iconfont icon-eye"></i>${article.value.viewCount} 浏览</span>`)
+      items.push(
+        `<span class="meta-item"><i class="iconfont icon-eye"></i>${article.value.viewCount} 浏览</span>`
+      )
     if (article.value.commentCount != null)
-      items.push(`<span class="meta-item"><i class="iconfont icon-pinglun"></i>${article.value.commentCount} 评论</span>`)
+      items.push(
+        `<span class="meta-item"><i class="iconfont icon-pinglun"></i>${article.value.commentCount} 评论</span>`
+      )
     if (article.value.categoryName)
-      items.push(`<span class="meta-item"><i class="iconfont icon-folder"></i>${article.value.categoryName}</span>`)
+      items.push(
+        `<span class="meta-item"><i class="iconfont icon-folder"></i>${article.value.categoryName}</span>`
+      )
     if (article.value.wordCount)
-      items.push(`<span class="meta-item"><i class="iconfont icon-guidang"></i>${article.value.wordCount} 字</span>`)
+      items.push(
+        `<span class="meta-item"><i class="iconfont icon-guidang"></i>${article.value.wordCount} 字</span>`
+      )
     if (article.value.readingTime)
-      items.push(`<span class="meta-item"><i class="iconfont icon-time"></i>${article.value.readingTime} 分钟</span>`)
+      items.push(
+        `<span class="meta-item"><i class="iconfont icon-time"></i>${article.value.readingTime} 分钟</span>`
+      )
     articleMeta.value = items.join('<span class="meta-dot">·</span>')
     loadComments()
     checkLike()
@@ -255,6 +267,15 @@ const flatCommentCount = computed(() => {
   return count
 })
 
+/* 文章内容图片懒加载 */
+const lazyContentHtml = computed(() => {
+  if (!article.value?.contentHtml) return ''
+  return article.value.contentHtml.replace(
+    /<img(?!\s+loading=)/gi,
+    '<img loading="lazy"'
+  )
+})
+
 watch(
   () => route.params.slug,
   (slug) => {
@@ -292,7 +313,7 @@ onMounted(() => {
             </div>
 
             <!-- 正文 -->
-            <div class="article-content" v-html="article.contentHtml" />
+            <div class="article-content" v-html="lazyContentHtml" />
 
             <!-- 点赞 + 转发 -->
             <div class="article-actions-inline">
@@ -440,6 +461,7 @@ onMounted(() => {
                       v-if="getAvatarUrl(c)"
                       :src="getAvatarUrl(c)"
                       class="c-avatar-img"
+                      loading="lazy"
                     />
                     <span v-else class="c-avatar-letter">{{
                       getInitial(c.nickname)
@@ -535,6 +557,7 @@ onMounted(() => {
                             v-if="getAvatarUrl(child)"
                             :src="getAvatarUrl(child)"
                             class="c-avatar-img"
+                            loading="lazy"
                           />
                           <span v-else class="c-avatar-letter">{{
                             getInitial(child.nickname)

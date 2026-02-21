@@ -8,6 +8,12 @@ const router = createRouter({
       name: 'home',
       component: () => import('@/view/Home/index.vue'),
       meta: { title: 'FeiTwnd的简历' }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      component: () => import('@/view/NotFound/index.vue'),
+      meta: { title: '页面不存在' }
     }
   ]
 })

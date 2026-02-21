@@ -123,7 +123,7 @@ create table visitors(
     fingerprint varchar(150) not null comment '访客指纹,用于唯一标识访客',
     session_id varchar(100) comment '会话ID(当前浏览器会话)',
     ip varchar(45) not null comment 'IP地址',
-    user_agent varchar(255) comment '用户代理',
+    user_agent text comment '用户代理',
     country varchar(25) comment '国家',
     province varchar(25) comment '省份',
     city varchar(25) comment '城市',
@@ -151,7 +151,7 @@ create table views(
     referer varchar(255) comment '来源URL',
     page_title varchar(100) comment '页面标题',
     ip_address varchar(45) comment 'IP地址',
-    user_agent varchar(255) comment '用户代理',
+    user_agent text comment '用户代理',
     view_time datetime comment '访问时间',
 
     index idx_view_time(view_time desc),

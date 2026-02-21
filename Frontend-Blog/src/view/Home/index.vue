@@ -202,5 +202,12 @@ onMounted(() => {
     font-size: 13px;
     padding: 10px 12px;
   }
+  .skeleton-card {
+    flex-direction: column;
+  }
+  .skeleton-cover {
+    width: 100%;
+    height: 160px;
+  }
 }
 </style>

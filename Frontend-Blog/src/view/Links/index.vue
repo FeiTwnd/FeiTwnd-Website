@@ -50,7 +50,7 @@ onMounted(() => {
           rel="noopener noreferrer"
           class="link-card"
         >
-          <img v-if="link.avatarUrl" :src="link.avatarUrl" class="link-avatar" />
+          <img v-if="link.avatarUrl" :src="link.avatarUrl" class="link-avatar" loading="lazy" />
           <span v-else class="link-avatar-letter">{{ link.name ? link.name.charAt(0) : '?' }}</span>
           <div class="link-body">
             <p class="link-name">{{ link.name }}</p>

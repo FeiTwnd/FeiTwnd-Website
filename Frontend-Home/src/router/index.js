@@ -10,6 +10,12 @@ const router = createRouter({
       meta: {
         title: 'FeiTwnd | 个人主页'
       }
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      component: () => import('@/view/NotFound/index.vue'),
+      meta: { title: '页面不存在' }
     }
   ]
 })

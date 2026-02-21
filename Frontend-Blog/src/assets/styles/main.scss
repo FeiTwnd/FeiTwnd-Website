@@ -309,6 +309,7 @@ html.dark .content-card,
 html.dark .about-card,
 html.dark .search-result-tip,
 html.dark .empty-tip,
+html.dark .empty-card,
 html.dark .comment-card,
 html.dark .form-card,
 html.dark .skeleton-card,
@@ -520,4 +521,12 @@ html.dark .msg-submit-btn {
 html.dark .form-submit-btn:hover,
 html.dark .msg-submit-btn:hover {
   background: #fff !important;
+}
+
+/* === 全局响应式适配 === */
+@media (max-width: 480px) {
+  .el-dialog {
+    --el-dialog-width: 92vw !important;
+    width: 92vw !important;
+  }
 }

@@ -57,10 +57,10 @@ const handlePage = (p) => {
 
 watch(
   () => route.params.slug,
-  () => {
+  async () => {
     page.value = 1
+    await load()
     resolveName()
-    load()
   }
 )
 
@@ -186,7 +186,14 @@ onMounted(async () => {
   }
 }
 @media (max-width: 600px) {
-  .content-card {
+  .skeleton-card {
+    flex-direction: column;
+  }
+  .skeleton-cover {
+    width: 100%;
+    height: 160px;
+  }
+  .empty-card {
     padding: 16px;
   }
 }

@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBlogStore } from '@/stores'
-import bgcImg from '@/assets/images/bgc.jpg'
+import bgcImg from '@/assets/images/bgc.webp'
 
 const route = useRoute()
 const blogStore = useBlogStore()
