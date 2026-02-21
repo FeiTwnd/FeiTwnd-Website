@@ -135,11 +135,7 @@ const navTo = (item) => {
             >
               <i :class="['iconfont', item.icon]" /> {{ item.label }}
             </a>
-            <router-link
-              v-else
-              :to="item.to"
-              class="nav-link"
-            >
+            <router-link v-else :to="item.to" class="nav-link">
               <i :class="['iconfont', item.icon]" /> {{ item.label }}
             </router-link>
           </template>

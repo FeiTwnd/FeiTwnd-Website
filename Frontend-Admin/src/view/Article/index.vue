@@ -106,7 +106,7 @@ const batchDelete = async () => {
   load()
 }
 
-const fmtDate = (d) => (d ? dayjs(d).format('YYYY-MM-DD') : '-')
+const fmtDate = (d) => (d ? dayjs(d).format('YYYY-MM-DD HH:mm') : '-')
 
 onMounted(load)
 </script>
@@ -202,7 +202,7 @@ onMounted(load)
           width="75"
           align="center"
         />
-        <el-table-column label="发布时间" width="120" align="center">
+        <el-table-column label="发布时间" width="160" align="center">
           <template #default="{ row }">{{
             fmtDate(row.publishTime || row.createTime)
           }}</template>
@@ -258,7 +258,9 @@ onMounted(load)
       />
       <template #footer>
         <el-button @click="viewDialogVisible = false">关闭</el-button>
-        <el-button type="primary" @click="toEdit(viewRow?.id)">去编辑</el-button>
+        <el-button type="primary" @click="toEdit(viewRow?.id)"
+          >去编辑</el-button
+        >
       </template>
     </el-dialog>
   </div>

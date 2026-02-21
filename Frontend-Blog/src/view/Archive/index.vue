@@ -235,6 +235,9 @@ onMounted(() => {
   .archive-layout {
     flex-direction: column;
   }
+  .archive-main {
+    width: 100%;
+  }
 }
 @media (max-width: 600px) {
   .content-card {

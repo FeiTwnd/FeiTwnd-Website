@@ -54,8 +54,8 @@ public class IpUtil {
 
             // 提取需要的信息
             geoInfo.put("country", (String) jsonMap.getOrDefault("country", ""));
-            geoInfo.put("province", (String) jsonMap.getOrDefault("regionName", ""));
-            geoInfo.put("city", (String) jsonMap.getOrDefault("city", ""));
+            geoInfo.put("province", stripRegionSuffix((String) jsonMap.getOrDefault("regionName", "")));
+            geoInfo.put("city", stripCitySuffix((String) jsonMap.getOrDefault("city", "")));
             geoInfo.put("latitude", String.valueOf(jsonMap.getOrDefault("lat", "")));
             geoInfo.put("longitude", String.valueOf(jsonMap.getOrDefault("lon", "")));
 
@@ -63,5 +63,29 @@ public class IpUtil {
             log.error("解析IP地址信息失败", e);
         }
         return geoInfo;
+    }
+
+    /**
+     * 去掉省/自治区等行政区划后缀
+     * 例：广东省→广东，广西壮族自治区→广西，内蒙古自治区→内蒙古，香港特别行政区→香港
+     */
+    private static String stripRegionSuffix(String region) {
+        if (region == null || region.isEmpty()) return region;
+        return region
+                .replaceAll("壮族自治区|维吾尔自治区|回族自治区|自治区|特别行政区|省$", "");
+    }
+
+    /**
+     * 去掉市/地区等后缀
+     * 例：广州市→广州，哈尔滨市→哈尔滨
+     * 注意：保留两字城市名（如"吉市"不去"市"，但实际几乎不存在）
+     */
+    private static String stripCitySuffix(String city) {
+        if (city == null || city.isEmpty()) return city;
+        // 只有长度>2时才去掉"市"，避免把"X市"这样的短名变成单字
+        if (city.length() > 2 && city.endsWith("市")) {
+            return city.substring(0, city.length() - 1);
+        }
+        return city;
     }
 }

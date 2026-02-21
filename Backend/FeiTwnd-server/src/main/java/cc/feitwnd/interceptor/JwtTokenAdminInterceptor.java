@@ -76,7 +76,10 @@ public class JwtTokenAdminInterceptor implements HandlerInterceptor {
             BaseContext.setCurrentRole(role);
             // 通过，放行
             return true;
-        } catch (Exception ex) {
+        }catch (GuestReadOnlyException ex){
+            throw ex;
+        }
+        catch (Exception ex) {
             // 校验失败，抛出未授权异常
             throw new UnauthorizedException(MessageConstant.NOT_AUTHORIZED);
         }

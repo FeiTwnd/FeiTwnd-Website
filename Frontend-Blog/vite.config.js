@@ -71,6 +71,14 @@ export default defineConfig({
             if (id.includes('element-plus')) {
               return 'element'
             }
+            if (
+              id.includes('md-editor-v3') ||
+              id.includes('highlight.js') ||
+              id.includes('marked') ||
+              id.includes('@vavt')
+            ) {
+              return 'md-preview'
+            }
             return 'vendor'
           }
         },

@@ -7,10 +7,11 @@ import {
   deleteMessage
 } from '@/api/message'
 import { generateCaptcha } from '@/api/captcha'
-import { useVisitorStore } from '@/stores'
+import { useVisitorStore, useBlogStore } from '@/stores'
 import SidebarCard from '@/components/SidebarCard.vue'
 
 const visitorStore = useVisitorStore()
+const blogStore = useBlogStore()
 const { articleTitle, articleMeta } = inject('setHero')
 
 const messages = ref([])
@@ -145,6 +146,10 @@ const isMine = (msg) =>
 
 /* 头像 */
 const getAvatarUrl = (msg) => {
+  // 如果是博主回复，使用个人信息的头像
+  if (msg.isAdminReply && blogStore.personalInfo?.avatar) {
+    return blogStore.personalInfo.avatar
+  }
   const eq = msg.emailOrQq
   if (!eq) return ''
   if (/^\d{5,11}$/.test(eq)) return `https://q1.qlogo.cn/g?b=qq&nk=${eq}&s=640`
@@ -156,8 +161,8 @@ const getInitial = (name) => (name ? name.charAt(0).toUpperCase() : '?')
 
 const fmtDate = (d) => {
   if (!d) return ''
-  const dt = new Date(d)
-  return `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
+  // 格式化为 YYYY-MM-DD HH:mm
+  return d.slice(0, 16).replace('T', ' ')
 }
 
 const totalCount = computed(() => {

@@ -89,13 +89,13 @@ public class MessageServiceImpl implements MessageService {
         // 5. 获取IP地址信息
         String clientIp = IpUtil.getClientIp(request);
         Map<String, String> geoInfo = IpUtil.getGeoInfo(clientIp);
-        // 拼接地址: 国家-省份-城市
-        String location = String.format("%s-%s-%s", 
-            geoInfo.getOrDefault("country", ""),
-            geoInfo.getOrDefault("province", ""),
-            geoInfo.getOrDefault("city", "")
-        );
-        if(location != null && !location.equals("--")) {
+        // 拼接地址: 省份-城市
+        String province = geoInfo.getOrDefault("province", "");
+        String city = geoInfo.getOrDefault("city", "");
+        String location = province.isEmpty() && city.isEmpty() ? null
+                : province.equals(city) ? province
+                : String.format("%s-%s", province, city).replaceAll("^-|-$", "");
+        if(location != null && !location.isEmpty()) {
             messages.setLocation(location);
         }
 
@@ -220,11 +220,12 @@ public class MessageServiceImpl implements MessageService {
         if (request != null) {
             String clientIp = IpUtil.getClientIp(request);
             Map<String, String> geoInfo = IpUtil.getGeoInfo(clientIp);
-            String location = String.format("%s-%s-%s",
-                    geoInfo.getOrDefault("country", ""),
-                    geoInfo.getOrDefault("province", ""),
-                    geoInfo.getOrDefault("city", ""));
-            if(location != null && !location.equals("--")) {
+            String province = geoInfo.getOrDefault("province", "");
+            String city = geoInfo.getOrDefault("city", "");
+            String location = province.isEmpty() && city.isEmpty() ? null
+                    : province.equals(city) ? province
+                    : String.format("%s-%s", province, city).replaceAll("^-|-$", "");
+            if(location != null && !location.isEmpty()) {
                 messages.setLocation(location);
             }
             String userAgent = request.getHeader("User-Agent");

@@ -32,35 +32,42 @@ onMounted(() => {
     <div class="links-layout">
       <div class="links-main">
         <div class="content-card">
-      <div class="card-header">
-        <i class="iconfont icon-lianjie" />
-        <span>共 {{ links.length }} 位朋友</span>
-      </div>
-
-      <div v-if="loading" class="placeholder-grid">
-        <div v-for="i in 6" :key="i" class="sk-card" />
-      </div>
-
-      <div v-else-if="links.length" class="link-grid">
-        <a
-          v-for="link in links"
-          :key="link.id"
-          :href="link.url"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="link-card"
-        >
-          <img v-if="link.avatarUrl" :src="link.avatarUrl" class="link-avatar" loading="lazy" />
-          <span v-else class="link-avatar-letter">{{ link.name ? link.name.charAt(0) : '?' }}</span>
-          <div class="link-body">
-            <p class="link-name">{{ link.name }}</p>
-            <p class="link-desc">{{ link.description }}</p>
+          <div class="card-header">
+            <i class="iconfont icon-lianjie" />
+            <span>共 {{ links.length }} 位朋友</span>
           </div>
-        </a>
-      </div>
 
-      <p v-else class="empty">暂无友链</p>
-    </div>
+          <div v-if="loading" class="placeholder-grid">
+            <div v-for="i in 6" :key="i" class="sk-card" />
+          </div>
+
+          <div v-else-if="links.length" class="link-grid">
+            <a
+              v-for="link in links"
+              :key="link.id"
+              :href="link.url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="link-card"
+            >
+              <img
+                v-if="link.avatarUrl"
+                :src="link.avatarUrl"
+                class="link-avatar"
+                loading="lazy"
+              />
+              <span v-else class="link-avatar-letter">{{
+                link.name ? link.name.charAt(0) : '?'
+              }}</span>
+              <div class="link-body">
+                <p class="link-name">{{ link.name }}</p>
+                <p class="link-desc">{{ link.description }}</p>
+              </div>
+            </a>
+          </div>
+
+          <p v-else class="empty">暂无友链</p>
+        </div>
       </div>
 
       <SidebarCard />
@@ -69,9 +76,18 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.links-page { width: 100%; }
-.links-layout { display: flex; gap: 24px; align-items: flex-start; }
-.links-main { flex: 1; min-width: 0; }
+.links-page {
+  width: 100%;
+}
+.links-layout {
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
+}
+.links-main {
+  flex: 1;
+  min-width: 0;
+}
 .content-card {
   background: #fff;
   border-radius: 8px;
@@ -180,7 +196,9 @@ onMounted(() => {
 }
 
 @media (max-width: 960px) {
-  .links-layout { flex-direction: column; }
+  .links-layout {
+    flex-direction: column;
+  }
 }
 @media (max-width: 600px) {
   .content-card {
@@ -188,6 +206,19 @@ onMounted(() => {
   }
   .link-grid {
     grid-template-columns: 1fr;
+  }
+  .link-card {
+    overflow: hidden;
+    max-width: 100%;
+  }
+  .link-body {
+    overflow: hidden;
+  }
+  .link-desc {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
   }
 }
 </style>

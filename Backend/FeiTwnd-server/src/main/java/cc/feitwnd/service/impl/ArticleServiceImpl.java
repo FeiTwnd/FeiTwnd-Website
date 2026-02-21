@@ -81,12 +81,16 @@ public class ArticleServiceImpl implements ArticleService {
         Articles articles = new Articles();
         BeanUtils.copyProperties(articleDTO, articles);
 
-        // Markdown转HTML（如果是富文本编辑器输出的HTML，直接清洗）
-        String rawContent = articleDTO.getContentMarkdown();
-        String contentHtml = MarkdownUtil.isHtml(rawContent)
-                ? MarkdownUtil.sanitize(rawContent)
-                : MarkdownUtil.toHtml(rawContent);
-        articles.setContentHtml(contentHtml);
+        // 优先使用前端编辑器渲染的HTML，否则后端转换
+        if (articleDTO.getContentHtml() != null && !articleDTO.getContentHtml().isBlank()) {
+            articles.setContentHtml(articleDTO.getContentHtml());
+        } else {
+            String rawContent = articleDTO.getContentMarkdown();
+            String contentHtml = MarkdownUtil.isHtml(rawContent)
+                    ? MarkdownUtil.sanitize(rawContent)
+                    : MarkdownUtil.toHtml(rawContent);
+            articles.setContentHtml(contentHtml);
+        }
 
         // 计算字数和阅读时间
         String plainText = articleDTO.getContentMarkdown();
@@ -159,13 +163,18 @@ public class ArticleServiceImpl implements ArticleService {
 
         BeanUtils.copyProperties(articleDTO, articles);
 
-        // 如果Markdown内容有更新，重新转HTML并计算字数
+        // 如果Markdown内容有更新，重新生成HTML并计算字数
         if (articleDTO.getContentMarkdown() != null) {
-            String raw = articleDTO.getContentMarkdown();
-            String contentHtml = MarkdownUtil.isHtml(raw)
-                    ? MarkdownUtil.sanitize(raw)
-                    : MarkdownUtil.toHtml(raw);
-            articles.setContentHtml(contentHtml);
+            // 优先使用前端编辑器渲染的HTML
+            if (articleDTO.getContentHtml() != null && !articleDTO.getContentHtml().isBlank()) {
+                articles.setContentHtml(articleDTO.getContentHtml());
+            } else {
+                String raw = articleDTO.getContentMarkdown();
+                String contentHtml = MarkdownUtil.isHtml(raw)
+                        ? MarkdownUtil.sanitize(raw)
+                        : MarkdownUtil.toHtml(raw);
+                articles.setContentHtml(contentHtml);
+            }
 
             long wordCount = countWords(articleDTO.getContentMarkdown());
             long readingTime = Math.max(1, wordCount / 300);

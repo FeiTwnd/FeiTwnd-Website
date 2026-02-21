@@ -7,9 +7,8 @@ const gonganBeian = ref('')
 const startYear = ref('')
 const currentYear = new Date().getFullYear()
 
-const apiBase = import.meta.env.DEV ? '/api' : ''
-const sitemapUrl = `${apiBase}/blog/sitemap.xml`
-const rssFeedUrl = `${apiBase}/blog/rss`
+const sitemapUrl = `/api/blog/sitemap.xml`
+const rssFeedUrl = `/api/blog/rss`
 
 onMounted(async () => {
   try {

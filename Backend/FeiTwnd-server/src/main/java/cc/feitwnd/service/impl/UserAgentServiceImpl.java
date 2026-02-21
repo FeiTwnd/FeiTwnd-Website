@@ -81,9 +81,24 @@ public class UserAgentServiceImpl implements UserAgentService {
         
         String ua = userAgent.toLowerCase();
         
+        // 微信内置浏览器（UA包含Chrome，必须优先判断）
+        if (ua.contains("micromessenger")) {
+            return "Wechat";
+        }
+        
+        // QQ内置浏览器（UA包含Chrome，必须优先判断）
+        if (ua.contains("qq/")) {
+            return "QQ";
+        }
+        
         // Edge浏览器 (新版基于Chromium)
         if (ua.contains("edg/") || ua.contains("edge/")) {
             return "Edge";
+        }
+        
+        // Opera浏览器（UA包含Chrome，需在Chrome之前判断）
+        if (ua.contains("opr/") || ua.contains("opera/")) {
+            return "Opera";
         }
         
         // Chrome浏览器 (需在Safari之前判断,因为Chrome的UA包含Safari)
@@ -101,24 +116,9 @@ public class UserAgentServiceImpl implements UserAgentService {
             return "Firefox";
         }
         
-        // Opera浏览器
-        if (ua.contains("opr/") || ua.contains("opera/")) {
-            return "Opera";
-        }
-        
         // IE浏览器
         if (ua.contains("msie") || ua.contains("trident/")) {
             return "Ie";
-        }
-        
-        // 微信内置浏览器
-        if (ua.contains("micromessenger")) {
-            return "Wechat";
-        }
-        
-        // QQ内置浏览器
-        if (ua.contains("qq/")) {
-            return "Qq";
         }
         
         return "Unknown";

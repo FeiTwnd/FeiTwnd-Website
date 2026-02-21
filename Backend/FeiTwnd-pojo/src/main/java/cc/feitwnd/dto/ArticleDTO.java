@@ -33,7 +33,6 @@ public class ArticleDTO {
     private String slug;
 
     // 文章摘要
-    @Size(max = 255, message = "文章摘要不能超过255字")
     private String summary;
 
     // 封面图片url
@@ -42,6 +41,9 @@ public class ArticleDTO {
     // Markdown内容
     @NotBlank(message = "文章内容不能为空")
     private String contentMarkdown;
+
+    // 前端编辑器渲染的HTML内容（可选，若提供则直接使用，不再后端转换）
+    private String contentHtml;
 
     // 分类ID
     @NotNull(message = "文章分类不能为空")

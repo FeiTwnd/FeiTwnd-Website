@@ -73,10 +73,10 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 
 <style scoped>
 .toc-card {
-  background: #fff;
+  background: var(--blog-card, #fff);
   border-radius: 8px;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-  border: 1px solid #ebeef5;
+  border: 1px solid var(--blog-border-light, #ebeef5);
   padding: 16px;
   margin-bottom: 16px;
 }
@@ -84,7 +84,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   font-size: 14px;
   font-weight: 700;
   margin: 0 0 10px;
-  color: #303133;
+  color: var(--blog-text, #303133);
   display: flex;
   align-items: center;
   gap: 6px;
@@ -101,7 +101,7 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 }
 .toc-item {
   font-size: 13px;
-  color: #606266;
+  color: var(--blog-text2, #606266);
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
@@ -116,14 +116,14 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   text-overflow: ellipsis;
 }
 .toc-item:hover {
-  color: #303133;
-  background: #f5f7fa;
+  color: var(--blog-text, #303133);
+  background: var(--blog-hover, #f5f7fa);
 }
 .toc-item.active {
-  color: #000;
+  color: var(--blog-text, #000);
   font-weight: 600;
-  border-left-color: #303133;
-  background: #f5f7fa;
+  border-left-color: var(--blog-text, #303133);
+  background: var(--blog-hover, #f5f7fa);
 }
 .toc-item.level-2 {
   padding-left: 8px;

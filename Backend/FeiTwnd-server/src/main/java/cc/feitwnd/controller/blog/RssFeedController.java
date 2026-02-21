@@ -34,7 +34,7 @@ public class RssFeedController {
     /**
      * 生成 RSS 2.0 Feed XML
      */
-    @GetMapping(value = "/rss", produces = MediaType.APPLICATION_XML_VALUE)
+    @GetMapping(value = "/rss", produces = "application/xml; charset=UTF-8")
     @Cacheable(value = "rssFeed", key = "'xml'")
     public String rssFeed() {
         String xml = rssFeedService.generateRssFeed();

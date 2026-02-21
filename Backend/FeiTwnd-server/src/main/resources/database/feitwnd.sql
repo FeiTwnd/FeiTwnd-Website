@@ -177,7 +177,7 @@ create table articles(
     -- 基础信息
     title varchar(50) not null comment '文章标题',
     slug varchar(50) unique not null comment 'URL标识，如：what-is-slug-field',
-    summary varchar(255) comment '文章摘要',
+    summary text comment '文章摘要',
     cover_image varchar(255) comment '封面图片url',
 
     -- 内容

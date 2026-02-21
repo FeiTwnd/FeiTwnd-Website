@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: /blog/sitemap.xml
+Sitemap: /api/blog/sitemap.xml

@@ -1,7 +1,7 @@
 <script setup>
 import { ref, inject, onMounted, watch, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import { useVisitorStore } from '@/stores'
+import { useVisitorStore, useBlogStore, useThemeStore } from '@/stores'
 import { getArticleBySlug } from '@/api/article'
 import {
   getCommentTree,
@@ -12,10 +12,23 @@ import {
 import { likeArticle, unlikeArticle, hasLiked } from '@/api/like'
 import { generateCaptcha } from '@/api/captcha'
 import TableOfContents from '@/components/TableOfContents.vue'
+import { MdPreview } from 'md-editor-v3'
+import 'md-editor-v3/lib/preview.css'
 
 const route = useRoute()
 const visitorStore = useVisitorStore()
+const blogStore = useBlogStore()
+const themeStore = useThemeStore()
 const { articleCover, articleTitle, articleMeta } = inject('setHero')
+
+/* MdPreview 暗黑模式适配 */
+const previewTheme = computed(() => {
+  if (themeStore.mode === 'dark') return 'dark'
+  if (themeStore.mode === 'light') return 'light'
+  return window.matchMedia('(prefers-color-scheme: dark)').matches
+    ? 'dark'
+    : 'light'
+})
 
 const article = ref(null)
 const loading = ref(true)
@@ -235,6 +248,10 @@ const isOwn = (c) => c.visitorId && c.visitorId === visitorStore.visitorId
 
 /* 头像 */
 const getAvatarUrl = (c) => {
+  // 如果是博主回复，使用个人信息的头像
+  if (c.isAdminReply && blogStore.personalInfo?.avatar) {
+    return blogStore.personalInfo.avatar
+  }
   const eq = c.emailOrQq
   if (!eq) return ''
   // 纯数字 → QQ号
@@ -267,7 +284,8 @@ const flatCommentCount = computed(() => {
   return count
 })
 
-/* 文章内容图片懒加载 */
+/* 文章内容：优先 MdPreview（需要 contentMarkdown），否则回退 v-html */
+const hasMarkdown = computed(() => !!article.value?.contentMarkdown?.trim())
 const lazyContentHtml = computed(() => {
   if (!article.value?.contentHtml) return ''
   return article.value.contentHtml.replace(
@@ -313,7 +331,18 @@ onMounted(() => {
             </div>
 
             <!-- 正文 -->
-            <div class="article-content" v-html="lazyContentHtml" />
+            <div class="article-content">
+              <MdPreview
+                v-if="hasMarkdown"
+                editorId="blog-article-preview"
+                :modelValue="article.contentMarkdown"
+                previewTheme="github"
+                :theme="previewTheme"
+                codeTheme="atom"
+                class="md-preview-fill"
+              />
+              <div v-else v-html="lazyContentHtml" class="fallback-content" />
+            </div>
 
             <!-- 点赞 + 转发 -->
             <div class="article-actions-inline">
@@ -685,7 +714,9 @@ onMounted(() => {
 
         <!-- 右侧: 目录 -->
         <aside class="article-sidebar">
-          <TableOfContents :content-html="article.contentHtml" />
+          <TableOfContents
+            :content-html="article.contentMarkdown || article.contentHtml"
+          />
         </aside>
       </div>
     </template>
@@ -753,17 +784,17 @@ onMounted(() => {
   gap: 10px;
   align-items: flex-start;
   padding: 16px 20px;
-  background: #f5f7fa;
+  background: var(--blog-hover, #f5f7fa);
   border-radius: 6px;
-  border-left: 3px solid #303133;
+  border-left: 3px solid var(--blog-text, #303133);
   margin-bottom: 24px;
   font-size: 14px;
-  color: #606266;
+  color: var(--blog-text2, #606266);
   line-height: 1.7;
 }
 .article-summary-block .iconfont {
   font-size: 16px;
-  color: #909399;
+  color: var(--blog-text3, #909399);
   margin-top: 2px;
   flex-shrink: 0;
 }
@@ -771,60 +802,46 @@ onMounted(() => {
   margin: 0;
 }
 
-/* 正文 */
+/* 正文容器 — MdPreview 填满 */
 .article-content {
-  font-size: 15.5px;
-  line-height: 1.85;
-  color: #333;
   word-break: break-word;
 }
-.article-content :deep(h1),
-.article-content :deep(h2),
-.article-content :deep(h3),
-.article-content :deep(h4) {
-  font-family: var(--blog-serif);
-  color: #303133;
-  margin: 28px 0 12px;
-  font-weight: 700;
+/* MdPreview 去掉自带内边距、融入卡片 */
+.article-content :deep(.md-editor) {
+  background: transparent !important;
+  border: none;
 }
-.article-content :deep(h2) {
-  font-size: 22px;
-  border-bottom: 1px solid #e4e7ed;
-  padding-bottom: 6px;
+.article-content :deep(.md-editor-preview-wrapper) {
+  padding: 0;
 }
-.article-content :deep(h3) {
-  font-size: 18px;
+.article-content :deep(.md-editor-preview) {
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: var(--blog-text, #333);
 }
-.article-content :deep(p) {
-  margin: 0 0 14px;
-}
-.article-content :deep(a) {
-  color: #303133;
-  text-decoration: underline;
-}
+/* 图片圆角 */
 .article-content :deep(img) {
   max-width: 100%;
-  border: 1px solid #e4e7ed;
   border-radius: 6px;
   margin: 8px 0;
 }
-.article-content :deep(blockquote) {
-  margin: 14px 0;
-  padding: 10px 16px;
-  border-left: 3px solid #303133;
-  background: #f5f7fa;
-  color: #606266;
-  font-style: italic;
+/* 回退 v-html 用的极简样式 */
+.fallback-content {
+  font-size: 15.5px;
+  line-height: 1.85;
+  color: var(--blog-text, #333);
 }
-.article-content :deep(code) {
-  background: #f5f7fa;
-  padding: 2px 5px;
-  border-radius: 3px;
-  font-size: 14px;
+.fallback-content :deep(h1),
+.fallback-content :deep(h2),
+.fallback-content :deep(h3),
+.fallback-content :deep(h4) {
+  color: var(--blog-text, #303133);
+  margin: 28px 0 12px;
+  font-weight: 700;
 }
-.article-content :deep(pre) {
-  background: #303133;
-  color: #e4e7ed;
+.fallback-content :deep(pre) {
+  background: #282c34;
+  color: #abb2bf;
   padding: 16px;
   border-radius: 6px;
   overflow-x: auto;
@@ -832,29 +849,42 @@ onMounted(() => {
   font-size: 13.5px;
   line-height: 1.6;
 }
-.article-content :deep(pre code) {
+.fallback-content :deep(pre code) {
   background: none;
   padding: 0;
   color: inherit;
 }
-.article-content :deep(ul),
-.article-content :deep(ol) {
-  padding-left: 24px;
-  margin: 0 0 14px;
+.fallback-content :deep(code) {
+  background: #f5f7fa;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 14px;
 }
-.article-content :deep(table) {
+.fallback-content :deep(img) {
+  max-width: 100%;
+  border-radius: 6px;
+  margin: 8px 0;
+}
+.fallback-content :deep(blockquote) {
+  margin: 14px 0;
+  padding: 10px 16px;
+  border-left: 3px solid #303133;
+  background: #f5f7fa;
+  color: #606266;
+}
+.fallback-content :deep(table) {
   width: 100%;
   border-collapse: collapse;
   margin: 14px 0;
   font-size: 14px;
 }
-.article-content :deep(th),
-.article-content :deep(td) {
+.fallback-content :deep(th),
+.fallback-content :deep(td) {
   border: 1px solid #e4e7ed;
   padding: 8px 12px;
   text-align: left;
 }
-.article-content :deep(th) {
+.fallback-content :deep(th) {
   background: #f5f7fa;
   font-weight: 600;
 }

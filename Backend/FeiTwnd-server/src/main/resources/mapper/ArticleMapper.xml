@@ -84,7 +84,7 @@
     </select>
 
     <select id="getBySlug" resultType="cc.feitwnd.vo.BlogArticleDetailVO">
-        select a.id, a.title, a.slug, a.summary, a.cover_image, a.content_html,
+        select a.id, a.title, a.slug, a.summary, a.cover_image, a.content_html, a.content_markdown,
                a.category_id, ac.name as category_name,
                a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
                a.publish_time, a.update_time

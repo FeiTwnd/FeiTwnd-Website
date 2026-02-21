@@ -21,8 +21,14 @@ const form = ref({
   categoryId: null,
   tagIds: [],
   contentMarkdown: '',
+  contentHtml: '',
   isPublished: 0
 })
+
+/* ---- 同步编辑器渲染后的 HTML ---- */
+const onHtmlChanged = (html) => {
+  form.value.contentHtml = html
+}
 
 const saving = ref(false)
 const uploadingCover = ref(false)
@@ -179,6 +185,7 @@ onMounted(async () => {
           :toolbars-exclude="['mermaid', 'katex', 'github']"
           class="md-editor-fill"
           @on-upload-img="onUploadImg"
+          @on-html-changed="onHtmlChanged"
         />
       </div>
 

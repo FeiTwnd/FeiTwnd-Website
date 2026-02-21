@@ -28,11 +28,23 @@ const fmtDate = (d) => (d ? d.slice(0, 10) : '')
         >
       </div>
       <div class="card-meta">
-        <span><i class="iconfont icon-eye" /> {{ article.viewCount ?? 0 }}</span>
-        <span><i class="iconfont icon-pinglun" /> {{ article.commentCount ?? 0 }}</span>
-        <span><i class="iconfont icon-dianzan" /> {{ article.likeCount ?? 0 }}</span>
-        <span v-if="article.wordCount"><i class="iconfont icon-guidang" /> {{ article.wordCount }} 字</span>
-        <span v-if="article.readingTime"><i class="iconfont icon-time" /> {{ article.readingTime }} 分钟</span>
+        <span
+          ><i class="iconfont icon-eye" /> {{ article.viewCount ?? 0 }}</span
+        >
+        <span
+          ><i class="iconfont icon-pinglun" />
+          {{ article.commentCount ?? 0 }}</span
+        >
+        <span
+          ><i class="iconfont icon-dianzan" />
+          {{ article.likeCount ?? 0 }}</span
+        >
+        <span v-if="article.wordCount"
+          ><i class="iconfont icon-guidang" /> {{ article.wordCount }} 字</span
+        >
+        <span v-if="article.readingTime"
+          ><i class="iconfont icon-time" /> {{ article.readingTime }} 分钟</span
+        >
       </div>
     </div>
   </router-link>

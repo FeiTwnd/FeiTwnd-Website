@@ -32,7 +32,7 @@ public class SitemapController {
     /**
      * 动态生成站点地图 XML
      */
-    @GetMapping(value = "/sitemap.xml", produces = MediaType.APPLICATION_XML_VALUE)
+    @GetMapping(value = "/sitemap.xml", produces = "application/xml; charset=UTF-8")
     @Cacheable(value = "sitemap", key = "'xml'")
     public String sitemap() {
         String xml = sitemapService.generateSitemap();

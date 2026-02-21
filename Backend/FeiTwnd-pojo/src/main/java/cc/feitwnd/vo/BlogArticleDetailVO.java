@@ -25,6 +25,7 @@ public class BlogArticleDetailVO implements Serializable {
     private String summary;
     private String coverImage;
     private String contentHtml;
+    private String contentMarkdown;
     private Long categoryId;
     private String categoryName;
     private Long viewCount;
