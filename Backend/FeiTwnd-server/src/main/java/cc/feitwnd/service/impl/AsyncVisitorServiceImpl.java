@@ -27,32 +27,47 @@ public class AsyncVisitorServiceImpl implements AsyncVisitorService {
     private ViewMapper viewMapper;
 
     /**
-     * 异步处理：IP地理位置查询 + 访客信息更新 + 浏览记录写入
+     * 异步处理：IP地理位置查询 + 访客地理信息更新 + 浏览记录写入
+     * 接收 visitorId 而非 Visitors 对象引用，避免主线程与异步线程共享可变对象导致竞态条件
      */
     @Async("taskExecutor")
-    public void processGeoAndRecordViewAsync(Visitors visitor, String ip, String userAgent,
+    public void processGeoAndRecordViewAsync(Long visitorId, String ip, String userAgent,
                                               String pagePath, String referer, String pageTitle) {
         try {
             // 耗时操作：IP地理位置查询
             Map<String, String> geoInfo = IpUtil.getGeoInfo(ip);
 
-            // 更新访客地理位置信息
-            boolean geoChanged = !equalsNullSafe(visitor.getCountry(), geoInfo.get("country"))
-                    || !equalsNullSafe(visitor.getProvince(), geoInfo.get("province"))
-                    || !equalsNullSafe(visitor.getCity(), geoInfo.get("city"));
+            String country = geoInfo.get("country");
+            String province = geoInfo.get("province");
+            String city = geoInfo.get("city");
 
-            if (geoChanged && !geoInfo.get("country").equals("")) {
-                visitor.setCountry(geoInfo.get("country"));
-                visitor.setProvince(geoInfo.get("province"));
-                visitor.setCity(geoInfo.get("city"));
-                visitor.setLongitude(geoInfo.get("longitude"));
-                visitor.setLatitude(geoInfo.get("latitude"));
-                visitorMapper.updateById(visitor);
+            // 仅在地理位置有效时更新
+            if (country != null && !country.isEmpty()) {
+                // 从数据库重新读取访客记录，确保拿到最新数据
+                Visitors current = visitorMapper.findById(visitorId);
+                if (current != null) {
+                    boolean geoChanged = !equalsNullSafe(current.getCountry(), country)
+                            || !equalsNullSafe(current.getProvince(), province)
+                            || !equalsNullSafe(current.getCity(), city);
+
+                    if (geoChanged) {
+                        // 仅更新地理位置字段，避免与主线程的访问计数产生竞态
+                        Visitors geoUpdate = Visitors.builder()
+                                .id(visitorId)
+                                .country(country)
+                                .province(province)
+                                .city(city)
+                                .longitude(geoInfo.get("longitude"))
+                                .latitude(geoInfo.get("latitude"))
+                                .build();
+                        visitorMapper.updateById(geoUpdate);
+                    }
+                }
             }
 
             // 写入浏览记录
             Views view = Views.builder()
-                    .visitorId(visitor.getId())
+                    .visitorId(visitorId)
                     .pagePath(pagePath)
                     .referer(referer)
                     .pageTitle(pageTitle)
@@ -62,9 +77,9 @@ public class AsyncVisitorServiceImpl implements AsyncVisitorService {
                     .build();
             viewMapper.insert(view);
 
-            log.debug("异步处理访客记录完成: visitorId={}, ip={}", visitor.getId(), ip);
+            log.debug("异步处理访客记录完成: visitorId={}, ip={}", visitorId, ip);
         } catch (Exception e) {
-            log.error("异步处理访客记录失败: visitorId={}, ip={}, ex={}", visitor.getId(), ip, e.getMessage());
+            log.error("异步处理访客记录失败: visitorId={}, ip={}, ex={}", visitorId, ip, e.getMessage());
         }
     }
 

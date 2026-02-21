@@ -46,7 +46,10 @@ public class BlockServiceImpl implements BlockService {
                 throw new BlockedException(MessageConstant.VISITOR_BLOCKED);
             } else {
                 // 封禁已过期，解除封禁
+                log.info("【访客追踪】封禁过期自动解封: id={}, fingerprint={}, expiresAt={}",
+                        visitor.getId(), fingerprint, visitor.getExpiresAt());
                 visitor.setIsBlocked(0);
+                visitor.setExpiresAt(null);
                 visitorMapper.updateById(visitor);
             }
         }

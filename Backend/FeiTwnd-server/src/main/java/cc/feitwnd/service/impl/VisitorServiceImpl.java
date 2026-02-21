@@ -18,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
@@ -71,8 +72,9 @@ public class VisitorServiceImpl implements VisitorService {
         Visitors visitor = findOrCreateVisitor(fingerprint, sessionId, userAgent, ip);
 
         // 异步处理：IP地理位置查询 + 访客地理信息更新 + 浏览记录写入
+        // 传递 visitorId 而非对象引用，避免主线程与异步线程共享可变对象导致竞态条件
         asyncVisitorService.processGeoAndRecordViewAsync(
-                visitor, ip, userAgent,
+                visitor.getId(), ip, userAgent,
                 visitorRecordDTO.getPagePath(),
                 visitorRecordDTO.getReferer(),
                 visitorRecordDTO.getPageTitle()
@@ -120,11 +122,15 @@ public class VisitorServiceImpl implements VisitorService {
 
         if(visitor!=null){
             // 缓存命中,更新基本信息
+            log.info("【访客追踪】缓存命中: id={}, fingerprint={}, ip={}, cachedViews={}",
+                    visitor.getId(), fingerprint, ip, visitor.getTotalViews());
             visitor.setSessionId(sessionId);
             visitor.setIp(ip);
             visitor.setLastVisitTime(LocalDateTime.now());
             visitor.setTotalViews(visitor.getTotalViews() + 1);
             visitorMapper.updateById(visitor);
+            // 回写Redis缓存，保持缓存数据与数据库同步（修复totalViews等字段不一致的问题）
+            redisTemplate.opsForValue().set(cacheKey, visitor, 1, TimeUnit.HOURS);
             return visitor;
         }
 
@@ -133,6 +139,7 @@ public class VisitorServiceImpl implements VisitorService {
 
         if(visitor==null){
             // 新访客：创建记录（地理位置字段由异步任务填充）
+            log.info("【访客追踪】新访客创建: fingerprint={}, ip={}", fingerprint, ip);
             visitor = Visitors.builder()
                     .fingerprint(fingerprint)
                     .sessionId(sessionId)
@@ -143,11 +150,25 @@ public class VisitorServiceImpl implements VisitorService {
                     .totalViews(1L)
                     .isBlocked(StatusConstant.DISABLE)
                     .build();
-            visitorMapper.insertVisitor(visitor);
-            // 写入Redis缓存
-            redisTemplate.opsForValue().set(cacheKey, visitor, 1, TimeUnit.HOURS);
+            try {
+                visitorMapper.insertVisitor(visitor);
+                log.info("【访客追踪】新访客插入成功: id={}, fingerprint={}", visitor.getId(), fingerprint);
+            } catch (DuplicateKeyException e) {
+                // 并发场景：另一个请求已经插入了相同指纹的访客，回退到数据库查询
+                log.warn("【访客追踪】并发创建，回退查询: fingerprint={}", fingerprint);
+                visitor = visitorMapper.findVisitorByFingerprint(fingerprint);
+                if (visitor != null) {
+                    visitor.setLastVisitTime(LocalDateTime.now());
+                    visitor.setTotalViews(visitor.getTotalViews() + 1);
+                    visitor.setSessionId(sessionId);
+                    visitor.setIp(ip);
+                    visitorMapper.updateById(visitor);
+                }
+            }
         }else{
             // 老访客：更新基本信息
+            log.info("【访客追踪】老访客更新: id={}, fingerprint={}, ip={}, dbViews={}",
+                    visitor.getId(), fingerprint, ip, visitor.getTotalViews());
             visitor.setLastVisitTime(LocalDateTime.now());
             visitor.setTotalViews(visitor.getTotalViews() + 1);
 
@@ -159,7 +180,10 @@ public class VisitorServiceImpl implements VisitorService {
 
             visitor.setIp(ip);
             visitorMapper.updateById(visitor);
-            // 回写Redis缓存
+        }
+
+        // 统一写入/更新Redis缓存
+        if (visitor != null) {
             redisTemplate.opsForValue().set(cacheKey, visitor, 1, TimeUnit.HOURS);
         }
         return visitor;

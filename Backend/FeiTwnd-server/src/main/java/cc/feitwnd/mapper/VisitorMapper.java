@@ -25,6 +25,14 @@ public interface VisitorMapper {
     Visitors findVisitorByFingerprint(String fingerprint);
 
     /**
+     * 根据id查询访客信息
+     * @param id
+     * @return
+     */
+    @Select("select * from visitors where id = #{id}")
+    Visitors findById(Long id);
+
+    /**
      * 插入访客信息
      * @param visitor
      */
