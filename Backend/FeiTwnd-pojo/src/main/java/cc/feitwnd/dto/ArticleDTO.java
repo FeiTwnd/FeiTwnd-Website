@@ -52,6 +52,9 @@ public class ArticleDTO {
     // 是否发布,0-否（草稿），1-是
     private Integer isPublished;
 
+    // 是否置顶,0-否，1-是
+    private Integer isTop;
+
     // 标签ID列表
     private List<Long> tagIds;
 }

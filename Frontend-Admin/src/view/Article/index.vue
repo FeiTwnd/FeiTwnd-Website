@@ -79,6 +79,11 @@ const togglePublish = async (row) => {
   load()
 }
 
+const toggleTop = async (row) => {
+  await articleStore.toggleArticleTop(row.id, row.isTop ? 0 : 1)
+  load()
+}
+
 const deleteOne = async (row) => {
   await ElMessageBox.confirm(`确认删除文章「${row.title}」？`, '警告', {
     confirmButtonText: '删除',
@@ -190,6 +195,11 @@ onMounted(load)
             <span>{{ row.isPublished ? '已发布' : '草稿' }}</span>
           </template>
         </el-table-column>
+        <el-table-column label="置顶" width="75" align="center">
+          <template #default="{ row }">
+            <span v-if="row.isTop">置顶</span>
+          </template>
+        </el-table-column>
         <el-table-column
           prop="viewCount"
           label="阅读"
@@ -207,7 +217,7 @@ onMounted(load)
             fmtDate(row.publishTime || row.createTime)
           }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="200" align="center" fixed="right">
+        <el-table-column label="操作" width="280" align="center" fixed="right">
           <template #default="{ row }">
             <div class="row-actions">
               <el-button link size="small" @click="openView(row)"
@@ -216,6 +226,10 @@ onMounted(load)
               <el-divider direction="vertical" />
               <el-button link size="small" @click="togglePublish(row)">
                 {{ row.isPublished ? '撤回' : '发布' }}
+              </el-button>
+              <el-divider direction="vertical" />
+              <el-button link size="small" @click="toggleTop(row)">
+                {{ row.isTop ? '取消置顶' : '置顶' }}
               </el-button>
               <el-divider direction="vertical" />
               <el-button link size="small" @click="toEdit(row.id)"

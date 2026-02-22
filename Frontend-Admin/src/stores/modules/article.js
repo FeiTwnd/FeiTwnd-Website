@@ -6,7 +6,8 @@ import {
   createArticle,
   updateArticle,
   deleteArticles,
-  togglePublish
+  togglePublish,
+  toggleTop
 } from '@/api/article'
 import { getCategoryList, getTagList } from '@/api/category'
 
@@ -82,6 +83,15 @@ export const useArticleStore = defineStore('article', () => {
     await togglePublish(id, isPublished)
   }
 
+  /**
+   * 切换置顶状态
+   * @param {number} id
+   * @param {0|1} isTop
+   */
+  const toggleArticleTop = async (id, isTop) => {
+    await toggleTop(id, isTop)
+  }
+
   return {
     list,
     total,
@@ -94,6 +104,7 @@ export const useArticleStore = defineStore('article', () => {
     fetchDetail,
     saveArticle,
     removeArticles,
-    toggleArticlePublish
+    toggleArticlePublish,
+    toggleArticleTop
   }
 })

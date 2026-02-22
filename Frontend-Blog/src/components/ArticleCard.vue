@@ -2,7 +2,7 @@
 defineProps({
   article: { type: Object, required: true }
 })
-const fmtDate = (d) => (d ? d.slice(0, 10) : '')
+const fmtDate = (d) => (d ? d.slice(0, 16).replace('T', ' ') : '')
 </script>
 
 <template>
@@ -11,6 +11,9 @@ const fmtDate = (d) => (d ? d.slice(0, 10) : '')
       <img :src="article.coverImage" :alt="article.title" loading="lazy" />
     </div>
     <div class="card-body">
+      <span v-if="article.isTop" class="card-pin">
+        <i class="iconfont icon-zhiding" />
+      </span>
       <div class="card-top">
         <span v-if="article.categoryName" class="card-category">
           <i class="iconfont icon-folder" /> {{ article.categoryName }}
@@ -93,6 +96,7 @@ const fmtDate = (d) => (d ? d.slice(0, 10) : '')
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
 }
 .card-top {
   display: flex;
@@ -109,6 +113,19 @@ const fmtDate = (d) => (d ? d.slice(0, 10) : '')
 .card-category {
   color: #606266;
   font-weight: 500;
+}
+.card-pin {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  font-weight: 600;
+  font-size: 25px;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.card-pin .iconfont {
+  font-size: 25px;
 }
 .card-title {
   font-family: var(--blog-serif);

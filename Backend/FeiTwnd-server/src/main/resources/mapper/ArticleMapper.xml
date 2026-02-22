@@ -5,10 +5,10 @@
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
         insert into articles (title, slug, summary, cover_image, content_markdown, content_html,
-                              category_id, word_count, reading_time, is_published, publish_time,
+                              category_id, word_count, reading_time, is_published, is_top, publish_time,
                               create_time, update_time)
         values (#{title}, #{slug}, #{summary}, #{coverImage}, #{contentMarkdown}, #{contentHtml},
-                #{categoryId}, #{wordCount}, #{readingTime}, #{isPublished}, #{publishTime},
+                #{categoryId}, #{wordCount}, #{readingTime}, #{isPublished}, #{isTop}, #{publishTime},
                 #{createTime}, #{updateTime})
     </insert>
 
@@ -16,7 +16,7 @@
         select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
                ac.name as category_name,
                a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
-               a.is_published, a.publish_time, a.create_time, a.update_time
+               a.is_published, a.is_top, a.publish_time, a.create_time, a.update_time
         from articles a
         left join article_categories ac on a.category_id = ac.id
         <where>
@@ -30,7 +30,7 @@
                 and a.is_published = #{isPublished}
             </if>
         </where>
-        order by a.create_time desc
+        order by a.is_top desc, a.create_time desc
     </select>
 
     <update id="update">
@@ -46,6 +46,7 @@
             <if test="wordCount != null">word_count = #{wordCount},</if>
             <if test="readingTime != null">reading_time = #{readingTime},</if>
             <if test="isPublished != null">is_published = #{isPublished},</if>
+            <if test="isTop != null">is_top = #{isTop},</if>
             <if test="publishTime != null">publish_time = #{publishTime},</if>
             <if test="updateTime != null">update_time = #{updateTime}</if>
         </set>
@@ -63,11 +64,11 @@
         select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
                ac.name as category_name,
                a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
-               a.is_published, a.publish_time, a.create_time, a.update_time
+               a.is_published, a.is_top, a.publish_time, a.create_time, a.update_time
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where match(a.title, a.summary, a.content_markdown) against(#{keyword} in boolean mode)
-        order by a.create_time desc
+        order by a.is_top desc, a.create_time desc
     </select>
 
     <!-- ===== 博客端查询 ===== -->
@@ -76,11 +77,11 @@
         select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
                ac.name as category_name,
                a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
-               a.publish_time
+               a.is_top, a.publish_time
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where a.is_published = 1
-        order by a.publish_time desc
+        order by a.is_top desc, a.publish_time desc
     </select>
 
     <select id="getBySlug" resultType="cc.feitwnd.vo.BlogArticleDetailVO">
@@ -97,11 +98,11 @@
         select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
                ac.name as category_name,
                a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
-               a.publish_time
+               a.is_top, a.publish_time
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where a.is_published = 1 and a.category_id = #{categoryId}
-        order by a.publish_time desc
+        order by a.is_top desc, a.publish_time desc
     </select>
 
     <select id="getArchiveList" resultType="cc.feitwnd.vo.ArticleArchiveItemVO">
@@ -115,14 +116,14 @@
         select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
                ac.name as category_name,
                a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
-               a.publish_time
+               a.is_top, a.publish_time
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where a.is_published = 1
           and (a.title like concat('%', #{keyword}, '%')
                or a.summary like concat('%', #{keyword}, '%')
                or a.content_markdown like concat('%', #{keyword}, '%'))
-        order by a.publish_time desc
+        order by a.is_top desc, a.publish_time desc
     </select>
 
     <select id="getViewTop10" resultType="cc.feitwnd.dto.ArticleTitleViewCountDTO">
@@ -137,12 +138,12 @@
         select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
                ac.name as category_name,
                a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
-               a.publish_time
+               a.is_top, a.publish_time
         from articles a
         left join article_categories ac on a.category_id = ac.id
         inner join article_tag_relations atr on a.id = atr.article_id
         where a.is_published = 1 and atr.tag_id = #{tagId}
-        order by a.publish_time desc
+        order by a.is_top desc, a.publish_time desc
     </select>
 
     <select id="getPrevArticle" resultType="cc.feitwnd.vo.BlogArticleVO">
@@ -165,11 +166,11 @@
         select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
                ac.name as category_name,
                a.view_count, a.like_count, a.comment_count, a.word_count, a.reading_time,
-               a.publish_time
+               a.is_top, a.publish_time
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where a.is_published = 1 and a.id != #{articleId} and a.category_id = #{categoryId}
-        order by a.publish_time desc
+        order by a.is_top desc, a.publish_time desc
         limit 6
     </select>
 </mapper>

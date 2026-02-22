@@ -104,6 +104,20 @@ public class ArticleController {
     }
 
     /**
+     * 置顶/取消置顶文章
+     * @param id
+     * @param isTop 0-取消置顶，1-置顶
+     * @return
+     */
+    @PutMapping("/top/{id}")
+    @OperationLog(value = OperationType.UPDATE, target = "article", targetId = "#id")
+    public Result toggleTop(@PathVariable Long id, @RequestParam Integer isTop) {
+        log.info("置顶/取消置顶文章: id={}, isTop={}", id, isTop);
+        articleService.toggleTop(id, isTop);
+        return Result.success();
+    }
+
+    /**
      * 文章搜索（标题、内容）
      * @param keyword
      * @param page

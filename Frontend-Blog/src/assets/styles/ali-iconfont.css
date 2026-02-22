@@ -15,6 +15,10 @@
   line-height: 1;
 }
 
+.icon-zhiding:before {
+  content: "\eb3e";
+}
+
 .icon-boke:before {
   content: "\e8dc";
 }

@@ -30,6 +30,7 @@ public class BlogArticleVO implements Serializable {
     private Long commentCount;
     private Long wordCount;
     private Long readingTime;
+    private Integer isTop;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishTime;
 }

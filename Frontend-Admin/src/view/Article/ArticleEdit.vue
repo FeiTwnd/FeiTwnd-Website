@@ -33,23 +33,6 @@ const onHtmlChanged = (html) => {
 const saving = ref(false)
 const uploadingCover = ref(false)
 
-/* ---- 字数统计（剥除 Markdown 语法后统计） ---- */
-const wordCount = computed(() => {
-  const text = form.value.contentMarkdown
-    .replace(/```[\s\S]*?```/g, '')
-    .replace(/`[^`\n]*`/g, '')
-    .replace(/!\[.*?\]\(.*?\)/g, '')
-    .replace(/\[.*?\]\(.*?\)/g, '')
-    .replace(/[#>*_~\-|]/g, ' ')
-    .trim()
-  if (!text) return 0
-  const chinese = (text.match(/[\u4e00-\u9fff]/g) || []).length
-  const english = (
-    text.replace(/[\u4e00-\u9fff]/g, ' ').match(/\b[a-zA-Z0-9]+\b/g) || []
-  ).length
-  return chinese + english
-})
-
 /* ---- 图片上传（md-editor-v3 回调格式） ---- */
 const onUploadImg = async (files, callback) => {
   try {
@@ -142,10 +125,6 @@ onMounted(async () => {
     <!-- 顶部操作栏 -->
     <div class="edit-topbar">
       <span class="edit-title">{{ isEdit ? '编辑文章' : '新建文章' }}</span>
-
-      <div class="topbar-center">
-        <el-tag type="info" size="small">字数：{{ wordCount }}</el-tag>
-      </div>
 
       <div class="edit-actions">
         <el-button size="small" @click="router.push('/article/list')"
@@ -300,11 +279,6 @@ onMounted(async () => {
   font-size: 15px;
   font-weight: 600;
   color: #303133;
-}
-.topbar-center {
-  display: flex;
-  align-items: center;
-  gap: 8px;
 }
 .edit-actions {
   display: flex;

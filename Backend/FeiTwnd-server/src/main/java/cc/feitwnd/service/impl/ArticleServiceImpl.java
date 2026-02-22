@@ -163,6 +163,13 @@ public class ArticleServiceImpl implements ArticleService {
 
         BeanUtils.copyProperties(articleDTO, articles);
 
+        // 如果从草稿切换到发布状态且尚无发布时间，设置发布时间
+        if (articleDTO.getIsPublished() != null
+                && articleDTO.getIsPublished().equals(StatusConstant.ENABLE)
+                && articles.getPublishTime() == null) {
+            articles.setPublishTime(LocalDateTime.now());
+        }
+
         // 如果Markdown内容有更新，重新生成HTML并计算字数
         if (articleDTO.getContentMarkdown() != null) {
             // 优先使用前端编辑器渲染的HTML
@@ -242,6 +249,29 @@ public class ArticleServiceImpl implements ArticleService {
         if (isPublished.equals(StatusConstant.ENABLE)) {
             notifyRssSubscribers(articles);
         }
+    }
+
+    /**
+     * 置顶/取消置顶文章
+     * @param id
+     * @param isTop
+     */
+    @Caching(evict = {
+            @CacheEvict(value = "articleList", allEntries = true),
+            @CacheEvict(value = "articleDetail", allEntries = true)
+    })
+    public void toggleTop(Long id, Integer isTop) {
+        Articles articles = articleMapper.getById(id);
+        if (articles == null) {
+            throw new ArticleException(MessageConstant.ARTICLE_NOT_FOUND);
+        }
+
+        Articles updateArticle = Articles.builder()
+                .id(id)
+                .isTop(isTop)
+                .build();
+
+        articleMapper.update(updateArticle);
     }
 
     /**

@@ -181,8 +181,8 @@ create table articles(
     cover_image varchar(255) comment '封面图片url',
 
     -- 内容
-    content_markdown text not null comment 'Markdown内容',
-    content_html text not null comment '转换后的HTML内容',
+    content_markdown longtext not null comment 'Markdown内容',
+    content_html longtext not null comment '转换后的HTML内容',
 
     -- 分类
     category_id int comment '分类ID',
@@ -196,6 +196,7 @@ create table articles(
 
     -- 发布信息
     is_published tinyint default 0 comment '是否发布,0-否，1-是',
+    is_top tinyint default 0 comment '是否置顶,0-否，1-是',
     publish_time datetime comment '发布时间',
 
     -- 归档

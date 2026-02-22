@@ -41,6 +41,14 @@ export const togglePublish = (id, isPublished) =>
   http.put(`/admin/article/publish/${id}`, null, { params: { isPublished } })
 
 /**
+ * 置顶 / 取消置顶
+ * @param {number} id
+ * @param {0|1} isTop
+ */
+export const toggleTop = (id, isTop) =>
+  http.put(`/admin/article/top/${id}`, null, { params: { isTop } })
+
+/**
  * 文章搜索
  * @param {{ keyword: string, page?: number, pageSize?: number }} params
  */

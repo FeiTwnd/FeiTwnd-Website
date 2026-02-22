@@ -54,6 +54,13 @@ public interface ArticleService {
     void publishOrCancel(Long id, Integer isPublished);
 
     /**
+     * 置顶/取消置顶文章
+     * @param id
+     * @param isTop
+     */
+    void toggleTop(Long id, Integer isTop);
+
+    /**
      * 文章搜索（标题、内容）
      * @param keyword
      * @param page

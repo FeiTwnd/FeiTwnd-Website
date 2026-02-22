@@ -56,7 +56,11 @@ onUnmounted(() => {
     />
     <main class="blog-main">
       <div class="main-inner">
-        <router-view />
+        <router-view v-slot="{ Component, route: viewRoute }">
+          <transition name="page-fade" mode="out-in">
+            <component :is="Component" :key="viewRoute.path" />
+          </transition>
+        </router-view>
       </div>
     </main>
     <BlogFooter />
@@ -101,6 +105,22 @@ onUnmounted(() => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 32px 28px;
+}
+
+/* 页面切换过渡动画 */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition:
+    opacity 0.3s ease,
+    transform 0.3s ease;
+}
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(12px);
+}
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-8px);
 }
 
 /* 回到顶部 */

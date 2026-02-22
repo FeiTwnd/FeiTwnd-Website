@@ -63,6 +63,9 @@ public class Articles implements Serializable {
     // 是否发布,0-否，1-是
     private Integer isPublished;
 
+    // 是否置顶,0-否，1-是
+    private Integer isTop;
+
     // 发布时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime publishTime;
