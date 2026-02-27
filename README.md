@@ -158,7 +158,7 @@ FeiTwnd/
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/FeiTwnd/FeiTwnd.git
+git clone https://github.com/FeiTwnd/FeiTwnd-Website.git
 cd FeiTwnd
 ```
 
