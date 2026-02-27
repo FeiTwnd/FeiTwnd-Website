@@ -68,7 +68,6 @@ public class IpUtil {
     /**
      * 去掉行政区划后缀（省、市、自治区、特别行政区）
      * 每个字段都独立校验"省"和"市"后缀
-     * 例：广东省→广东，北京市→北京，广西壮族自治区→广西，香港特别行政区→香港，广州市→广州
      */
     private static String stripAdminSuffix(String name) {
         if (name == null || name.isEmpty()) return name;

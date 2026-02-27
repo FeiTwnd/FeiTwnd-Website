@@ -136,8 +136,8 @@ public class ReportServiceImpl implements ReportService {
                 .collect(Collectors.toList());
 
         return ArticleViewTop10VO.builder()
-                .titleList(String.join(",", titleList))
-                .viewCountList(String.join(",", viewCountList.stream().map(String::valueOf).collect(Collectors.toList())))
+                .titleList(titleList)
+                .viewCountList(viewCountList)
                 .build();
     }
 

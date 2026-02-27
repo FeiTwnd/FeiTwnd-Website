@@ -186,10 +186,10 @@ onMounted(load)
           show-overflow-tooltip
         />
         <el-table-column
-          label="所属文章ID"
-          prop="articleId"
-          width="110"
-          align="center"
+          label="所属文章"
+          prop="articleTitle"
+          min-width="140"
+          show-overflow-tooltip
         />
         <el-table-column label="状态" width="90" align="center">
           <template #default="{ row }">
@@ -247,8 +247,8 @@ onMounted(load)
       :close-on-click-modal="false"
     >
       <el-descriptions v-if="detailRow" :column="2" border size="small">
-        <el-descriptions-item label="文章ID">{{
-          detailRow.articleId ?? '-'
+        <el-descriptions-item label="所属文章">{{
+          detailRow.articleTitle ?? '-'
         }}</el-descriptions-item>
         <el-descriptions-item label="来源">{{
           detailRow.isAdminReply ? '管理员' : '访客'

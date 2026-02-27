@@ -16,7 +16,11 @@ const isEditorPage = computed(() => route.path.startsWith('/article/edit'))
 
 const navItems = [
   { path: '/dashboard', icon: 'icon-yibiaopan', label: '仪表盘' },
-  { path: '/article/list', icon: 'icon-bianjiwenzhang_huaban', label: '文章管理' },
+  {
+    path: '/article/list',
+    icon: 'icon-bianjiwenzhang_huaban',
+    label: '文章管理'
+  },
   { path: '/category', icon: 'icon-folder', label: '分类 / 标签' },
   { path: '/comment', icon: 'icon-comment', label: '评论管理' },
   { path: '/message', icon: 'icon-liuyan', label: '留言管理' },
@@ -277,7 +281,9 @@ const handleLogout = () => {
 /* ---- 路由切换过渡 ---- */
 .page-fade-enter-active,
 .page-fade-leave-active {
-  transition: opacity 0.22s ease, transform 0.22s ease;
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
 }
 
 .page-fade-enter-from {

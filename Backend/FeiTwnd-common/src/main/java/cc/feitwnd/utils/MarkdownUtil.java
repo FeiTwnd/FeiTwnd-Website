@@ -24,11 +24,11 @@ public class MarkdownUtil {
             return "";
         }
         
-        // 1. 解析Markdown
+        // 解析Markdown
         Node document = parser.parse(markdown);
         String html = renderer.render(document);
         
-        // 2. 安全过滤（防止XSS）
+        // 安全过滤（防止XSS）
         return sanitizeHtml(html);
     }
 

@@ -43,9 +43,16 @@ http.interceptors.response.use(
   (error) => {
     const status = error?.response?.status
     if (status === 401) {
-      ElMessage.warning('登录状态失效，请重新登录')
-      localStorage.removeItem('admin_token')
-      router.push('/login')
+      // 防止多个并发请求同时 401 弹出多个提示
+      if (!http._isRedirecting401) {
+        http._isRedirecting401 = true
+        ElMessage.warning('登录状态失效，请重新登录')
+        localStorage.removeItem('admin_token')
+        router.push('/login')
+        setTimeout(() => {
+          http._isRedirecting401 = false
+        }, 2000)
+      }
     } else if (status === 403) {
       ElMessage.error('权限不足，无法执行该操作')
     } else {

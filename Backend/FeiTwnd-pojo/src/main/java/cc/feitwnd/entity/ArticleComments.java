@@ -76,6 +76,9 @@ public class ArticleComments implements Serializable {
     // 是否为管理员回复，0-否，1-是
     private Integer isAdminReply;
 
+    // 文章标题（非数据库字段，关联查询时填充）
+    private String articleTitle;
+
     // 创建时间
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createTime;

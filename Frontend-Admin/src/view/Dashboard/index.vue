@@ -39,7 +39,11 @@ const statCards = [
   { key: 'totalVisitorCount', label: '总访客数', icon: 'icon-user' },
   { key: 'todayViewCount', label: '今日浏览', icon: 'icon-today' },
   { key: 'todayNewVisitorCount', label: '今日新访客', icon: 'icon-new' },
-  { key: 'totalArticleCount', label: '文章总数', icon: 'icon-bianjiwenzhang_huaban' },
+  {
+    key: 'totalArticleCount',
+    label: '文章总数',
+    icon: 'icon-bianjiwenzhang_huaban'
+  },
   { key: 'totalCommentCount', label: '评论总数', icon: 'icon-comment' },
   { key: 'pendingCommentCount', label: '待审评论', icon: 'icon-pending' }
 ]
@@ -179,8 +183,8 @@ const fetchVisitorChart = async () => {
 const fetchBarChart = async () => {
   const res = await getArticleViewTop10()
   const vo = res.data ?? {}
-  const titles = splitStr(vo.titleList).slice(0, 10).reverse()
-  const counts = splitNum(vo.viewCountList).slice(0, 10).reverse()
+  const titles = (vo.titleList ?? []).slice(0, 10).reverse()
+  const counts = (vo.viewCountList ?? []).slice(0, 10).reverse()
   barChart.value?.setOption({
     tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
     grid: { left: 130, right: 20, top: 16, bottom: 24 },
@@ -219,6 +223,18 @@ const fetchPieChart = async () => {
   }))
   pieChart.value?.setOption({
     tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+    color: [
+      '#303133',
+      '#606266',
+      '#909399',
+      '#A8ABB2',
+      '#C0C4CC',
+      '#D4D7DE',
+      '#DCDFE6',
+      '#E4E7ED',
+      '#EBEEF5',
+      '#F2F6FC'
+    ],
     legend: {
       orient: 'vertical',
       right: 10,

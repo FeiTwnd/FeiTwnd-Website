@@ -17,22 +17,23 @@
     </insert>
 
     <select id="pageQuery" resultType="cc.feitwnd.entity.ArticleComments">
-        select * from article_comments
+        select c.*, a.title as article_title from article_comments c
+        left join articles a on c.article_id = a.id
         <where>
             <if test="articleId != null">
-                and article_id = #{articleId}
+                and c.article_id = #{articleId}
             </if>
             <if test="isApproved != null">
-                and is_approved = #{isApproved}
+                and c.is_approved = #{isApproved}
             </if>
             <if test="startTime != null">
-                and create_time &gt;= #{startTime}
+                and c.create_time &gt;= #{startTime}
             </if>
             <if test="endTime != null">
-                and create_time &lt;= #{endTime}
+                and c.create_time &lt;= #{endTime}
             </if>
         </where>
-        order by create_time desc
+        order by c.create_time desc
     </select>
 
     <select id="getByArticleId" resultType="cc.feitwnd.entity.ArticleComments">
