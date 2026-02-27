@@ -155,9 +155,16 @@ onMounted(async () => {
               d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10A15.3 15.3 0 0112 2z"
             />
           </svg>
-          <a :href="info.website" target="_blank" rel="noopener">{{
-            info.website.replace(/^https?:\/\//, '')
-          }}</a>
+          <a
+            :href="
+              info.website.match(/^https?:\/\//)
+                ? info.website
+                : 'https://' + info.website
+            "
+            target="_blank"
+            rel="noopener"
+            >{{ info.website.replace(/^https?:\/\//, '') }}</a
+          >
         </li>
       </ul>
     </header>
