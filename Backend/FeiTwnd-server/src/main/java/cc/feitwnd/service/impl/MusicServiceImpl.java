@@ -11,6 +11,8 @@ import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -26,6 +28,7 @@ public class MusicServiceImpl implements MusicService {
      * 添加音乐
      * @param music
      */
+    @CacheEvict(value = "musicList", allEntries = true)
     public void addMusic(MusicDTO musicDTO) {
         Music music = new Music();
         BeanUtils.copyProperties(musicDTO, music);
@@ -49,6 +52,7 @@ public class MusicServiceImpl implements MusicService {
      * 更新音乐
      * @param music
      */
+    @CacheEvict(value = "musicList", allEntries = true)
     public void updateMusic(MusicDTO musicDTO) {
         Music music = new Music();
         BeanUtils.copyProperties(musicDTO, music);
@@ -59,6 +63,7 @@ public class MusicServiceImpl implements MusicService {
      * 批量删除音乐
      * @param ids
      */
+    @CacheEvict(value = "musicList", allEntries = true)
     public void batchDelete(List<Long> ids) {
         musicMapper.batchDelete(ids);
     }
@@ -76,6 +81,7 @@ public class MusicServiceImpl implements MusicService {
      * 获取所有可见的音乐
      * @return
      */
+    @Cacheable(value = "musicList", key = "'visible'")
     public List<MusicVO> getAllVisibleMusic() {
         List<Music> musicList = musicMapper.getAllVisibleMusic();
         if(musicList != null && !musicList.isEmpty()) {

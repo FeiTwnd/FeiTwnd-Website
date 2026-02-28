@@ -10,6 +10,8 @@ import cc.feitwnd.service.SystemConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,6 +36,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * @param configKey
      * @return
      */
+    @Cacheable(value = "systemConfig", key = "#configKey")
     public SystemConfig getByKey(String configKey) {
         return systemConfigMapper.getByKey(configKey);
     }
@@ -51,6 +54,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 添加系统配置
      * @param systemConfigDTO
      */
+    @CacheEvict(value = "systemConfig", allEntries = true)
     public void addConfig(SystemConfigDTO systemConfigDTO) {
         // 检查配置键是否已存在
         SystemConfig existingConfig = systemConfigMapper.getByKey(systemConfigDTO.getConfigKey());
@@ -66,6 +70,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 更新系统配置
      * @param systemConfigDTO
      */
+    @CacheEvict(value = "systemConfig", allEntries = true)
     public void updateConfig(SystemConfigDTO systemConfigDTO) {
         SystemConfig systemConfig = new SystemConfig();
         BeanUtils.copyProperties(systemConfigDTO, systemConfig);
@@ -76,6 +81,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * 批量删除系统配置
      * @param ids
      */
+    @CacheEvict(value = "systemConfig", allEntries = true)
     public void batchDelete(List<Long> ids) {
         systemConfigMapper.batchDelete(ids);
     }

@@ -314,6 +314,7 @@ public class ArticleServiceImpl implements ArticleService {
 
     // ===== 博客端方法 =====
 
+    @Cacheable(value = "articleList", key = "'page:' + #page + ':' + #pageSize")
     public PageResult getPublishedPage(int page, int pageSize) {
         PageHelper.startPage(page, pageSize);
         Page<BlogArticleVO> pageResult = articleMapper.getPublishedPage();
@@ -356,6 +357,7 @@ public class ArticleServiceImpl implements ArticleService {
         }
     }
 
+    @Cacheable(value = "articleList", key = "'cat:' + #categoryId + ':' + #page + ':' + #pageSize")
     public PageResult getPublishedByCategoryId(Long categoryId, int page, int pageSize) {
         PageHelper.startPage(page, pageSize);
         Page<BlogArticleVO> pageResult = articleMapper.getPublishedByCategoryId(categoryId);
@@ -386,12 +388,14 @@ public class ArticleServiceImpl implements ArticleService {
         return new ArrayList<>(archiveMap.values());
     }
 
+    @Cacheable(value = "articleList", key = "'search:' + #keyword + ':' + #page + ':' + #pageSize")
     public PageResult searchPublished(String keyword, int page, int pageSize) {
         PageHelper.startPage(page, pageSize);
         Page<BlogArticleVO> pageResult = articleMapper.searchPublished(keyword);
         return new PageResult(pageResult.getTotal(), pageResult.getResult());
     }
 
+    @Cacheable(value = "articleList", key = "'tag:' + #tagId + ':' + #page + ':' + #pageSize")
     public PageResult getPublishedByTagId(Long tagId, int page, int pageSize) {
         PageHelper.startPage(page, pageSize);
         Page<BlogArticleVO> pageResult = articleMapper.getPublishedByTagId(tagId);
