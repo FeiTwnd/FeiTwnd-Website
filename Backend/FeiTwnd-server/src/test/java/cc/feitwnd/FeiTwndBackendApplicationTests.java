@@ -9,8 +9,8 @@ class FeiTwndBackendApplicationTests {
 
     @Test
     public void testPassword() throws Exception {
-        String password = "";
-        String salt = "";
+        String password = "123456"; // 替换为你需要的密码
+        String salt = "123456";    //  替换为你需要的盐值，可以是任意字符串
 
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         String combined = password + salt;

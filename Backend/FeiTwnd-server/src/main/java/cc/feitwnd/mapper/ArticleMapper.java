@@ -98,21 +98,18 @@ public interface ArticleMapper {
     /**
      * 浏览量批量累加（定时同步Redis增量）
      */
-    @AutoFill(value = OperationType.UPDATE)
     @Update("update articles set view_count = view_count + #{increment} where id = #{id}")
     void addViewCount(@Param("id") Long id, @Param("increment") int increment);
 
     /**
      * 点赞数+1
      */
-    @AutoFill(value = OperationType.UPDATE)
     @Update("update articles set like_count = like_count + 1 where id = #{id}")
     void incrementLikeCount(Long id);
 
     /**
      * 点赞数-1
      */
-    @AutoFill(value = OperationType.UPDATE)
     @Update("update articles set like_count = case when like_count > 0 then like_count - 1 else 0 end where id = #{id}")
     void decrementLikeCount(Long id);
 
