@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="60 seconds">
+
+    <!-- 定义变量 -->
+    <property name="LOG_HOME" value="/opt/app/logs" />
+    <property name="APP_NAME" value="feitwnd" />
+    <property name="MAX_HISTORY" value="30" />
+    <property name="MAX_FILE_SIZE" value="10MB" />
+    <property name="TOTAL_SIZE_CAP" value="1GB" />
+
+    <!-- 控制台输出（所有环境通用） -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- ==================== 生产环境：文件 Appender ==================== -->
+    <springProfile name="prod">
+
+        <!-- 主应用日志文件 -->
+        <appender name="APPLICATION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_HOME}/${APP_NAME}-application.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_HOME}/${APP_NAME}-application-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+                <maxHistory>${MAX_HISTORY}</maxHistory>
+                <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+                <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{ip:-}] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- 错误日志单独文件 -->
+        <appender name="ERROR_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_HOME}/${APP_NAME}-error.log</file>
+            <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                <level>ERROR</level>
+            </filter>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_HOME}/${APP_NAME}-error-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+                <maxHistory>30</maxHistory>
+                <maxFileSize>10MB</maxFileSize>
+                <totalSizeCap>500MB</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{ip:-}] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- 安全扫描日志单独文件 -->
+        <appender name="SECURITY_SCAN_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_HOME}/${APP_NAME}-security-scan.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_HOME}/${APP_NAME}-security-scan-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+                <maxHistory>90</maxHistory>
+                <maxFileSize>10MB</maxFileSize>
+                <totalSizeCap>2GB</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{ip:-}] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- SQL慢查询日志 -->
+        <appender name="SQL_SLOW_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>${LOG_HOME}/${APP_NAME}-sql-slow.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>${LOG_HOME}/${APP_NAME}-sql-slow-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+                <maxHistory>7</maxHistory>
+                <maxFileSize>10MB</maxFileSize>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- 安全扫描日志器 -->
+        <logger name="SECURITY_SCAN" level="WARN" additivity="false">
+            <appender-ref ref="SECURITY_SCAN_FILE" />
+            <appender-ref ref="CONSOLE" />
+        </logger>
+
+        <!-- MyBatis SQL日志 -->
+        <logger name="cc.feitwnd.mapper" level="WARN">
+            <appender-ref ref="APPLICATION_FILE" />
+        </logger>
+
+        <!-- 慢SQL日志 -->
+        <logger name="cc.feitwnd.mapper.slow" level="DEBUG" additivity="false">
+            <appender-ref ref="SQL_SLOW_FILE" />
+        </logger>
+
+        <!-- 404错误处理 -->
+        <logger name="org.springframework.web.servlet.PageNotFound" level="ERROR" additivity="false">
+            <appender-ref ref="SECURITY_SCAN_FILE" />
+        </logger>
+
+        <!-- 根日志 -->
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="APPLICATION_FILE" />
+            <appender-ref ref="ERROR_FILE" />
+        </root>
+
+    </springProfile>
+
+    <!-- ==================== 开发环境：仅控制台 ==================== -->
+    <springProfile name="dev">
+
+        <!-- 安全扫描日志器（开发环境仅输出到控制台） -->
+        <logger name="SECURITY_SCAN" level="WARN" additivity="false">
+            <appender-ref ref="CONSOLE" />
+        </logger>
+
+        <!-- MyBatis SQL日志（开发环境显示 SQL） -->
+        <logger name="cc.feitwnd.mapper" level="DEBUG" />
+
+        <!-- 404错误处理 -->
+        <logger name="org.springframework.web.servlet.PageNotFound" level="ERROR" additivity="false">
+            <appender-ref ref="CONSOLE" />
+        </logger>
+
+        <!-- 根日志 -->
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+        </root>
+
+    </springProfile>
+
+    <!-- ==================== 所有环境通用 ==================== -->
+    <logger name="org.apache.tomcat" level="ERROR" />
+    <logger name="org.apache.coyote" level="ERROR" />
+    <logger name="org.apache.catalina" level="ERROR" />
+
+</configuration>
