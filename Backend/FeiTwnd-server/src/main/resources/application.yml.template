@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 5922
 
 spring:
   application:
@@ -81,10 +81,10 @@ feitwnd:
     access-key-secret: your-alioss-access-key-secret
     bucket-name: your-bucket-name
   email:
-    personal:      #邮件发送者昵称
-    from:          #邮件发送者邮箱
+    personal:    #SMTP邮件发送者昵称
+    from:   #SMTP邮件发送者邮箱，跟上面那个邮箱配置的username一致即可
   visitor:
-    verify-code:   #游客验证码
+    verify-code:   #管理端游客登录用的邮箱验证码
   image:
     compress:
       enabled: true           # 是否启用图片压缩

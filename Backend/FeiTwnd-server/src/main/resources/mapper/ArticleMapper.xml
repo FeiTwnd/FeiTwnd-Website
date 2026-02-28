@@ -81,7 +81,7 @@
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where a.is_published = 1
-        order by a.is_top desc, a.publish_time desc
+        order by a.is_top desc, coalesce(a.publish_time, a.create_time) desc
     </select>
 
     <select id="getBySlug" resultType="cc.feitwnd.vo.BlogArticleDetailVO">
@@ -102,14 +102,14 @@
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where a.is_published = 1 and a.category_id = #{categoryId}
-        order by a.is_top desc, a.publish_time desc
+        order by a.is_top desc, coalesce(a.publish_time, a.create_time) desc
     </select>
 
     <select id="getArchiveList" resultType="cc.feitwnd.vo.ArticleArchiveItemVO">
         select id, title, slug, publish_day, publish_time
         from articles
         where is_published = 1
-        order by publish_time desc
+        order by coalesce(publish_time, create_time) desc
     </select>
 
     <select id="searchPublished" resultType="cc.feitwnd.vo.BlogArticleVO">
@@ -123,7 +123,7 @@
           and (a.title like concat('%', #{keyword}, '%')
                or a.summary like concat('%', #{keyword}, '%')
                or a.content_markdown like concat('%', #{keyword}, '%'))
-        order by a.is_top desc, a.publish_time desc
+        order by a.is_top desc, coalesce(a.publish_time, a.create_time) desc
     </select>
 
     <select id="getViewTop10" resultType="cc.feitwnd.dto.ArticleTitleViewCountDTO">
@@ -143,7 +143,7 @@
         left join article_categories ac on a.category_id = ac.id
         inner join article_tag_relations atr on a.id = atr.article_id
         where a.is_published = 1 and atr.tag_id = #{tagId}
-        order by a.is_top desc, a.publish_time desc
+        order by a.is_top desc, coalesce(a.publish_time, a.create_time) desc
     </select>
 
     <select id="getPrevArticle" resultType="cc.feitwnd.vo.BlogArticleVO">
@@ -170,7 +170,7 @@
         from articles a
         left join article_categories ac on a.category_id = ac.id
         where a.is_published = 1 and a.id != #{articleId} and a.category_id = #{categoryId}
-        order by a.is_top desc, a.publish_time desc
+        order by a.is_top desc, coalesce(a.publish_time, a.create_time) desc
         limit 6
     </select>
 </mapper>

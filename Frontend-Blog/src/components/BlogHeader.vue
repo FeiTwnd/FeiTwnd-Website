@@ -1,10 +1,9 @@
 <script setup>
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 import { useBlogStore, useThemeStore } from '@/stores'
 
 const router = useRouter()
-const route = useRoute()
 const blogStore = useBlogStore()
 const themeStore = useThemeStore()
 

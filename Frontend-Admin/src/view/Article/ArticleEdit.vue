@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useArticleStore } from '@/stores'
 import { uploadFile } from '@/api/settings'
 import { MdEditor } from 'md-editor-v3'
@@ -81,6 +81,7 @@ const autoSlug = () => {
 }
 
 /* ---- 保存 / 发布 ---- */
+const isSaved = ref(false)
 const handleSave = async (isPublished) => {
   if (!form.value.title.trim()) return ElMessage.warning('请输入文章标题')
   if (!form.value.slug.trim())
@@ -92,12 +93,63 @@ const handleSave = async (isPublished) => {
   try {
     form.value.isPublished = isPublished
     await articleStore.saveArticle({ ...form.value })
+    isSaved.value = true
     ElMessage.success(isPublished ? '发布成功' : '保存草稿成功')
     router.push('/article/list')
   } finally {
     saving.value = false
   }
 }
+
+/* ---- 内容变更检测 & 离开提示 ---- */
+const initialSnapshot = ref('')
+const hasUnsavedChanges = () => {
+  if (isSaved.value) return false
+  const current = JSON.stringify({
+    title: form.value.title,
+    slug: form.value.slug,
+    summary: form.value.summary,
+    coverImage: form.value.coverImage,
+    categoryId: form.value.categoryId,
+    tagIds: form.value.tagIds,
+    contentMarkdown: form.value.contentMarkdown
+  })
+  return current !== initialSnapshot.value
+}
+
+const takeSnapshot = () => {
+  initialSnapshot.value = JSON.stringify({
+    title: form.value.title,
+    slug: form.value.slug,
+    summary: form.value.summary,
+    coverImage: form.value.coverImage,
+    categoryId: form.value.categoryId,
+    tagIds: form.value.tagIds,
+    contentMarkdown: form.value.contentMarkdown
+  })
+}
+
+onBeforeRouteLeave(async () => {
+  if (!hasUnsavedChanges()) return true
+  try {
+    await ElMessageBox.confirm('你有未保存的内容，是否保存为草稿？', '提示', {
+      confirmButtonText: '保存草稿',
+      cancelButtonText: '不保存',
+      distinguishCancelAndClose: true,
+      type: 'warning'
+    })
+    // 用户点击保存草稿
+    await handleSave(0)
+    return true
+  } catch (action) {
+    if (action === 'cancel') {
+      // 用户点击不保存，直接离开
+      return true
+    }
+    // 用户点击关闭按钮，留在当前页面
+    return false
+  }
+})
 
 onMounted(async () => {
   await Promise.all([articleStore.fetchCategories(), articleStore.fetchTags()])
@@ -117,6 +169,7 @@ onMounted(async () => {
       })
     }
   }
+  takeSnapshot()
 })
 </script>
 

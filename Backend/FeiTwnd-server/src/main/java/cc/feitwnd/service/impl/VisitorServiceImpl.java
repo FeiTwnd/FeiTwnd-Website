@@ -211,10 +211,21 @@ public class VisitorServiceImpl implements VisitorService {
     }
 
     /**
-     * 批量解封访客
+     * 批量解封访客（同时清除 Redis 封禁缓存）
      * @param ids
      */
     public void batchUnblock(List<Long> ids) {
+        // 先查出这些访客的 fingerprint，用于清除 Redis 封禁缓存
+        for (Long id : ids) {
+            Visitors visitor = visitorMapper.findById(id);
+            if (visitor != null && visitor.getFingerprint() != null) {
+                String blockedKey = "visitor:blocked:" + visitor.getFingerprint();
+                redisTemplate.delete(blockedKey);
+                // 同时清除访客信息缓存，避免旧的 isBlocked=1 状态残留
+                String visitorKey = VISITOR_KEY + visitor.getFingerprint();
+                redisTemplate.delete(visitorKey);
+            }
+        }
         visitorMapper.batchUnblock(ids);
     }
 }

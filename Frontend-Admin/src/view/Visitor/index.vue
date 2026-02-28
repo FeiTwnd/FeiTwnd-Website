@@ -149,47 +149,47 @@ onMounted(load)
         @selection-change="handleSelectionChange"
       >
         <el-table-column type="selection" width="48" />
-        <el-table-column prop="ip" label="IP 地址" width="160" />
+        <el-table-column prop="ip" label="IP 地址" min-width="140" />
         <el-table-column
           prop="country"
           label="国家"
-          width="100"
+          min-width="90"
           show-overflow-tooltip
         />
         <el-table-column
           prop="province"
           label="省份"
-          width="120"
+          min-width="100"
           show-overflow-tooltip
         />
         <el-table-column
           prop="city"
           label="城市"
-          width="120"
+          min-width="100"
           show-overflow-tooltip
         />
         <el-table-column
           prop="totalViews"
           label="浏览次数"
-          width="100"
+          min-width="90"
           align="center"
         />
-        <el-table-column label="状态" width="90" align="center">
+        <el-table-column label="状态" min-width="80" align="center">
           <template #default="{ row }">
             <span>{{ row.isBlocked ? '已封禁' : '正常' }}</span>
           </template>
         </el-table-column>
-        <el-table-column label="首次访问" width="158" align="center">
+        <el-table-column label="首次访问" min-width="150" align="center">
           <template #default="{ row }">{{
             fmtDate(row.firstVisitTime)
           }}</template>
         </el-table-column>
-        <el-table-column label="最近访问" width="158" align="center">
+        <el-table-column label="最近访问" min-width="150" align="center">
           <template #default="{ row }">{{
             fmtDate(row.lastVisitTime)
           }}</template>
         </el-table-column>
-        <el-table-column label="封禁到期" width="158" align="center">
+        <el-table-column label="封禁到期" min-width="150" align="center">
           <template #default="{ row }">
             <span>{{
               row.isBlocked ? fmtDate(row.expiresAt) || '永久' : '-'

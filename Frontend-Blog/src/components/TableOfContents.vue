@@ -96,8 +96,6 @@ onUnmounted(() => window.removeEventListener('scroll', handleScroll))
   list-style: none;
   margin: 0;
   padding: 0;
-  max-height: 400px;
-  overflow-y: auto;
 }
 .toc-item {
   font-size: 13px;
