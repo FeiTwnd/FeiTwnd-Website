@@ -25,8 +25,8 @@
 
 ```bash
 # 1. Fork 本仓库并克隆到本地
-git clone https://github.com/your-username/FeiTwnd.git
-cd FeiTwnd
+git clone https://github.com/FeiTwnd/FeiTwnd-Website.git
+cd FeiTwnd-Website
 
 # 2. 创建新分支
 git checkout -b feat/your-feature-name
