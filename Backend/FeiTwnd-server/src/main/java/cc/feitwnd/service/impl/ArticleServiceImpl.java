@@ -104,10 +104,13 @@ public class ArticleServiceImpl implements ArticleService {
             articles.setPublishTime(LocalDateTime.now());
         }
 
-        // 初始化统计字段
+        // 初始化统计字段和默认状态
         articles.setViewCount(0L);
         articles.setLikeCount(0L);
         articles.setCommentCount(0L);
+        if (articles.getIsTop() == null) {
+            articles.setIsTop(0);
+        }
 
         articleMapper.insert(articles);
 
@@ -350,11 +353,8 @@ public class ArticleServiceImpl implements ArticleService {
     /**
      * 文章浏览量+1（写入Redis，定时同步MySQL）
      */
-    public void incrementViewCount(String slug) {
-        BlogArticleDetailVO articleDetail = articleMapper.getBySlug(slug);
-        if (articleDetail != null) {
-            redisTemplate.opsForHash().increment(VIEW_COUNT_KEY, articleDetail.getId().toString(), 1);
-        }
+    public void incrementViewCount(Long articleId) {
+        redisTemplate.opsForHash().increment(VIEW_COUNT_KEY, articleId.toString(), 1);
     }
 
     @Cacheable(value = "articleList", key = "'cat:' + #categoryId + ':' + #page + ':' + #pageSize")

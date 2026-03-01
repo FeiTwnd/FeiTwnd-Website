@@ -55,26 +55,42 @@ const batchApprove = async () => {
 
 /* ---- 删除 ---- */
 const deleteOne = async (row) => {
-  await ElMessageBox.confirm('确认删除该条留言？', '警告', {
-    confirmButtonText: '删除',
-    cancelButtonText: '取消',
-    type: 'warning'
-  })
-  await messageStore.remove([row.id])
-  ElMessage.success('删除成功')
-  load()
+  try {
+    await ElMessageBox.confirm('确认删除该条留言？', '警告', {
+      confirmButtonText: '删除',
+      cancelButtonText: '取消',
+      type: 'warning'
+    })
+  } catch {
+    return
+  }
+  try {
+    await messageStore.remove([row.id])
+    ElMessage.success('删除成功')
+    load()
+  } catch (e) {
+    ElMessage.error(e.response?.data?.msg || '删除失败')
+  }
 }
 
 const batchDelete = async () => {
   if (!selected.value.length) return ElMessage.warning('请先选择留言')
-  await ElMessageBox.confirm(
-    `确认删除选中的 ${selected.value.length} 条留言？`,
-    '警告',
-    { confirmButtonText: '删除', cancelButtonText: '取消', type: 'warning' }
-  )
-  await messageStore.remove(selected.value.map((r) => r.id))
-  ElMessage.success('批量删除成功')
-  load()
+  try {
+    await ElMessageBox.confirm(
+      `确认删除选中的 ${selected.value.length} 条留言？`,
+      '警告',
+      { confirmButtonText: '删除', cancelButtonText: '取消', type: 'warning' }
+    )
+  } catch {
+    return
+  }
+  try {
+    await messageStore.remove(selected.value.map((r) => r.id))
+    ElMessage.success('批量删除成功')
+    load()
+  } catch (e) {
+    ElMessage.error(e.response?.data?.msg || '批量删除失败')
+  }
 }
 
 /* ---- 详情弹窗 ---- */
@@ -106,7 +122,7 @@ const submitReply = async () => {
     rootId: t.rootId ?? t.id,
     parentNickname: t.nickname ?? '',
     content: replyContent.value,
-    isMarkdown: 0
+    isMarkdown: 1
   })
   ElMessage.success('回复成功')
   replyVisible.value = false

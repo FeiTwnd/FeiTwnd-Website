@@ -23,7 +23,9 @@ public class MessageVO implements Serializable {
     private Long rootId;
     private Long parentId;
     private String parentNickname;
+    private String content;
     private String contentHtml;
+    private Integer isMarkdown;
     private Long visitorId;
     private String nickname;
     private String emailOrQq;

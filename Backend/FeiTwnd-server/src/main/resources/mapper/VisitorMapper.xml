@@ -71,5 +71,6 @@
         from visitors
         group by province
         order by count desc
+        limit 10
     </select>
 </mapper>

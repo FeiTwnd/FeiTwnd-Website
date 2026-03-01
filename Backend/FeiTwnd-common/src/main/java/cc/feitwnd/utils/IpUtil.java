@@ -17,9 +17,23 @@ public class IpUtil {
     public static final String IP_API = "http://ip-api.com/json/";
     public static final String LANGUAGE = "zh-CN";
 
-    // 获取真实IP地址
+    // 获取真实IP地址（兼容CDN/反向代理）
     public static String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
+        // CDN专用头（优先级最高）
+        String ip = request.getHeader("CF-Connecting-IP");      // Cloudflare
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("True-Client-IP");            // Cloudflare Enterprise / Akamai
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("Ali-CDN-Real-IP");           // 阿里云CDN
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");                 // Nginx / 通用CDN
+        }
+        // 标准代理头
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Forwarded-For");
+        }
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
@@ -30,7 +44,7 @@ public class IpUtil {
             ip = request.getRemoteAddr();
         }
 
-        // 多级代理时，取第一个IP
+        // 多级代理时，取第一个IP（即真实客户端IP）
         if (ip != null && ip.contains(",")) {
             ip = ip.split(",")[0].trim();
         }

@@ -210,7 +210,7 @@ const cancelReply = () => {
 
 const startEdit = (c) => {
   editingId.value = c.id
-  editContent.value = c.contentHtml?.replace(/<[^>]+>/g, '') ?? ''
+  editContent.value = c.content ?? c.contentHtml?.replace(/<[^>]+>/g, '') ?? ''
 }
 const doEdit = async (c) => {
   if (!editContent.value.trim()) return
@@ -235,11 +235,15 @@ const doDelete = async (c) => {
       cancelButtonText: '取消',
       type: 'warning'
     })
+  } catch {
+    return // 用户取消
+  }
+  try {
     await deleteComment(c.id, visitorStore.visitorId)
     ElMessage.success('删除成功')
     loadComments()
-  } catch {
-    /* cancel */
+  } catch (e) {
+    ElMessage.error(e.response?.data?.msg || '删除失败')
   }
 }
 
@@ -805,6 +809,7 @@ onMounted(() => {
 /* 正文容器 — MdPreview 填满 */
 .article-content {
   word-break: break-word;
+  overflow-x: hidden;
 }
 /* MdPreview 去掉自带内边距、融入卡片 */
 .article-content :deep(.md-editor) {
@@ -818,6 +823,48 @@ onMounted(() => {
   font-size: 15.5px;
   line-height: 1.85;
   color: var(--blog-text, #333);
+}
+/* 代码块响应式：阻止撑宽页面 */
+.article-content :deep(pre) {
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+.article-content :deep(pre code) {
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+.article-content :deep(table) {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+/* MdPreview 代码块组件（details.md-editor-code）修复 */
+/* 1. summary 头部 z-index 压到导航栏之下，避免滚动时盖住 header */
+.article-content :deep(.md-editor-code-head) {
+  z-index: 1 !important;
+  position: relative;
+}
+/* 2. 代码块整体限制宽度 + 横向滚动（修复手机端撑宽页面） */
+.article-content :deep(.md-editor-code) {
+  max-width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+.article-content :deep(.md-editor-code pre) {
+  max-width: 100%;
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+}
+.article-content :deep(.md-editor-code pre code) {
+  white-space: pre;
+  word-break: normal;
+  overflow-wrap: normal;
+  display: block;
 }
 /* 图片圆角 */
 .article-content :deep(img) {
@@ -1239,7 +1286,71 @@ onMounted(() => {
   line-height: 1.65;
 }
 .c-body :deep(p) {
-  margin: 0;
+  margin: 4px 0;
+}
+.c-body :deep(pre) {
+  background: #282c34;
+  color: #abb2bf;
+  padding: 12px 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.c-body :deep(pre code) {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+.c-body :deep(code) {
+  background: #f5f7fa;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #476582;
+}
+.c-body :deep(blockquote) {
+  margin: 8px 0;
+  padding: 6px 12px;
+  border-left: 3px solid #dcdfe6;
+  background: #f5f7fa;
+  color: #606266;
+}
+.c-body :deep(ul),
+.c-body :deep(ol) {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+.c-body :deep(a) {
+  color: #409eff;
+  text-decoration: none;
+}
+.c-body :deep(a:hover) {
+  text-decoration: underline;
+}
+.c-body :deep(h1),
+.c-body :deep(h2),
+.c-body :deep(h3),
+.c-body :deep(h4) {
+  margin: 8px 0 4px;
+  font-weight: 600;
+  color: #303133;
+}
+.c-body :deep(h1) {
+  font-size: 18px;
+}
+.c-body :deep(h2) {
+  font-size: 16px;
+}
+.c-body :deep(h3) {
+  font-size: 15px;
+}
+.c-body :deep(img) {
+  max-width: 100%;
+  border-radius: 4px;
 }
 
 .c-date {

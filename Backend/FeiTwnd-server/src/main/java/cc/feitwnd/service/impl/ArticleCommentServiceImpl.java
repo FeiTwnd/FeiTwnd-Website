@@ -73,7 +73,16 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      * 批量审核通过评论
      * @param ids
      */
+    @Transactional
     public void batchApprove(List<Long> ids) {
+        // 先查询每条评论，只对"当前未审核"的评论增加文章评论数
+        for (Long id : ids) {
+            ArticleComments comment = articleCommentMapper.getById(id);
+            if (comment != null && comment.getArticleId() != null
+                    && (comment.getIsApproved() == null || comment.getIsApproved() == 0)) {
+                articleCommentMapper.incrementCommentCount(comment.getArticleId());
+            }
+        }
         articleCommentMapper.batchApprove(ids);
     }
 
@@ -83,20 +92,24 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      */
     @Transactional
     public void batchDelete(List<Long> ids) {
-        // 先查询每条评论的articleId，用于减少对应文章的评论数
         for (Long id : ids) {
             ArticleComments comment = articleCommentMapper.getById(id);
-            if (comment != null && comment.getArticleId() != null) {
-                // 如果是根评论，级联删除所有子评论
-                if (comment.getRootId() == null || comment.getRootId() == 0) {
-                    Integer childCount = articleCommentMapper.countByRootId(id);
-                    if (childCount != null && childCount > 0) {
-                        articleCommentMapper.deleteByRootId(id);
-                        for (int i = 0; i < childCount; i++) {
-                            articleCommentMapper.decrementCommentCount(comment.getArticleId());
-                        }
+            if (comment == null || comment.getArticleId() == null) {
+                continue;
+            }
+            // 如果是根评论，级联删除所有子评论
+            if (comment.getRootId() == null || comment.getRootId() == 0) {
+                // 只对已审核的子评论减少评论数
+                Integer approvedChildCount = articleCommentMapper.countApprovedByRootId(id);
+                if (approvedChildCount != null && approvedChildCount > 0) {
+                    for (int i = 0; i < approvedChildCount; i++) {
+                        articleCommentMapper.decrementCommentCount(comment.getArticleId());
                     }
                 }
+                articleCommentMapper.deleteByRootId(id);
+            }
+            // 只有已审核的评论才减少文章评论数
+            if (comment.getIsApproved() != null && comment.getIsApproved() == 1) {
                 articleCommentMapper.decrementCommentCount(comment.getArticleId());
             }
         }
@@ -143,6 +156,11 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         }
 
         articleCommentMapper.save(articleComments);
+
+        // 管理员回复自动通过审核，文章评论数+1
+        if (articleCommentReplyDTO.getArticleId() != null) {
+            articleCommentMapper.incrementCommentCount(articleCommentReplyDTO.getArticleId());
+        }
 
         // 检查父评论是否开启邮箱通知
         notifyParentIfNeeded(articleCommentReplyDTO.getParentId(), "FeiTwnd",
@@ -234,8 +252,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         // 8. 保存到数据库
         articleCommentMapper.save(articleComments);
 
-        // 9. 文章评论数+1
-        articleCommentMapper.incrementCommentCount(articleCommentDTO.getArticleId());
+        // 9. 评论数不在提交时+1，改为审核通过时+1（见 batchApprove）
 
         // 10. 检查父评论是否开启邮箱通知
         if (articleCommentDTO.getParentId() != null) {
@@ -287,19 +304,24 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
 
         // 如果是根评论，级联删除所有子评论
         if (comment.getRootId() == null || comment.getRootId() == 0) {
-            Integer childCount = articleCommentMapper.countByRootId(id);
-            if (childCount != null && childCount > 0) {
-                articleCommentMapper.deleteByRootId(id);
-                // 评论数减去子评论数
-                for (int i = 0; i < childCount; i++) {
+            // 只对已审核的子评论减少评论数
+            Integer approvedChildCount = articleCommentMapper.countApprovedByRootId(id);
+            if (approvedChildCount != null && approvedChildCount > 0) {
+                for (int i = 0; i < approvedChildCount; i++) {
                     articleCommentMapper.decrementCommentCount(comment.getArticleId());
                 }
+            }
+            Integer totalChildCount = articleCommentMapper.countByRootId(id);
+            if (totalChildCount != null && totalChildCount > 0) {
+                articleCommentMapper.deleteByRootId(id);
             }
         }
 
         articleCommentMapper.deleteById(id);
-        // 文章评论数-1
-        articleCommentMapper.decrementCommentCount(comment.getArticleId());
+        // 只有已审核的评论才减少文章评论数
+        if (comment.getIsApproved() != null && comment.getIsApproved() == 1) {
+            articleCommentMapper.decrementCommentCount(comment.getArticleId());
+        }
         log.info("访客删除评论成功: id={}, visitorId={}", id, visitorId);
     }
 

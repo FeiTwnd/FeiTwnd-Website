@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -177,6 +178,7 @@ public class MessageServiceImpl implements MessageService {
      * 批量删除留言
      * @param ids
      */
+    @Transactional
     public void batchDelete(List<Long> ids) {
         // 如果是根留言，级联删除所有子留言
         for (Long id : ids) {
@@ -298,6 +300,7 @@ public class MessageServiceImpl implements MessageService {
     /**
      * 访客删除留言
      */
+    @Transactional
     public void visitorDeleteMessage(Long id, Long visitorId) {
         Messages message = messageMapper.getById(id);
         if (message == null) {

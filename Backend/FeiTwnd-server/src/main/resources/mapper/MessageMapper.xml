@@ -56,7 +56,7 @@
     <!-- ===== 博客端查询 ===== -->
 
     <select id="getApprovedList" resultType="cc.feitwnd.vo.MessageVO">
-        select id, root_id, parent_id, parent_nickname, content_html,
+        select id, root_id, parent_id, parent_nickname, content, content_html, is_markdown,
                visitor_id, nickname, email_or_qq, location, user_agent_os, user_agent_browser,
                is_approved, is_secret, is_admin_reply, create_time
         from messages

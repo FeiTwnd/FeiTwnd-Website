@@ -106,4 +106,10 @@ public interface ArticleCommentMapper {
      */
     @Select("select count(*) from article_comments where root_id = #{rootId}")
     Integer countByRootId(Long rootId);
+
+    /**
+     * 统计某根评论下已审核的子评论数
+     */
+    @Select("select count(*) from article_comments where root_id = #{rootId} and is_approved = 1")
+    Integer countApprovedByRootId(Long rootId);
 }

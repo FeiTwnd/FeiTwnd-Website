@@ -109,11 +109,15 @@ const handleDelete = async (msg) => {
     await ElMessageBox.confirm('确定删除这条留言?', '确认', {
       type: 'warning'
     })
+  } catch {
+    return // 用户取消
+  }
+  try {
     await deleteMessage(msg.id, visitorStore.visitorId)
     ElMessage.success('已删除')
     await load()
-  } catch {
-    /* cancelled */
+  } catch (e) {
+    ElMessage.error(e.response?.data?.msg || '删除失败')
   }
 }
 
@@ -127,7 +131,8 @@ const startReply = (msg) => {
 const startEdit = (msg) => {
   replyTarget.value = null
   editTarget.value = msg
-  form.value.content = msg.contentHtml?.replace(/<[^>]+>/g, '') || ''
+  form.value.content = msg.content ?? (msg.contentHtml?.replace(/<[^>]+>/g, '') || '')
+  form.value.isMarkdown = msg.isMarkdown === 1
   document.querySelector('.msg-form')?.scrollIntoView({ behavior: 'smooth' })
 }
 
@@ -789,7 +794,71 @@ onMounted(() => {
   line-height: 1.7;
 }
 .msg-body :deep(p) {
-  margin: 0;
+  margin: 4px 0;
+}
+.msg-body :deep(pre) {
+  background: #282c34;
+  color: #abb2bf;
+  padding: 12px 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 8px 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.msg-body :deep(pre code) {
+  background: none;
+  padding: 0;
+  color: inherit;
+  font-size: inherit;
+}
+.msg-body :deep(code) {
+  background: #f5f7fa;
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-size: 13px;
+  color: #476582;
+}
+.msg-body :deep(blockquote) {
+  margin: 8px 0;
+  padding: 6px 12px;
+  border-left: 3px solid #dcdfe6;
+  background: #f5f7fa;
+  color: #606266;
+}
+.msg-body :deep(ul),
+.msg-body :deep(ol) {
+  padding-left: 20px;
+  margin: 4px 0;
+}
+.msg-body :deep(a) {
+  color: #409eff;
+  text-decoration: none;
+}
+.msg-body :deep(a:hover) {
+  text-decoration: underline;
+}
+.msg-body :deep(h1),
+.msg-body :deep(h2),
+.msg-body :deep(h3),
+.msg-body :deep(h4) {
+  margin: 8px 0 4px;
+  font-weight: 600;
+  color: #303133;
+}
+.msg-body :deep(h1) {
+  font-size: 18px;
+}
+.msg-body :deep(h2) {
+  font-size: 16px;
+}
+.msg-body :deep(h3) {
+  font-size: 15px;
+}
+.msg-body :deep(img) {
+  max-width: 100%;
+  border-radius: 4px;
 }
 
 /* 底部：hover操作在右下角 */

@@ -56,13 +56,12 @@ public class OnlineCount {
      */
     @OnClose
     public void onClose(Session session) {
-        sessions.remove(session.getId());
-        int count = onlineCount.decrementAndGet();
-
-        log.info("连接关闭: {}, 当前在线: {} 人", session.getId(), count);
-
-        // 广播更新
-        broadcastCount();
+        // 只有当 session 确实在 map 中时才递减，防止与 @OnError 重复扣减导致负数
+        if (sessions.remove(session.getId()) != null) {
+            int count = onlineCount.decrementAndGet();
+            log.info("连接关闭: {}, 当前在线: {} 人", session.getId(), count);
+            broadcastCount();
+        }
     }
 
     /**
@@ -70,8 +69,11 @@ public class OnlineCount {
      */
     @OnError
     public void onError(Session session, Throwable error) {
-        sessions.remove(session.getId());
-        log.debug("WebSocket 连接异常: {}", session.getId());
+        if (sessions.remove(session.getId()) != null) {
+            int count = onlineCount.decrementAndGet();
+            log.debug("WebSocket 连接异常: {}, 当前在线: {} 人", session.getId(), count);
+            broadcastCount();
+        }
     }
 
     /**

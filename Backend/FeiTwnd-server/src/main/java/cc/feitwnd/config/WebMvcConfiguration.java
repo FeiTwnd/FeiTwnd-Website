@@ -2,11 +2,14 @@ package cc.feitwnd.config;
 
 import cc.feitwnd.interceptor.JwtTokenAdminInterceptor;
 import cc.feitwnd.json.JacksonObjectMapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -33,6 +36,16 @@ public class WebMvcConfiguration extends WebMvcConfigurationSupport {
                 .excludePathPatterns("/admin/admin/login")
                 .excludePathPatterns("/admin/admin/sendCode")
                 .excludePathPatterns("/admin/admin/logout");
+
+        // API 响应禁止 CDN/浏览器缓存，防止 GET 请求返回过期数据
+        registry.addInterceptor(new HandlerInterceptor() {
+            @Override
+            public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+                response.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, max-age=0");
+                response.setHeader("Pragma", "no-cache");
+                return true;
+            }
+        }).addPathPatterns("/admin/**", "/blog/**","/cv/**","/home/**");
     }
 
     /**

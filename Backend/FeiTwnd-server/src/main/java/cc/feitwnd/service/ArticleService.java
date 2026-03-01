@@ -82,9 +82,9 @@ public interface ArticleService {
     BlogArticleDetailVO getBySlug(String slug);
 
     /**
-     * 文章浏览量+1（写入Redis）
+     * 文章浏览量+1（写入Redis，基于文章ID）
      */
-    void incrementViewCount(String slug);
+    void incrementViewCount(Long articleId);
 
     /**
      * 根据分类ID获取已发布文章列表（分页）

@@ -8,6 +8,7 @@ import cc.feitwnd.vo.ArticleArchiveVO;
 import cc.feitwnd.vo.BlogArticleDetailVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,11 @@ public class ArticleController {
 
     @Autowired
     private ArticleService articleService;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    private static final String VIEW_COUNT_KEY = "article:viewCount";
 
     /**
      * 获取已发布文章列表（分页）
@@ -40,9 +46,17 @@ public class ArticleController {
     @GetMapping("/detail/{slug}")
     public Result<BlogArticleDetailVO> getBySlug(@PathVariable String slug) {
         log.info("博客端获取文章详情: slug={}", slug);
-        // 浏览量+1（写入Redis，与查询分离，不影响缓存）
-        articleService.incrementViewCount(slug);
+        // 先从缓存获取文章详情（避免冗余DB查询）
         BlogArticleDetailVO articleDetail = articleService.getBySlug(slug);
+        // 浏览量+1（写入Redis，基于文章ID，不再需要额外查库）
+        articleService.incrementViewCount(articleDetail.getId());
+        // 合并Redis中尚未同步到MySQL的浏览量增量，展示实时浏览数
+        Object pending = redisTemplate.opsForHash().get(VIEW_COUNT_KEY, articleDetail.getId().toString());
+        if (pending != null) {
+            long pendingCount = ((Number) pending).longValue();
+            // 返回 MySQL基准值 + Redis待同步增量（含本次+1）
+            articleDetail.setViewCount(articleDetail.getViewCount() + pendingCount);
+        }
         return Result.success(articleDetail);
     }
 
