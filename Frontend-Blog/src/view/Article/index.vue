@@ -806,12 +806,10 @@ onMounted(() => {
   margin: 0;
 }
 
-/* 正文容器 — MdPreview 填满 */
 .article-content {
   word-break: break-word;
-  overflow-x: hidden;
 }
-/* MdPreview 去掉自带内边距、融入卡片 */
+
 .article-content :deep(.md-editor) {
   background: transparent !important;
   border: none;
@@ -824,48 +822,14 @@ onMounted(() => {
   line-height: 1.85;
   color: var(--blog-text, #333);
 }
-/* 代码块响应式：阻止撑宽页面 */
-.article-content :deep(pre) {
-  max-width: 100%;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-  box-sizing: border-box;
-}
-.article-content :deep(pre code) {
-  white-space: pre;
-  word-break: normal;
-  overflow-wrap: normal;
-}
+
 .article-content :deep(table) {
   display: block;
   max-width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-/* MdPreview 代码块组件（details.md-editor-code）修复 */
-/* 1. summary 头部 z-index 压到导航栏之下，避免滚动时盖住 header */
-.article-content :deep(.md-editor-code-head) {
-  z-index: 1 !important;
-  position: relative;
-}
-/* 2. 代码块整体限制宽度 + 横向滚动（修复手机端撑宽页面） */
-.article-content :deep(.md-editor-code) {
-  max-width: 100%;
-  overflow: hidden;
-  box-sizing: border-box;
-}
-.article-content :deep(.md-editor-code pre) {
-  max-width: 100%;
-  overflow-x: auto !important;
-  -webkit-overflow-scrolling: touch;
-  box-sizing: border-box;
-}
-.article-content :deep(.md-editor-code pre code) {
-  white-space: pre;
-  word-break: normal;
-  overflow-wrap: normal;
-  display: block;
-}
+
 /* 图片圆角 */
 .article-content :deep(img) {
   max-width: 100%;
@@ -1421,6 +1385,11 @@ onMounted(() => {
   .article-layout {
     flex-direction: column;
   }
+  .article-main {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
   .article-sidebar {
     width: 100%;
     position: static;
@@ -1438,5 +1407,36 @@ onMounted(() => {
   .form-row {
     flex-direction: column;
   }
+}
+</style>
+
+<style>
+/* 代码块容器 */
+.article-content .md-editor-code {
+  max-width: 100% !important;
+  width: 100% !important;
+  box-sizing: border-box !important;
+}
+/* pre 限制宽度 */
+.article-content .md-editor-code > pre {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+.article-content .md-editor-code > pre > code {
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: auto !important;
+  display: block !important;
+}
+/* md-editor-code-block */
+.article-content .md-editor-code .md-editor-code-block {
+  width: auto !important;
+  min-width: 0 !important;
+}
+/* summary 不浮在导航栏上方 */
+.article-content .md-editor-code > .md-editor-code-head {
+  z-index: 1 !important;
+  position: relative !important;
 }
 </style>
