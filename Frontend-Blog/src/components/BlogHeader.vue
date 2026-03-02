@@ -83,7 +83,13 @@ const navItems = [
   { label: '归档', icon: 'icon-guidang', to: '/archive' },
   { label: '友链', icon: 'icon-lianjie', to: '/links' },
   { label: '留言', icon: 'icon-liuyan', to: '/message' },
-  { label: '关于', icon: 'icon-guanyu', to: '/about' }
+  { label: '关于', icon: 'icon-guanyu', to: '/about' },
+  {
+    label: '开往',
+    icon: 'icon-subway',
+    href: 'https://www.travellings.cn/go.html',
+    external: true
+  }
 ]
 
 const doSearch = () => {
