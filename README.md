@@ -12,7 +12,7 @@
 
 一套基于 **Spring Boot 3 + Vue 3** 的个人网站全栈解决方案，包含博客、后台管理、个人主页、在线简历四个子站点和一个统一后端服务。
 
-> 在线演示：[blog.feitwnd.cc](https://blog.feitwnd.cc) · [home.feitwnd.cc](https://home.feitwnd.cc) · [cv.feitwnd.cc](https://cv.feitwnd.cc)
+> 在线演示：[blog.feitwnd.cc](https://blog.feitwnd.cc) · [feitwnd.cc](https://feitwnd.cc) · [cv.feitwnd.cc](https://cv.feitwnd.cc)
 
 ---
 
