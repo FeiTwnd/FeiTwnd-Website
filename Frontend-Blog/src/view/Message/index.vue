@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, inject } from 'vue'
+import { ref, onMounted, computed, inject, nextTick } from 'vue'
 import {
   getMessageTree,
   submitMessage,
@@ -9,6 +9,7 @@ import {
 import { generateCaptcha } from '@/api/captcha'
 import { useVisitorStore, useBlogStore } from '@/stores'
 import SidebarCard from '@/components/SidebarCard.vue'
+import EmojiPicker from '@/components/EmojiPicker.vue'
 
 const visitorStore = useVisitorStore()
 const blogStore = useBlogStore()
@@ -29,6 +30,25 @@ const form = ref({
 const replyTarget = ref(null)
 const editTarget = ref(null)
 const submitting = ref(false)
+const msgTextareaRef = ref(null)
+
+/* 插入 emoji 到留言文本框光标位置 */
+const insertMsgEmoji = (char) => {
+  const ta = msgTextareaRef.value
+  if (!ta) {
+    form.value.content += char
+    return
+  }
+  const start = ta.selectionStart
+  const end = ta.selectionEnd
+  const val = form.value.content
+  form.value.content = val.slice(0, start) + char + val.slice(end)
+  nextTick(() => {
+    const pos = start + char.length
+    ta.setSelectionRange(pos, pos)
+    ta.focus()
+  })
+}
 
 /* 验证码 */
 const captcha = ref({ question: '', result: null })
@@ -131,7 +151,8 @@ const startReply = (msg) => {
 const startEdit = (msg) => {
   replyTarget.value = null
   editTarget.value = msg
-  form.value.content = msg.content ?? (msg.contentHtml?.replace(/<[^>]+>/g, '') || '')
+  form.value.content =
+    msg.content ?? (msg.contentHtml?.replace(/<[^>]+>/g, '') || '')
   form.value.isMarkdown = msg.isMarkdown === 1
   document.querySelector('.msg-form')?.scrollIntoView({ behavior: 'smooth' })
 }
@@ -213,6 +234,7 @@ onMounted(() => {
           </div>
 
           <textarea
+            ref="msgTextareaRef"
             v-model="form.content"
             class="form-textarea"
             placeholder="写点什么..."
@@ -277,13 +299,16 @@ onMounted(() => {
               <input type="checkbox" v-model="form.isMarkdown" />
               Markdown
             </label>
-            <button
-              class="btn-submit"
-              :disabled="submitting"
-              @click="handleSubmit"
-            >
-              {{ editTarget ? '修改' : '留言' }}
-            </button>
+            <div class="form-actions">
+              <EmojiPicker @select="insertMsgEmoji" />
+              <button
+                class="btn-submit"
+                :disabled="submitting"
+                @click="handleSubmit"
+              >
+                {{ editTarget ? '修改' : '留言' }}
+              </button>
+            </div>
           </div>
         </div>
 
@@ -641,6 +666,13 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
+}
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
 }
 .option-check {
   display: flex;

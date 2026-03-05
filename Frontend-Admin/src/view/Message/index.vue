@@ -7,7 +7,7 @@ const messageStore = useMessageStore()
 
 const filterStatus = ref('')
 const page = ref(1)
-const size = ref(15)
+const size = ref(10)
 const selected = ref([])
 
 /** 拉取列表 */

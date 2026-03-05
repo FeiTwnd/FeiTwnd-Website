@@ -15,6 +15,10 @@
   line-height: 1;
 }
 
+.icon-talk_emjio:before {
+  content: "\e6b3";
+}
+
 .icon-subway:before {
   content: "\e6ce";
 }

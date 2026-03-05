@@ -1,5 +1,5 @@
 <script setup>
-import { ref, inject, onMounted, watch, computed } from 'vue'
+import { ref, inject, onMounted, watch, computed, nextTick } from 'vue'
 import { useRoute } from 'vue-router'
 import { useVisitorStore, useBlogStore, useThemeStore } from '@/stores'
 import { getArticleBySlug } from '@/api/article'
@@ -12,6 +12,7 @@ import {
 import { likeArticle, unlikeArticle, hasLiked } from '@/api/like'
 import { generateCaptcha } from '@/api/captcha'
 import TableOfContents from '@/components/TableOfContents.vue'
+import EmojiPicker from '@/components/EmojiPicker.vue'
 import { MdPreview } from 'md-editor-v3'
 import 'md-editor-v3/lib/preview.css'
 
@@ -50,6 +51,25 @@ const replyTarget = ref(null)
 const submitting = ref(false)
 const editingId = ref(null)
 const editContent = ref('')
+const commentTextareaRef = ref(null)
+
+/* 插入 emoji 到评论文本框光标位置 */
+const insertCommentEmoji = (char) => {
+  const ta = commentTextareaRef.value
+  if (!ta) {
+    commentForm.value.content += char
+    return
+  }
+  const start = ta.selectionStart
+  const end = ta.selectionEnd
+  const val = commentForm.value.content
+  commentForm.value.content = val.slice(0, start) + char + val.slice(end)
+  nextTick(() => {
+    const pos = start + char.length
+    ta.setSelectionRange(pos, pos)
+    ta.focus()
+  })
+}
 
 /* 验证码 */
 const captcha = ref({ question: '', result: null })
@@ -413,6 +433,7 @@ onMounted(() => {
                 <a class="cancel-reply" @click="cancelReply">&times;</a>
               </div>
               <textarea
+                ref="commentTextareaRef"
                 v-model="commentForm.content"
                 placeholder="写下你的想法..."
                 class="form-textarea"
@@ -475,13 +496,16 @@ onMounted(() => {
                   <input type="checkbox" v-model="commentForm.isMarkdown" />
                   Markdown
                 </label>
-                <button
-                  class="form-submit"
-                  :disabled="submitting"
-                  @click="handleSubmitComment"
-                >
-                  {{ submitting ? '提交中...' : '发表评论' }}
-                </button>
+                <div class="form-actions">
+                  <EmojiPicker @select="insertCommentEmoji" />
+                  <button
+                    class="form-submit"
+                    :disabled="submitting"
+                    @click="handleSubmitComment"
+                  >
+                    {{ submitting ? '提交中...' : '发表评论' }}
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -1103,6 +1127,12 @@ onMounted(() => {
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
+}
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
 }
 .option-check {
   display: flex;

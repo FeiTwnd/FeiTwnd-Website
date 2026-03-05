@@ -8,7 +8,7 @@ const commentStore = useCommentStore()
 const filterStatus = ref('')
 const filterArticleId = ref('')
 const page = ref(1)
-const size = ref(15)
+const size = ref(10)
 const selected = ref([])
 
 const load = () => {
