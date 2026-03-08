@@ -8,7 +8,7 @@ const baseURL = '/api'
  */
 const http = axios.create({
   baseURL,
-  timeout: 15000
+  timeout: 300000
 })
 
 /**
