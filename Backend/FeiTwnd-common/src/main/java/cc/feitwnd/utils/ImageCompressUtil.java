@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -45,17 +46,17 @@ public class ImageCompressUtil {
 
         log.info("开始压缩: {} ({}KB)", originalName, originalSize / 1024);
 
-        // 第一次压缩
-        byte[] compressedBytes = compressWithQuality(file.getBytes(), imageProperties.getQuality());
+        // 保留原始字节，每次压缩都基于原图，避免二次有损压缩导致色彩失真
+        byte[] originalBytes = file.getBytes();
+        byte[] compressedBytes = compressWithQuality(originalBytes, imageProperties.getQuality());
 
-        // 如果还是太大，递归压缩
         int attempts = 0;
         double currentQuality = imageProperties.getQuality();
 
         while (isOversized(compressedBytes) && attempts < 10) {
-            // 逐步降低质量
             currentQuality = Math.max(0.3, currentQuality - 0.05);
-            compressedBytes = compressWithQuality(compressedBytes, currentQuality);
+            // 始终从原图重新压缩，而非压缩已压缩的数据
+            compressedBytes = compressWithQuality(originalBytes, currentQuality);
             attempts++;
         }
 
@@ -82,6 +83,7 @@ public class ImageCompressUtil {
 
             Thumbnails.of(inputStream)
                     .scale(1.0)  // 保持原尺寸
+                    .imageType(BufferedImage.TYPE_INT_RGB) // 强制标准RGB，防止WebP色彩空间转换偏绿
                     .outputFormat(imageProperties.getOutPutFormat())
                     .outputQuality(quality)
                     .toOutputStream(outputStream);
