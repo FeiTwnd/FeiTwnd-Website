@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: /api/blog/sitemap.xml
+Sitemap: https://blog.feitwnd.cc/api/blog/sitemap.xml

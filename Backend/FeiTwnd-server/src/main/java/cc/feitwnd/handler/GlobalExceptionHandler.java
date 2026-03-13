@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.stream.Collectors;
@@ -102,6 +103,16 @@ public class GlobalExceptionHandler {
     public Result exceptionHandler(MissingServletRequestParameterException ex){
         log.error("缺少请求参数：{}", ex.getMessage());
         return Result.error("缺少必要参数：" + ex.getParameterName());
+    }
+
+    /**
+     * 请求路径不存在异常
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Result exceptionHandler(NoHandlerFoundException ex){
+        log.warn("请求路径不存在：{} {}", ex.getHttpMethod(), ex.getRequestURL());
+        return Result.error("请求地址不存在");
     }
 
     /**
