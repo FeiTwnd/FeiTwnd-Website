@@ -55,8 +55,42 @@ services:
     container_name: feitwnd-backend
     restart: always
     environment:
-      SPRING_PROFILES_ACTIVE: prod
+      SPRING_PROFILES_ACTIVE: docker
       TZ: Asia/Shanghai
+      # 数据库配置
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: FeiTwnd
+      MYSQL_USER: feitwnd
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-your_password}
+      # Redis配置
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-}
+      REDIS_DATABASE: 0
+      # JWT配置
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY:-your-jwt-secret-key-change-in-production}
+      JWT_TTL: ${JWT_TTL:-86400000}
+      # 阿里云OSS配置
+      ALIOSS_ENDPOINT: ${ALIOSS_ENDPOINT}
+      ALIOSS_ACCESS_KEY_ID: ${ALIOSS_ACCESS_KEY_ID}
+      ALIOSS_ACCESS_KEY_SECRET: ${ALIOSS_ACCESS_KEY_SECRET}
+      ALIOSS_BUCKET_NAME: ${ALIOSS_BUCKET_NAME}
+      # 邮件配置
+      MAIL_HOST: ${MAIL_HOST}
+      MAIL_PORT: ${MAIL_PORT}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
+      EMAIL_PERSONAL: ${EMAIL_PERSONAL}
+      EMAIL_FROM: ${EMAIL_FROM}
+      # 访客验证码
+      VISITOR_VERIFY_CODE: ${VISITOR_VERIFY_CODE}
+      # 网站配置
+      WEBSITE_TITLE: ${WEBSITE_TITLE}
+      WEBSITE_HOME: ${WEBSITE_HOME}
+      WEBSITE_ADMIN: ${WEBSITE_ADMIN}
+      WEBSITE_CV: ${WEBSITE_CV}
+      WEBSITE_BLOG: ${WEBSITE_BLOG}
     ports:
       - "5922:5922"
     networks:

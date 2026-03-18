@@ -1,0 +1,111 @@
+# Docker 生产环境配置
+# 使用 docker-compose 传入的环境变量
+server:
+  port: 5922
+  error:
+    include-stacktrace: never
+    include-message: never
+    whitelabel:
+      enabled: false
+
+spring:
+  threads:
+    virtual:
+      enabled: true
+  main:
+    allow-circular-references: true
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 50MB
+  #数据库连接信息
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    host: ${MYSQL_HOST:mysql}
+    port: ${MYSQL_PORT:3306}
+    database: ${MYSQL_DATABASE:FeiTwnd}
+    username: ${MYSQL_USER:feitwnd}
+    password: ${MYSQL_PASSWORD}
+    # Druid连接池专用配置
+    druid:
+      initial-size: 5
+      min-idle: 5
+      max-active: 20
+      max-wait: 60000
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      database: ${REDIS_DATABASE:0}
+
+  # 邮件配置
+  mail:
+    host: ${MAIL_HOST:smtp.qq.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+
+# JWT 配置
+feitwnd:
+  jwt:
+    secret-key: ${JWT_SECRET_KEY}
+    ttl: ${JWT_TTL:86400000}
+    token-name: Authorization
+  alioss:
+    endpoint: ${ALIOSS_ENDPOINT}
+    access-key-id: ${ALIOSS_ACCESS_KEY_ID}
+    access-key-secret: ${ALIOSS_ACCESS_KEY_SECRET}
+    bucket-name: ${ALIOSS_BUCKET_NAME}
+  email:
+    personal: ${EMAIL_PERSONAL}
+    from: ${EMAIL_FROM}
+  visitor:
+    verify-code: ${VISITOR_VERIFY_CODE}
+  image:
+    compress:
+      enabled: ${IMAGE_COMPRESS_ENABLED:true}
+      max-size-kb: ${IMAGE_COMPRESS_MAX_SIZE:500}
+      quality: ${IMAGE_COMPRESS_QUALITY:0.9}
+      output-format: webp
+  website:
+    title: ${WEBSITE_TITLE:}
+    home: ${WEBSITE_HOME:}
+    admin: ${WEBSITE_ADMIN:}
+    cv: ${WEBSITE_CV:}
+    blog: ${WEBSITE_BLOG:}
+
+# MyBatis 配置
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: cc.feitwnd.entity
+  configuration:
+    map-underscore-to-camel-case: true
+
+# 日志配置
+logging:
+  level:
+    cc.feitwnd: INFO
+    org.springframework.web.servlet.PageNotFound: ERROR
+    org.springframework.web: WARN
+    org.apache.tomcat: ERROR
+    cc.feitwnd.mapper: WARN
+    org.mybatis: WARN
+    org.apache.ibatis: WARN
+    com.zaxxer.hikari: WARN
+    org.springframework: WARN
+    org.hibernate: WARN
+    com.alibaba.druid: WARN
+    org.apache.coyote: ERROR
+    org.apache.catalina: ERROR
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"

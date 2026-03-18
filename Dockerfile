@@ -39,4 +39,5 @@ ENV JAVA_OPTS="-XX:+UseZGC -Xmx2048m -Xms512m -XX:+HeapDumpOnOutOfMemoryError"
 EXPOSE 5922
 
 # 启动命令
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar feitwnd.jar --spring.profiles.active=prod --server.port=5922"]
+# spring.profiles.active 由 docker-compose 环境变量 SPRING_PROFILES_ACTIVE 传入
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar feitwnd.jar"]
