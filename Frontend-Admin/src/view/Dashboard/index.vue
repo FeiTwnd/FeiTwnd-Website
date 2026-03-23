@@ -45,7 +45,9 @@ const statCards = [
     icon: 'icon-bianjiwenzhang_huaban'
   },
   { key: 'totalCommentCount', label: '评论总数', icon: 'icon-comment' },
-  { key: 'pendingCommentCount', label: '待审评论', icon: 'icon-pending' }
+  { key: 'totalMessageCount', label: '留言总数', icon: 'icon-liuyanban-05' },
+  { key: 'pendingCommentCount', label: '待审评论', icon: 'icon-shenhe' },
+  { key: 'pendingMessageCount', label: '待审留言', icon: 'icon-shenhe1' }
 ]
 
 const fetchOverview = async () => {
@@ -383,10 +385,9 @@ onMounted(() => {
 }
 
 .stat-icon {
-  width: 44px;
-  height: 44px;
+  width: 50px;
+  height: 50px;
   border-radius: 8px;
-  background-color: #f5f7fa;
   display: flex;
   align-items: center;
   justify-content: center;

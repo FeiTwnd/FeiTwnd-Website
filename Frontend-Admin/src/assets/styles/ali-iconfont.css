@@ -14,6 +14,22 @@
   line-height: 1;
 }
 
+.icon-talk_emjio:before {
+  content: "\e6b3";
+}
+
+.icon-shenhe:before {
+  content: "\e69e";
+}
+
+.icon-shenhe1:before {
+  content: "\e69a";
+}
+
+.icon-liuyanban-05:before {
+  content: "\e630";
+}
+
 .icon-guanliduan:before {
   content: "\e618";
 }
