@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useCommentStore } from '@/stores'
 import dayjs from 'dayjs'
+import EmojiPicker from '@/components/EmojiPicker.vue'
 
 const commentStore = useCommentStore()
 
@@ -106,11 +107,29 @@ const openDetail = (row) => {
 const replyDialogVisible = ref(false)
 const replyTarget = ref(null)
 const replyContent = ref('')
+const replyInputRef = ref(null)
 
 const openReply = (row) => {
   replyTarget.value = row
   replyContent.value = ''
   replyDialogVisible.value = true
+}
+
+const insertReplyEmoji = (char) => {
+  const textarea = replyInputRef.value?.textarea
+  if (!textarea) {
+    replyContent.value += char
+    return
+  }
+  const start = textarea.selectionStart ?? replyContent.value.length
+  const end = textarea.selectionEnd ?? replyContent.value.length
+  const val = replyContent.value
+  replyContent.value = val.slice(0, start) + char + val.slice(end)
+  nextTick(() => {
+    const pos = start + char.length
+    textarea.setSelectionRange(pos, pos)
+    textarea.focus()
+  })
 }
 
 const submitReply = async () => {
@@ -309,12 +328,16 @@ onMounted(load)
         {{ replyTarget.content }}
       </div>
       <el-input
+        ref="replyInputRef"
         v-model="replyContent"
         type="textarea"
         :rows="4"
         placeholder="输入回复内容"
         style="margin-top: 12px"
       />
+      <div class="reply-tools">
+        <EmojiPicker @select="insertReplyEmoji" />
+      </div>
       <template #footer>
         <el-button @click="replyDialogVisible = false">取消</el-button>
         <el-button type="primary" @click="submitReply">发送回复</el-button>
@@ -393,5 +416,11 @@ onMounted(load)
 .reply-author {
   font-weight: 600;
   color: #303133;
+}
+
+.reply-tools {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
 }
 </style>
