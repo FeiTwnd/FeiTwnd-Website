@@ -87,9 +87,10 @@ let ws = null
 
 const connectWs = () => {
   const protocol = location.protocol === 'https:' ? 'wss' : 'ws'
-  const host = import.meta.env.DEV ? 'localhost:5922' : location.host
+  const host = location.host
+  const wsPath = '/api/ws/online'
   try {
-    ws = new WebSocket(`${protocol}://${host}/api/ws/online`)
+    ws = new WebSocket(`${protocol}://${host}${wsPath}`)
     ws.onmessage = (e) => {
       const msg = e.data
       if (msg === 'pong') return
