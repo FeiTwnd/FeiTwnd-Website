@@ -5,6 +5,7 @@ import cc.feitwnd.dto.MessageDTO;
 import cc.feitwnd.dto.MessageEditDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.MessageService;
+import cc.feitwnd.service.VisitorTokenService;
 import cc.feitwnd.vo.MessageVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -24,6 +25,8 @@ public class MessageController {
 
     @Autowired
     private MessageService messageService;
+    @Autowired
+    private VisitorTokenService visitorTokenService;
 
     /**
      * 访客提交留言
@@ -56,7 +59,10 @@ public class MessageController {
     @PutMapping("/edit")
     @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
               timeWindow = 60, message = "操作过于频繁，请稍后再试")
-    public Result<String> editMessage(@Valid @RequestBody MessageEditDTO editDTO) {
+    public Result<String> editMessage(@Valid @RequestBody MessageEditDTO editDTO,
+                                      HttpServletRequest request) {
+        Long visitorId = visitorTokenService.resolveVisitorId(request);
+        editDTO.setVisitorId(visitorId);
         log.info("访客编辑留言: {}", editDTO);
         messageService.editMessage(editDTO);
         return Result.success();
@@ -68,7 +74,8 @@ public class MessageController {
     @DeleteMapping("/{id}")
     @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
               timeWindow = 60, message = "操作过于频繁，请稍后再试")
-    public Result<String> deleteMessage(@PathVariable Long id, @RequestParam Long visitorId) {
+    public Result<String> deleteMessage(@PathVariable Long id, HttpServletRequest request) {
+        Long visitorId = visitorTokenService.resolveVisitorId(request);
         log.info("访客删除留言: id={}, visitorId={}", id, visitorId);
         messageService.visitorDeleteMessage(id, visitorId);
         return Result.success();

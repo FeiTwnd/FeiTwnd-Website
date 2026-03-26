@@ -9,6 +9,7 @@ export const useVisitorStore = defineStore(
     const visitorId = ref(null)
     const sessionId = ref('')
     const fingerprint = ref('')
+    const visitorToken = ref('')
     const nickname = ref('')
     const email = ref('')
 
@@ -20,16 +21,25 @@ export const useVisitorStore = defineStore(
         visitorId.value = d.visitorId
         sessionId.value = d.sessionId
         fingerprint.value = d.visitorFingerprint
+        visitorToken.value = d.visitorToken || ''
       } catch (e) {
         console.error('访客记录失败', e)
       }
     }
 
-    return { visitorId, sessionId, fingerprint, nickname, email, record }
+    return {
+      visitorId,
+      sessionId,
+      fingerprint,
+      visitorToken,
+      nickname,
+      email,
+      record
+    }
   },
   {
     persist: {
-      pick: ['visitorId', 'fingerprint', 'nickname', 'email']
+      pick: ['visitorId', 'fingerprint', 'visitorToken', 'nickname', 'email']
     }
   }
 )

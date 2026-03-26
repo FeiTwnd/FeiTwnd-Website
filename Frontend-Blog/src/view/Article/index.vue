@@ -235,12 +235,16 @@ const startEdit = (c) => {
 const doEdit = async (c) => {
   if (!editContent.value.trim()) return
   try {
-    await editComment({
-      id: c.id,
-      visitorId: visitorStore.visitorId,
-      content: editContent.value.trim(),
-      isMarkdown: c.isMarkdown ?? 0
-    })
+    await editComment(
+      {
+        id: c.id,
+        visitorId: visitorStore.visitorId,
+        content: editContent.value.trim(),
+        isMarkdown: c.isMarkdown ?? 0
+      },
+      visitorStore.visitorToken,
+      visitorStore.fingerprint
+    )
     editingId.value = null
     ElMessage.success('修改成功')
     loadComments()
@@ -259,7 +263,11 @@ const doDelete = async (c) => {
     return // 用户取消
   }
   try {
-    await deleteComment(c.id, visitorStore.visitorId)
+    await deleteComment(
+      c.id,
+      visitorStore.visitorToken,
+      visitorStore.fingerprint
+    )
     ElMessage.success('删除成功')
     loadComments()
   } catch (e) {

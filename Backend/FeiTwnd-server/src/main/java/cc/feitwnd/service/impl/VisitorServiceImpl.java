@@ -10,6 +10,7 @@ import cc.feitwnd.service.AsyncVisitorService;
 import cc.feitwnd.service.BlockService;
 import cc.feitwnd.service.FingerprintService;
 import cc.feitwnd.service.VisitorService;
+import cc.feitwnd.service.VisitorTokenService;
 import cc.feitwnd.utils.IpUtil;
 import cc.feitwnd.vo.VisitorRecordVO;
 import com.github.pagehelper.Page;
@@ -40,6 +41,8 @@ public class VisitorServiceImpl implements VisitorService {
     private FingerprintService fingerprintService;
     @Autowired
     private BlockService blockService;
+    @Autowired
+    private VisitorTokenService visitorTokenService;
 
     // Redis键前缀
     public static final String VISITOR_KEY = "visitor:fingerprint:";
@@ -85,6 +88,7 @@ public class VisitorServiceImpl implements VisitorService {
                 .visitorFingerprint(fingerprint)
                 .sessionId(sessionId)
                 .visitorId(visitor.getId())
+            .visitorToken(visitorTokenService.generateToken(visitor.getId(), fingerprint))
                 .isNewVisitor(visitor.getTotalViews() <= 1)
                 .build();
         return visitorRecordVO;

@@ -95,7 +95,7 @@ const handleSubmit = async () => {
         content: form.value.content,
         visitorId: visitorStore.visitorId,
         isMarkdown: form.value.isMarkdown ? 1 : 0
-      })
+      }, visitorStore.visitorToken, visitorStore.fingerprint)
       ElMessage.success('修改成功')
     } else {
       await submitMessage({
@@ -133,7 +133,11 @@ const handleDelete = async (msg) => {
     return // 用户取消
   }
   try {
-    await deleteMessage(msg.id, visitorStore.visitorId)
+    await deleteMessage(
+      msg.id,
+      visitorStore.visitorToken,
+      visitorStore.fingerprint
+    )
     ElMessage.success('已删除')
     await load()
   } catch (e) {

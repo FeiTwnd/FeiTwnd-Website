@@ -11,9 +11,19 @@ export const submitComment = (data) =>
   request.post('/blog/articleComment', data)
 
 /** 编辑评论 */
-export const editComment = (data) =>
-  request.put('/blog/articleComment/edit', data)
+export const editComment = (data, visitorToken, visitorFingerprint) =>
+  request.put('/blog/articleComment/edit', data, {
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
+  })
 
 /** 删除评论 */
-export const deleteComment = (id, visitorId) =>
-  request.delete(`/blog/articleComment/${id}`, { params: { visitorId } })
+export const deleteComment = (id, visitorToken, visitorFingerprint) =>
+  request.delete(`/blog/articleComment/${id}`, {
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
+  })

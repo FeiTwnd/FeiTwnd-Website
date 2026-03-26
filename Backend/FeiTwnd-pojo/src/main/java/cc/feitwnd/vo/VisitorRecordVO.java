@@ -18,6 +18,8 @@ public class VisitorRecordVO {
     private String sessionId;
     // 访客在数据库中的ID
     private Long visitorId;
+    // 访客身份令牌
+    private String visitorToken;
     // 是否是新访客
     private Boolean isNewVisitor;
 }

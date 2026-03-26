@@ -8,8 +8,19 @@ export const getMessageTree = (visitorId) =>
 export const submitMessage = (data) => request.post('/blog/message', data)
 
 /** 编辑留言 */
-export const editMessage = (data) => request.put('/blog/message/edit', data)
+export const editMessage = (data, visitorToken, visitorFingerprint) =>
+  request.put('/blog/message/edit', data, {
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
+  })
 
 /** 删除留言 */
-export const deleteMessage = (id, visitorId) =>
-  request.delete(`/blog/message/${id}`, { params: { visitorId } })
+export const deleteMessage = (id, visitorToken, visitorFingerprint) =>
+  request.delete(`/blog/message/${id}`, {
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
+  })

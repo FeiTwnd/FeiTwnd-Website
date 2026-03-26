@@ -5,6 +5,7 @@ import cc.feitwnd.dto.ArticleCommentDTO;
 import cc.feitwnd.dto.ArticleCommentEditDTO;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleCommentService;
+import cc.feitwnd.service.VisitorTokenService;
 import cc.feitwnd.vo.ArticleCommentVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -24,6 +25,8 @@ public class ArticleCommentController {
 
     @Autowired
     private ArticleCommentService articleCommentService;
+    @Autowired
+    private VisitorTokenService visitorTokenService;
 
     /**
      * 根据文章ID获取评论列表（树形结构，含当前访客的未审核评论）
@@ -55,7 +58,10 @@ public class ArticleCommentController {
     @PutMapping("/edit")
     @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
               timeWindow = 60, message = "操作过于频繁，请稍后再试")
-    public Result<String> editComment(@Valid @RequestBody ArticleCommentEditDTO editDTO) {
+    public Result<String> editComment(@Valid @RequestBody ArticleCommentEditDTO editDTO,
+                                      HttpServletRequest request) {
+        Long visitorId = visitorTokenService.resolveVisitorId(request);
+        editDTO.setVisitorId(visitorId);
         log.info("访客编辑评论: {}", editDTO);
         articleCommentService.editComment(editDTO);
         return Result.success();
@@ -67,7 +73,8 @@ public class ArticleCommentController {
     @DeleteMapping("/{id}")
     @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
               timeWindow = 60, message = "操作过于频繁，请稍后再试")
-    public Result<String> deleteComment(@PathVariable Long id, @RequestParam Long visitorId) {
+    public Result<String> deleteComment(@PathVariable Long id, HttpServletRequest request) {
+        Long visitorId = visitorTokenService.resolveVisitorId(request);
         log.info("访客删除评论: id={}, visitorId={}", id, visitorId);
         articleCommentService.visitorDeleteComment(id, visitorId);
         return Result.success();
