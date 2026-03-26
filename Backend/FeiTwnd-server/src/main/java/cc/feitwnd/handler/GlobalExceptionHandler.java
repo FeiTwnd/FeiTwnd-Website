@@ -8,6 +8,8 @@ import cc.feitwnd.exception.TokenException;
 import cc.feitwnd.result.Result;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -34,28 +36,28 @@ public class GlobalExceptionHandler {
      */
     @ExceptionHandler
     public Result exceptionHandler(BaseException ex){
-        log.error("业务异常：{}", ex.getMessage());
+        log.warn("业务异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Result exceptionHandler(TokenException ex){
-        log.error("令牌异常：{}", ex.getMessage());
+        log.warn("令牌异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result exceptionHandler(BlockedException ex){
-        log.error("封禁异常：{}", ex.getMessage());
+        log.warn("封禁异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public Result exceptionHandler(GuestReadOnlyException ex){
-        log.error("游客只读异常：{}", ex.getMessage());
+        log.warn("游客只读异常：{}", ex.getMessage());
         return Result.error(ex.getMessage());
     }
 
@@ -68,8 +70,29 @@ public class GlobalExceptionHandler {
         String errorMsg = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
                 .collect(Collectors.joining("; "));
-        log.error("参数校验异常：{}", errorMsg);
+        log.warn("参数校验异常：{}", errorMsg);
         return Result.error(errorMsg);
+    }
+
+    /**
+     * 请求体JSON格式错误（例如数组传对象、字段格式非法）
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result exceptionHandler(HttpMessageNotReadableException ex){
+        log.warn("请求体解析异常：{}", ex.getMostSpecificCause().getMessage());
+        return Result.error("请求体格式错误");
+    }
+
+    /**
+     * 路径参数/查询参数类型不匹配
+     */
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Result exceptionHandler(MethodArgumentTypeMismatchException ex){
+        log.warn("参数类型不匹配：{}={}, 目标类型={}",
+                ex.getName(), ex.getValue(), ex.getRequiredType() == null ? "unknown" : ex.getRequiredType().getSimpleName());
+        return Result.error("参数类型错误：" + ex.getName());
     }
 
     @ExceptionHandler
@@ -91,7 +114,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public Result exceptionHandler(HttpRequestMethodNotSupportedException ex){
-        log.error("请求方法不支持：{}", ex.getMessage());
+        log.warn("请求方法不支持：{}", ex.getMessage());
         return Result.error("不支持的请求方法：" + ex.getMethod());
     }
 
@@ -101,7 +124,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result exceptionHandler(MissingServletRequestParameterException ex){
-        log.error("缺少请求参数：{}", ex.getMessage());
+        log.warn("缺少请求参数：{}", ex.getMessage());
         return Result.error("缺少必要参数：" + ex.getParameterName());
     }
 
@@ -121,7 +144,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result exceptionHandler(MaxUploadSizeExceededException ex){
-        log.error("文件上传大小超限：{}", ex.getMessage());
+        log.warn("文件上传大小超限：{}", ex.getMessage());
         return Result.error("上传文件大小超过限制");
     }
 

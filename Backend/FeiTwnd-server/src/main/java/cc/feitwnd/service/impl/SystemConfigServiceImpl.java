@@ -36,7 +36,7 @@ public class SystemConfigServiceImpl implements SystemConfigService {
      * @param configKey
      * @return
      */
-    @Cacheable(value = "systemConfig", key = "#configKey")
+    @Cacheable(value = "systemConfig", key = "#configKey", unless = "#result == null")
     public SystemConfig getByKey(String configKey) {
         return systemConfigMapper.getByKey(configKey);
     }

@@ -41,6 +41,7 @@ public class SecurityLogConfig {
             "/phpmyadmin", "/phpinfo", "/info.php", "/config.php",
             "/actuator", "/debug", "/console", "/druid",
             "/manager/html", "/solr", "/jenkins", "/struts",
+            "/swagger-ui", "/swagger-resources", "/v3/api-docs", "/doc.html",
             "/.aws", "/.docker", "/cgi-bin"
     );
 
