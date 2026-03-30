@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useArticleStore } from '@/stores'
 import { uploadFile } from '@/api/settings'
 import { MdEditor } from 'md-editor-v3'
+import EmojiPicker from '@/components/EmojiPicker.vue'
 import 'md-editor-v3/lib/style.css'
 
 const route = useRoute()
@@ -32,6 +33,7 @@ const onHtmlChanged = (html) => {
 
 const saving = ref(false)
 const uploadingCover = ref(false)
+const editorPanelRef = ref(null)
 
 /* ---- 图片上传（md-editor-v3 回调格式） ---- */
 const onUploadImg = async (files, callback) => {
@@ -80,24 +82,59 @@ const autoSlug = () => {
   }
 }
 
+/* ---- 快捷插入 emoji ---- */
+const insertEditorEmoji = (char) => {
+  const textarea = editorPanelRef.value?.querySelector('textarea')
+  if (!textarea) {
+    form.value.contentMarkdown += char
+    return
+  }
+
+  const start = textarea.selectionStart ?? form.value.contentMarkdown.length
+  const end = textarea.selectionEnd ?? form.value.contentMarkdown.length
+  const val = form.value.contentMarkdown
+  form.value.contentMarkdown = val.slice(0, start) + char + val.slice(end)
+
+  nextTick(() => {
+    const pos = start + char.length
+    textarea.setSelectionRange(pos, pos)
+    textarea.focus()
+  })
+}
+
 /* ---- 保存 / 发布 ---- */
 const isSaved = ref(false)
-const handleSave = async (isPublished) => {
+const handleSave = async (
+  isPublished,
+  { redirectAfterSave = isPublished === 1 } = {}
+) => {
   if (!form.value.title.trim()) return ElMessage.warning('请输入文章标题')
   if (!form.value.slug.trim())
     return ElMessage.warning('请输入 URL 标识 (Slug)')
   if (!form.value.contentMarkdown.trim())
     return ElMessage.warning('请输入文章内容')
   if (!form.value.categoryId) return ElMessage.warning('请选择文章分类')
+  if (saving.value) return
   saving.value = true
   try {
     form.value.isPublished = isPublished
     await articleStore.saveArticle({ ...form.value })
-    isSaved.value = true
+    isSaved.value = isPublished === 1 && redirectAfterSave
+    takeSnapshot()
     ElMessage.success(isPublished ? '发布成功' : '保存草稿成功')
-    router.push('/article/list')
+    if (redirectAfterSave) {
+      router.push('/article/list')
+    }
   } finally {
     saving.value = false
+  }
+}
+
+/* ---- Ctrl/Cmd + S 保存草稿 ---- */
+const onKeydownSave = (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') {
+    e.preventDefault()
+    handleSave(0, { redirectAfterSave: false })
   }
 }
 
@@ -139,7 +176,7 @@ onBeforeRouteLeave(async () => {
       type: 'warning'
     })
     // 用户点击保存草稿
-    await handleSave(0)
+    await handleSave(0, { redirectAfterSave: false })
     return true
   } catch (action) {
     if (action === 'cancel') {
@@ -152,6 +189,7 @@ onBeforeRouteLeave(async () => {
 })
 
 onMounted(async () => {
+  window.addEventListener('keydown', onKeydownSave)
   await Promise.all([articleStore.fetchCategories(), articleStore.fetchTags()])
   if (isEdit.value) {
     const res = await articleStore.fetchDetail(route.params.id)
@@ -170,6 +208,10 @@ onMounted(async () => {
     }
   }
   takeSnapshot()
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKeydownSave)
 })
 </script>
 
@@ -210,7 +252,10 @@ onMounted(async () => {
     <!-- 主体区域 -->
     <div class="edit-body">
       <!-- Markdown 编辑器 -->
-      <div class="editor-panel">
+      <div ref="editorPanelRef" class="editor-panel">
+        <div class="editor-toolbar-emoji">
+          <EmojiPicker @select="insertEditorEmoji" />
+        </div>
         <MdEditor
           v-model="form.contentMarkdown"
           preview-theme="github"
@@ -364,11 +409,28 @@ onMounted(async () => {
 
 /* 编辑器面板 */
 .editor-panel {
+  position: relative;
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.editor-toolbar-emoji {
+  position: absolute;
+  left: 666px;
+  top: 2px;
+  z-index: 20;
+}
+.editor-toolbar-emoji :deep(.emoji-trigger) {
+  width: 30px;
+  height: 30px;
+}
+.editor-toolbar-emoji :deep(.emoji-panel) {
+  top: 36px;
+  bottom: auto;
+  z-index: 3000;
 }
 
 /* md-editor-v3 填满面板高度 */
@@ -417,6 +479,10 @@ onMounted(async () => {
 .cover-uploader {
   width: 100%;
 }
+.cover-uploader :deep(.el-upload) {
+  width: 100%;
+  display: block;
+}
 .cover-preview {
   width: 100%;
   border-radius: 6px;
@@ -426,6 +492,7 @@ onMounted(async () => {
 }
 .cover-placeholder {
   width: 100%;
+  box-sizing: border-box;
   height: 78px;
   border: 1px dashed #d3d6db;
   border-radius: 6px;

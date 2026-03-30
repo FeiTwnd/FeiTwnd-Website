@@ -81,6 +81,8 @@ public class ArticleServiceImpl implements ArticleService {
         Articles articles = new Articles();
         BeanUtils.copyProperties(articleDTO, articles);
 
+        boolean firstPublishNow = StatusConstant.ENABLE.equals(articleDTO.getIsPublished());
+
         // 优先使用前端编辑器渲染的HTML，否则后端转换
         if (articleDTO.getContentHtml() != null && !articleDTO.getContentHtml().isBlank()) {
             articles.setContentHtml(articleDTO.getContentHtml());
@@ -100,7 +102,7 @@ public class ArticleServiceImpl implements ArticleService {
         articles.setReadingTime(readingTime);
 
         // 设置发布信息
-        if (articleDTO.getIsPublished() != null && articleDTO.getIsPublished().equals(StatusConstant.ENABLE)) {
+        if (firstPublishNow) {
             articles.setPublishTime(LocalDateTime.now());
         }
 
@@ -117,6 +119,11 @@ public class ArticleServiceImpl implements ArticleService {
         // 保存文章-标签关联
         if (articleDTO.getTagIds() != null && !articleDTO.getTagIds().isEmpty()) {
             articleTagMapper.batchInsertRelations(articles.getId(), articleDTO.getTagIds());
+        }
+
+        // 仅首次发布时通知RSS订阅者
+        if (firstPublishNow) {
+            notifyRssSubscribers(articles);
         }
     }
 
@@ -164,12 +171,13 @@ public class ArticleServiceImpl implements ArticleService {
             throw new ArticleException(MessageConstant.ARTICLE_NOT_FOUND);
         }
 
+        boolean firstPublishNow = articles.getPublishTime() == null
+                && StatusConstant.ENABLE.equals(articleDTO.getIsPublished());
+
         BeanUtils.copyProperties(articleDTO, articles);
 
         // 如果从草稿切换到发布状态且尚无发布时间，设置发布时间
-        if (articleDTO.getIsPublished() != null
-                && articleDTO.getIsPublished().equals(StatusConstant.ENABLE)
-                && articles.getPublishTime() == null) {
+        if (firstPublishNow) {
             articles.setPublishTime(LocalDateTime.now());
         }
 
@@ -200,6 +208,11 @@ public class ArticleServiceImpl implements ArticleService {
             if (!articleDTO.getTagIds().isEmpty()) {
                 articleTagMapper.batchInsertRelations(articleDTO.getId(), articleDTO.getTagIds());
             }
+        }
+
+        // 仅首次发布时通知RSS订阅者
+        if (firstPublishNow) {
+            notifyRssSubscribers(articles);
         }
     }
 
@@ -236,20 +249,22 @@ public class ArticleServiceImpl implements ArticleService {
             throw new ArticleException(MessageConstant.ARTICLE_NOT_FOUND);
         }
 
+        boolean firstPublishNow = StatusConstant.ENABLE.equals(isPublished) && articles.getPublishTime() == null;
+
         Articles updateArticle = Articles.builder()
                 .id(id)
                 .isPublished(isPublished)
                 .build();
 
         // 发布时设置发布时间（仅首次发布设置）
-        if (isPublished.equals(StatusConstant.ENABLE) && articles.getPublishTime() == null) {
+        if (firstPublishNow) {
             updateArticle.setPublishTime(LocalDateTime.now());
         }
 
         articleMapper.update(updateArticle);
 
         // 发布时通知RSS订阅者
-        if (isPublished.equals(StatusConstant.ENABLE)) {
+        if (firstPublishNow) {
             notifyRssSubscribers(articles);
         }
     }
