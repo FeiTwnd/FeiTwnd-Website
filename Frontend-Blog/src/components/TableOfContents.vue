@@ -48,11 +48,14 @@ const extractHeadings = () => {
     const nodes = el.querySelectorAll('h1, h2, h3, h4')
     const list = []
     nodes.forEach((node, idx) => {
+      const text = node.textContent?.trim() || ''
+      // 忽略 markdown 分割线等伪标题，只保留真实标题
+      if (!text || /^-+$/.test(text)) return
       const id = node.id || `heading-${idx}`
       node.id = id
       list.push({
         id,
-        text: node.textContent.trim(),
+        text,
         level: parseInt(node.tagName.charAt(1))
       })
     })
