@@ -223,7 +223,7 @@ onBeforeUnmount(() => {
 
       <div class="edit-actions">
         <el-button size="small" @click="router.push('/article/list')"
-          >取消</el-button
+          >返回</el-button
         >
         <el-button size="small" :loading="saving" @click="handleSave(0)"
           >保存草稿</el-button
