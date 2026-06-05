@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useVisitorStore } from '@/stores'
+import { useVisitorStore, useUserStore } from '@/stores'
 import dayjs from 'dayjs'
 
 const visitorStore = useVisitorStore()
+const userStore = useUserStore()
 
 /* ---- 搜索 ---- */
 const searchForm = ref({ country: '', province: '', city: '', status: '' })
@@ -87,7 +88,9 @@ const batchUnblock = async () => {
 
 const fmtDate = (d) => (d ? dayjs(d).format('YYYY-MM-DD HH:mm') : '-')
 
-onMounted(load)
+onMounted(() => {
+  if (!userStore.isGuest) load()
+})
 </script>
 
 <template>

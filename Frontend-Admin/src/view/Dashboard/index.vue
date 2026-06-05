@@ -1,5 +1,6 @@
 <script setup>
-import { ref, onMounted, shallowRef } from 'vue'
+import { ref, onMounted, shallowRef, watch } from 'vue'
+import { useUserStore } from '@/stores'
 import {
   getOverview,
   getViewStatistics,
@@ -29,6 +30,8 @@ echarts.use([
   LegendComponent,
   CanvasRenderer
 ])
+
+const userStore = useUserStore()
 
 /* ---- 概览数据 ---- */
 const overview = ref({})
@@ -271,15 +274,56 @@ const initCharts = () => {
   fetchPieChart()
 }
 
-onMounted(() => {
+const loadDashboard = () => {
   fetchOverview()
   fetchRunDays()
   initCharts()
+}
+
+onMounted(() => {
+  // 用户信息已加载 → 直接判断
+  if (userStore.userInfo?.id) {
+    if (!userStore.isGuest) loadDashboard()
+    return
+  }
+  // 页面刷新后 userInfo 尚未加载 → 等待加载完成再判断
+  const stop = watch(
+    () => userStore.userInfo,
+    (info) => {
+      if (info?.id) {
+        stop()
+        if (!userStore.isGuest) loadDashboard()
+      }
+    }
+  )
 })
 </script>
 
 <template>
   <div class="dashboard">
+    <!-- 游客/加载中：骨架屏 -->
+    <template v-if="userStore.isGuest || !userStore.userInfo?.id">
+      <div class="stat-grid">
+        <div v-for="i in 9" :key="i" class="stat-card">
+          <div class="sk-stat-icon" />
+          <div class="stat-info">
+            <div class="sk-line sk-val" />
+            <div class="sk-line sk-lbl" />
+          </div>
+        </div>
+      </div>
+      <div class="chart-row">
+        <div class="chart-card" v-for="i in 4" :key="i">
+          <div class="chart-header">
+            <div class="sk-line sk-title" />
+          </div>
+          <div class="sk-chart-body" />
+        </div>
+      </div>
+    </template>
+
+    <!-- 管理员模式：真实数据 -->
+    <template v-else>
     <!-- 概览卡片 -->
     <div v-loading="loadingOverview" class="stat-grid">
       <div v-for="card in statCards" :key="card.key" class="stat-card">
@@ -358,6 +402,7 @@ onMounted(() => {
         <span class="run-unit">天</span>
       </div>
     </div>
+    </template>
   </div>
 </template>
 
@@ -486,5 +531,47 @@ onMounted(() => {
 
 .chart-body {
   height: 260px;
+}
+
+/* 游客骨架屏 */
+@keyframes admin-sk-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.sk-line {
+  display: block;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: admin-sk-shimmer 1.5s ease-in-out infinite;
+}
+.sk-stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: admin-sk-shimmer 1.5s ease-in-out infinite;
+}
+.sk-val {
+  width: 48px;
+  height: 22px;
+  margin-bottom: 6px;
+}
+.sk-lbl {
+  width: 60px;
+  height: 13px;
+}
+.sk-title {
+  width: 90px;
+  height: 16px;
+}
+.sk-chart-body {
+  height: 260px;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: admin-sk-shimmer 1.5s ease-in-out infinite;
 }
 </style>

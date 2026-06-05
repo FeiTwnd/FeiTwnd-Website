@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useOperationLogStore } from '@/stores'
+import { useOperationLogStore, useUserStore } from '@/stores'
 import dayjs from 'dayjs'
 
 const logStore = useOperationLogStore()
+const userStore = useUserStore()
 
 /* ---- 搜索 ---- */
 const searchForm = ref({
@@ -95,7 +96,9 @@ const typeLabel = (t) => {
   return m[t] ?? t
 }
 
-onMounted(load)
+onMounted(() => {
+  if (!userStore.isGuest) load()
+})
 </script>
 
 <template>

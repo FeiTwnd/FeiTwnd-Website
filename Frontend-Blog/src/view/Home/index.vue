@@ -141,6 +141,14 @@ onMounted(() => {
 }
 
 /* 骨架屏 */
+@keyframes sk-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
 .skeleton-card {
   display: flex;
   gap: 16px;
@@ -153,18 +161,22 @@ onMounted(() => {
 .skeleton-cover {
   width: 200px;
   height: 130px;
-  background: #ebeef5;
   border-radius: 6px;
   flex-shrink: 0;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
 }
 .skeleton-body {
   flex: 1;
 }
 .skeleton-line {
   height: 14px;
-  background: #ebeef5;
   border-radius: 4px;
   margin-bottom: 10px;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
 }
 .w60 {
   width: 60%;

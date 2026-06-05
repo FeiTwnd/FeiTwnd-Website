@@ -6,9 +6,14 @@ export const getCommentTree = (articleId, visitorId) =>
     params: { visitorId }
   })
 
-/** 提交评论 */
-export const submitComment = (data) =>
-  request.post('/blog/articleComment', data)
+/** 提交评论（需token验证） */
+export const submitComment = (data, visitorToken, visitorFingerprint) =>
+  request.post('/blog/articleComment', data, {
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
+  })
 
 /** 编辑评论 */
 export const editComment = (data, visitorToken, visitorFingerprint) =>

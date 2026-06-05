@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useArticleStore } from '@/stores'
+import { useArticleStore, useUserStore } from '@/stores'
 import dayjs from 'dayjs'
 
 const router = useRouter()
 const articleStore = useArticleStore()
+const userStore = useUserStore()
 
 /* ---- 搜索表单 ---- */
 const searchForm = ref({ title: '', categoryId: '', isPublished: '' })
@@ -113,7 +114,9 @@ const batchDelete = async () => {
 
 const fmtDate = (d) => (d ? dayjs(d).format('YYYY-MM-DD HH:mm') : '-')
 
-onMounted(load)
+onMounted(() => {
+  if (!userStore.isGuest) load()
+})
 </script>
 
 <template>

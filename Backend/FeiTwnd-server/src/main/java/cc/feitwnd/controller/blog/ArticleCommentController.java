@@ -47,6 +47,9 @@ public class ArticleCommentController {
               timeWindow = 60, message = "评论过于频繁，请稍后再试")
     public Result<String> submitComment(@Valid @RequestBody ArticleCommentDTO articleCommentDTO,
                                         HttpServletRequest request) {
+        // 验证访客身份，覆盖DTO中的visitorId，防止伪造
+        Long visitorId = visitorTokenService.resolveVisitorId(request);
+        articleCommentDTO.setVisitorId(visitorId);
         log.info("访客提交文章评论: {}", articleCommentDTO);
         articleCommentService.submitComment(articleCommentDTO, request);
         return Result.success();

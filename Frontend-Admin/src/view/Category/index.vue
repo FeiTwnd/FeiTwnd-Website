@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useCategoryStore } from '@/stores'
+import { useCategoryStore, useUserStore } from '@/stores'
 
 const categoryStore = useCategoryStore()
+const userStore = useUserStore()
 
 /* ---- Tab ---- */
 const activeTab = ref('category')
@@ -76,6 +77,7 @@ const deleteTag = async (row) => {
 }
 
 onMounted(() => {
+  if (userStore.isGuest) return
   categoryStore.fetchCategories()
   categoryStore.fetchTags()
 })

@@ -12,6 +12,7 @@ import cc.feitwnd.mapper.MessageMapper;
 import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.AsyncEmailService;
+import cc.feitwnd.service.CaptchaService;
 import cc.feitwnd.service.MessageService;
 import cc.feitwnd.service.UserAgentService;
 import cc.feitwnd.utils.IpUtil;
@@ -52,6 +53,9 @@ public class MessageServiceImpl implements MessageService {
     @Autowired
     private WebsiteProperties websiteProperties;
 
+    @Autowired
+    private CaptchaService captchaService;
+
     // 邮箱正则
     private static final Pattern EMAIL_PATTERN = Pattern.compile(
             "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$"
@@ -66,28 +70,36 @@ public class MessageServiceImpl implements MessageService {
      * @param request
      */
     public void submitMessage(MessageDTO messageDTO, HttpServletRequest request) {
-        // 1. 校验邮箱或QQ号
+        // 1. 校验验证码
+        if (messageDTO.getCaptchaId() == null || messageDTO.getCaptchaAnswer() == null) {
+            throw new ValidationException("请输入验证码");
+        }
+        if (!captchaService.verify(messageDTO.getCaptchaId(), messageDTO.getCaptchaAnswer())) {
+            throw new ValidationException("验证码错误，请重新计算");
+        }
+
+        // 2. 校验邮箱或QQ号
         validateEmailOrQq(messageDTO.getEmailOrQq());
 
-        // 2. 创建留言实体
+        // 3. 创建留言实体
         Messages messages = new Messages();
         BeanUtils.copyProperties(messageDTO, messages);
 
-        // 3. 处理Markdown内容
+        // 4. 处理Markdown内容
         if (messageDTO.getIsMarkdown() != null && messageDTO.getIsMarkdown() == 1) {
-            // 如果是Markdown，转换为HTML
+            // 如果是Markdown，转换为HTML（已包含XSS防护）
             String html = MarkdownUtil.toHtml(messageDTO.getContent());
             messages.setContentHtml(html);
         } else {
-            // 如果不是Markdown，直接使用原内容
-            messages.setContentHtml(messageDTO.getContent());
+            // 非Markdown内容也需XSS清洗
+            messages.setContentHtml(MarkdownUtil.sanitize(messageDTO.getContent()));
         }
 
-        // 4. 设置访客ID
+        // 5. 设置访客ID（已由Controller层验证）
         Long visitorId = messageDTO.getVisitorId();
         messages.setVisitorId(visitorId);
 
-        // 5. 获取IP地址信息
+        // 6. 获取IP地址信息
         String clientIp = IpUtil.getClientIp(request);
         Map<String, String> geoInfo = IpUtil.getGeoInfo(clientIp);
         // 拼接地址: 省份-城市
@@ -100,23 +112,23 @@ public class MessageServiceImpl implements MessageService {
             messages.setLocation(location);
         }
 
-        // 6. 解析UserAgent
+        // 7. 解析UserAgent
         String userAgent = request.getHeader("User-Agent");
         String osName = userAgentService.getOsName(userAgent);
         String browserName = userAgentService.getBrowserName(userAgent);
         messages.setUserAgentOs(osName);
         messages.setUserAgentBrowser(browserName);
 
-        // 7. 设置默认值
+        // 8. 设置默认值
         messages.setIsApproved(0); // 默认未审核
         messages.setIsEdited(0);   // 默认未编辑
         messages.setCreateTime(LocalDateTime.now());
         messages.setUpdateTime(LocalDateTime.now());
 
-        // 8. 保存到数据库
+        // 9. 保存到数据库
         messageMapper.save(messages);
 
-        // 9. 检查父留言是否开启邮箱通知
+        // 10. 检查父留言是否开启邮箱通知
         if (messageDTO.getParentId() != null) {
             notifyParentIfNeeded(messageDTO.getParentId(),
                     messageDTO.getNickname(), messageDTO.getContent(), "message");
@@ -207,7 +219,7 @@ public class MessageServiceImpl implements MessageService {
             String html = MarkdownUtil.toHtml(messageReplyDTO.getContent());
             messages.setContentHtml(html);
         } else {
-            messages.setContentHtml(messageReplyDTO.getContent());
+            messages.setContentHtml(MarkdownUtil.sanitize(messageReplyDTO.getContent()));
         }
 
         // 3. 设置管理员回复标识
@@ -290,7 +302,7 @@ public class MessageServiceImpl implements MessageService {
         if (editDTO.getIsMarkdown() != null && editDTO.getIsMarkdown() == 1) {
             updateMessage.setContentHtml(MarkdownUtil.toHtml(editDTO.getContent()));
         } else {
-            updateMessage.setContentHtml(editDTO.getContent());
+            updateMessage.setContentHtml(MarkdownUtil.sanitize(editDTO.getContent()));
         }
 
         messageMapper.updateContent(updateMessage);

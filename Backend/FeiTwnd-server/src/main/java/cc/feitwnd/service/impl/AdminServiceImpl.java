@@ -136,6 +136,7 @@ public class AdminServiceImpl implements AdminService {
                 .id(adminId)
                 .nickname(admin.getNickname())
                 .email(admin.getEmail())
+                .role(admin.getRole())
                 .build();
     }
 

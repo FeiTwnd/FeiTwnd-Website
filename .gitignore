@@ -51,3 +51,5 @@ package-lock.json
 !Backend/FeiTwnd-server/src/main/resources/application-docker.yml
 !/docker-compose.yml
 !/Dockerfile
+
+CLAUDE.md

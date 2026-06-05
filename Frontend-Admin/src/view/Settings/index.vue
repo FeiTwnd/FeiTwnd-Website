@@ -85,7 +85,7 @@ const deleteConfig = async (row) => {
 }
 
 onMounted(() => {
-  fetchConfigs()
+  if (!userStore.isGuest) fetchConfigs()
 })
 
 /* ---- 账号安全 ---- */

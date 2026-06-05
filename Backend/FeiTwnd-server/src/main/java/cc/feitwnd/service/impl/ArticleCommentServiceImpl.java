@@ -12,6 +12,7 @@ import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleCommentService;
 import cc.feitwnd.service.AsyncEmailService;
+import cc.feitwnd.service.CaptchaService;
 import cc.feitwnd.service.UserAgentService;
 import cc.feitwnd.utils.IpUtil;
 import cc.feitwnd.utils.MarkdownUtil;
@@ -48,6 +49,9 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
 
     @Autowired
     private WebsiteProperties websiteProperties;
+
+    @Autowired
+    private CaptchaService captchaService;
 
     /**
      * 分页条件查询评论（时间、是否审核）
@@ -129,7 +133,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
             String html = MarkdownUtil.toHtml(articleCommentReplyDTO.getContent());
             articleComments.setContentHtml(html);
         } else {
-            articleComments.setContentHtml(articleCommentReplyDTO.getContent());
+            articleComments.setContentHtml(MarkdownUtil.sanitize(articleCommentReplyDTO.getContent()));
         }
 
         // 设置管理员回复标识
@@ -206,7 +210,15 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      */
     @Transactional
     public void submitComment(ArticleCommentDTO articleCommentDTO, HttpServletRequest request) {
-        // 1. 校验邮箱或QQ号
+        // 1. 校验验证码
+        if (articleCommentDTO.getCaptchaId() == null || articleCommentDTO.getCaptchaAnswer() == null) {
+            throw new ValidationException("请输入验证码");
+        }
+        if (!captchaService.verify(articleCommentDTO.getCaptchaId(), articleCommentDTO.getCaptchaAnswer())) {
+            throw new ValidationException("验证码错误，请重新计算");
+        }
+
+        // 2. 校验邮箱或QQ号
         validateEmailOrQq(articleCommentDTO.getEmailOrQq());
 
         // 2. 创建评论实体
@@ -218,7 +230,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
             String html = MarkdownUtil.toHtml(articleCommentDTO.getContent());
             articleComments.setContentHtml(html);
         } else {
-            articleComments.setContentHtml(articleCommentDTO.getContent());
+            articleComments.setContentHtml(MarkdownUtil.sanitize(articleCommentDTO.getContent()));
         }
 
         // 4. 设置访客ID
@@ -282,7 +294,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         if (editDTO.getIsMarkdown() != null && editDTO.getIsMarkdown() == 1) {
             updateComment.setContentHtml(MarkdownUtil.toHtml(editDTO.getContent()));
         } else {
-            updateComment.setContentHtml(editDTO.getContent());
+            updateComment.setContentHtml(MarkdownUtil.sanitize(editDTO.getContent()));
         }
 
         articleCommentMapper.updateContent(updateComment);

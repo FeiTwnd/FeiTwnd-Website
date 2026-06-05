@@ -45,4 +45,10 @@ public class ArticleCommentDTO implements Serializable {
     private Integer isMarkdown;
     private Integer isSecret;
     private Integer isNotice;
+
+    // 验证码ID（服务端校验）
+    private String captchaId;
+
+    // 验证码答案
+    private Integer captchaAnswer;
 }

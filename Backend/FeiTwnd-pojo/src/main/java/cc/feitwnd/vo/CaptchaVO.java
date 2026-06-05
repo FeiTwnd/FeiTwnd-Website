@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 
 /**
- * 验证码VO
+ * 验证码VO（仅返回题目，答案服务端存储）
  */
 @Data
 @Builder
@@ -22,7 +22,4 @@ public class CaptchaVO implements Serializable {
 
     /** 算术题目，如 "3 + 5 = ?" */
     private String question;
-
-    /** 正确答案 */
-    private int result;
 }

@@ -1,10 +1,15 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores'
 
 const route = useRoute()
 const userStore = useUserStore()
+
+// 页面刷新时恢复用户信息（含role，用于游客检测）
+onMounted(() => {
+  if (userStore.token) userStore.fetchUserInfo()
+})
 
 /** 侧边栏是否收起 */
 const collapsed = ref(false)

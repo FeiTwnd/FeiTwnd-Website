@@ -115,10 +115,20 @@ onMounted(() => {
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   gap: 14px;
 }
+@keyframes sk-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
 .sk-card {
   height: 80px;
-  background: #ebeef5;
   border-radius: 8px;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
 }
 
 .link-grid {

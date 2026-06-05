@@ -72,7 +72,7 @@ const insertCommentEmoji = (char) => {
 }
 
 /* 验证码 */
-const captcha = ref({ question: '', result: null })
+const captcha = ref({ captchaId: '', question: '' })
 const captchaHover = ref(false)
 const captchaFocus = ref(false)
 const loadCaptcha = async () => {
@@ -142,7 +142,11 @@ const loadComments = async () => {
 const checkLike = async () => {
   if (!article.value || !visitorStore.visitorId) return
   try {
-    const res = await hasLiked(article.value.id, visitorStore.visitorId)
+    const res = await hasLiked(
+      article.value.id,
+      visitorStore.visitorToken,
+      visitorStore.fingerprint
+    )
     liked.value = res.data.data === true
   } catch {
     liked.value = false
@@ -154,11 +158,19 @@ const toggleLike = async () => {
   liking.value = true
   try {
     if (liked.value) {
-      await unlikeArticle(article.value.id, visitorStore.visitorId)
+      await unlikeArticle(
+        article.value.id,
+        visitorStore.visitorToken,
+        visitorStore.fingerprint
+      )
       liked.value = false
       article.value.likeCount = Math.max(0, (article.value.likeCount ?? 1) - 1)
     } else {
-      await likeArticle(article.value.id, visitorStore.visitorId)
+      await likeArticle(
+        article.value.id,
+        visitorStore.visitorToken,
+        visitorStore.fingerprint
+      )
       liked.value = true
       article.value.likeCount = (article.value.likeCount ?? 0) + 1
     }
@@ -175,10 +187,10 @@ const handleSubmitComment = async () => {
     ElMessage.warning('请填写昵称和内容')
     return
   }
-  // 验证码校验
+  // 验证码基础校验（实际验证在服务端）
   const answer = parseInt(commentForm.value.captchaAnswer, 10)
-  if (isNaN(answer) || answer !== captcha.value.result) {
-    ElMessage.warning('验证码错误，请重新计算')
+  if (isNaN(answer)) {
+    ElMessage.warning('请输入正确的验证码')
     loadCaptcha()
     return
   }
@@ -195,9 +207,15 @@ const handleSubmitComment = async () => {
       emailOrQq: commentForm.value.emailOrQq || visitorStore.email || '',
       isMarkdown: commentForm.value.isMarkdown ? 1 : 0,
       isSecret: commentForm.value.isSecret ? 1 : 0,
-      isNotice: commentForm.value.isNotice ? 1 : 0
+      isNotice: commentForm.value.isNotice ? 1 : 0,
+      captchaId: captcha.value.captchaId,
+      captchaAnswer: answer
     }
-    await submitComment(payload)
+    await submitComment(
+      payload,
+      visitorStore.visitorToken,
+      visitorStore.fingerprint
+    )
     visitorStore.nickname = nick
     if (commentForm.value.emailOrQq)
       visitorStore.email = commentForm.value.emailOrQq
@@ -775,11 +793,21 @@ onMounted(() => {
 .loading-wrap {
   padding: 20px 0;
 }
+@keyframes sk-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
 .skeleton-line {
   height: 14px;
-  background: #ebeef5;
   border-radius: 4px;
   margin-bottom: 10px;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
 }
 .w60 {
   width: 60%;

@@ -22,7 +22,10 @@ const rssEditMode = ref(false) // 编辑模式
 const checkRssStatus = async () => {
   if (!visitorStore.visitorId) return
   try {
-    const res = await checkSubscription(visitorStore.visitorId)
+    const res = await checkSubscription(
+      visitorStore.visitorToken,
+      visitorStore.fingerprint
+    )
     const data = res.data.data
     if (data && data.subscribed) {
       isSubscribed.value = true
@@ -48,11 +51,15 @@ const handleRssSubscribe = async () => {
   }
   rssSubmitting.value = true
   try {
-    await addSubscription({
-      visitorId: visitorStore.visitorId,
-      nickname: rssForm.value.nickname.trim() || '',
-      email: rssForm.value.email.trim()
-    })
+    await addSubscription(
+      {
+        visitorId: visitorStore.visitorId,
+        nickname: rssForm.value.nickname.trim() || '',
+        email: rssForm.value.email.trim()
+      },
+      visitorStore.visitorToken,
+      visitorStore.fingerprint
+    )
     ElMessage.success(rssEditMode.value ? '订阅信息已更新' : '订阅成功')
     isSubscribed.value = true
     rssEditMode.value = false
@@ -65,10 +72,9 @@ const handleRssSubscribe = async () => {
 }
 
 const handleRssUnsubscribe = async () => {
-  if (!rssForm.value.email) return
   rssSubmitting.value = true
   try {
-    await unsubscribe(rssForm.value.email)
+    await unsubscribe(visitorStore.visitorToken, visitorStore.fingerprint)
     ElMessage.success('已取消订阅')
     isSubscribed.value = false
     rssForm.value = { nickname: '', email: '' }
@@ -162,103 +168,131 @@ const goTag = (slug) => {
   <aside class="sidebar">
     <!-- 个人信息卡片 -->
     <div class="side-card info-card">
-      <div class="info-avatar-wrap">
-        <img
-          v-if="info.avatar"
-          :src="info.avatar"
-          class="info-avatar"
-          loading="lazy"
-        />
-      </div>
-      <h3 class="info-name">{{ info.nickname || 'FeiTwnd' }}</h3>
-      <p v-if="info.tag" class="info-tag">{{ info.tag }}</p>
-      <p v-if="info.location" class="info-location">
-        <i class="iconfont icon-position" />
-        {{ info.location }}
-      </p>
+      <template v-if="blogStore.loaded">
+        <div class="info-avatar-wrap">
+          <img
+            v-if="info.avatar"
+            :src="info.avatar"
+            class="info-avatar"
+            loading="lazy"
+          />
+        </div>
+        <h3 class="info-name">{{ info.nickname || 'FeiTwnd' }}</h3>
+        <p v-if="info.tag" class="info-tag">{{ info.tag }}</p>
+        <p v-if="info.location" class="info-location">
+          <i class="iconfont icon-position" />
+          {{ info.location }}
+        </p>
 
-      <!-- 数据统计行 -->
-      <div class="info-stats">
-        <div class="info-stat" @click="goArchive">
-          <span class="stat-num">{{ report.articleTotalCount ?? 0 }}</span>
-          <span class="stat-label">文章</span>
+        <div class="info-stats">
+          <div class="info-stat" @click="goArchive">
+            <span class="stat-num">{{ report.articleTotalCount ?? 0 }}</span>
+            <span class="stat-label">文章</span>
+          </div>
+          <div class="info-stat" @click="showCatModal = true">
+            <span class="stat-num">{{ report.categoryTotalCount ?? 0 }}</span>
+            <span class="stat-label">分类</span>
+          </div>
+          <div class="info-stat" @click="showTagModal = true">
+            <span class="stat-num">{{ report.tagTotalCount ?? 0 }}</span>
+            <span class="stat-label">标签</span>
+          </div>
         </div>
-        <div class="info-stat" @click="showCatModal = true">
-          <span class="stat-num">{{ report.categoryTotalCount ?? 0 }}</span>
-          <span class="stat-label">分类</span>
-        </div>
-        <div class="info-stat" @click="showTagModal = true">
-          <span class="stat-num">{{ report.tagTotalCount ?? 0 }}</span>
-          <span class="stat-label">标签</span>
-        </div>
-      </div>
 
-      <!-- 社交链接 -->
-      <div class="info-social">
-        <a
-          v-if="info.github"
-          :href="info.github"
-          target="_blank"
-          rel="noopener"
-          class="social-link"
-          title="GitHub"
-        >
-          <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-            <path
-              d="M12 .3a12 12 0 00-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.33 3.3 1.23a11.5 11.5 0 016.02 0c2.28-1.56 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18a4.65 4.65 0 011.23 3.22c0 4.61-2.81 5.63-5.48 5.93.43.37.81 1.1.81 2.22l-.01 3.29c0 .31.22.69.83.57A12 12 0 0012 .3"
-            />
-          </svg>
-        </a>
-        <a
-          v-if="info.email"
-          :href="`mailto:${info.email}`"
-          class="social-link"
-          title="Email"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            width="18"
-            height="18"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
+        <div class="info-social">
+          <a
+            v-if="info.github"
+            :href="info.github"
+            target="_blank"
+            rel="noopener"
+            class="social-link"
+            title="GitHub"
           >
-            <rect width="20" height="16" x="2" y="4" rx="2" />
-            <path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7" />
-          </svg>
-        </a>
-        <span
-          class="social-link"
-          :class="{ subscribed: isSubscribed }"
-          :title="isSubscribed ? '已订阅 RSS' : 'RSS 订阅'"
-          @click="openRssModal"
-        >
-          <i class="iconfont icon-rssdingyue" style="font-size: 18px" />
-        </span>
-      </div>
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path
+                d="M12 .3a12 12 0 00-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.5 1 .1-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.33 3.3 1.23a11.5 11.5 0 016.02 0c2.28-1.56 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18a4.65 4.65 0 011.23 3.22c0 4.61-2.81 5.63-5.48 5.93.43.37.81 1.1.81 2.22l-.01 3.29c0 .31.22.69.83.57A12 12 0 0012 .3"
+              />
+            </svg>
+          </a>
+          <a
+            v-if="info.email"
+            :href="`mailto:${info.email}`"
+            class="social-link"
+            title="Email"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect width="20" height="16" x="2" y="4" rx="2" />
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 01-2.06 0L2 7" />
+            </svg>
+          </a>
+          <span
+            class="social-link"
+            :class="{ subscribed: isSubscribed }"
+            :title="isSubscribed ? '已订阅 RSS' : 'RSS 订阅'"
+            @click="openRssModal"
+          >
+            <i class="iconfont icon-rssdingyue" style="font-size: 18px" />
+          </span>
+        </div>
+      </template>
+      <template v-else>
+        <div class="info-avatar-wrap">
+          <div class="sk-avatar" />
+        </div>
+        <div class="sk-line sk-line-name" />
+        <div class="sk-line sk-line-tag" />
+        <div class="sk-line sk-line-loc" />
+        <div class="info-stats">
+          <div class="info-stat" v-for="i in 3" :key="i">
+            <span class="sk-line sk-stat-num" />
+            <span class="sk-line sk-stat-label" />
+          </div>
+        </div>
+        <div class="info-social">
+          <span class="sk-social-icon" v-for="i in 3" :key="i" />
+        </div>
+      </template>
     </div>
 
     <!-- 站点统计卡片 -->
     <div class="side-card stats-card">
-      <h4 class="card-title"><i class="iconfont icon-eye" /> 站点统计</h4>
-      <div class="stats-grid">
-        <div class="sg-item">
-          <span class="sg-label">在线访客</span>
-          <span class="sg-val">{{ onlineCount }}</span>
+      <template v-if="blogStore.loaded">
+        <h4 class="card-title"><i class="iconfont icon-eye" /> 站点统计</h4>
+        <div class="stats-grid">
+          <div class="sg-item">
+            <span class="sg-label">在线访客</span>
+            <span class="sg-val">{{ onlineCount }}</span>
+          </div>
+          <div class="sg-item">
+            <span class="sg-label">今日浏览</span>
+            <span class="sg-val">{{ report.viewTodayCount ?? 0 }}</span>
+          </div>
+          <div class="sg-item">
+            <span class="sg-label">总浏览量</span>
+            <span class="sg-val">{{ report.viewTotalCount ?? 0 }}</span>
+          </div>
+          <div class="sg-item">
+            <span class="sg-label">总访客量</span>
+            <span class="sg-val">{{ report.visitorTotalCount ?? 0 }}</span>
+          </div>
         </div>
-        <div class="sg-item">
-          <span class="sg-label">今日浏览</span>
-          <span class="sg-val">{{ report.viewTodayCount ?? 0 }}</span>
+      </template>
+      <template v-else>
+        <div class="sk-line sk-card-title" />
+        <div class="stats-grid">
+          <div class="sg-item" v-for="i in 4" :key="i">
+            <span class="sk-line sk-sg-label" />
+            <span class="sk-line sk-sg-val" />
+          </div>
         </div>
-        <div class="sg-item">
-          <span class="sg-label">总浏览量</span>
-          <span class="sg-val">{{ report.viewTotalCount ?? 0 }}</span>
-        </div>
-        <div class="sg-item">
-          <span class="sg-label">总访客量</span>
-          <span class="sg-val">{{ report.visitorTotalCount ?? 0 }}</span>
-        </div>
-      </div>
+      </template>
     </div>
 
     <!-- 默认插槽（文章页可插入目录等） -->
@@ -600,6 +634,80 @@ const goTag = (slug) => {
   font-size: 11px;
   color: #909399;
   margin-left: 2px;
+}
+
+/* 骨架屏 */
+@keyframes sk-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+.sk-line {
+  display: block;
+  height: 14px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
+}
+.sk-avatar {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
+}
+.sk-line-name {
+  width: 100px;
+  height: 18px;
+  margin: 12px auto 4px;
+}
+.sk-line-tag {
+  width: 70px;
+  height: 12px;
+  margin: 0 auto 6px;
+}
+.sk-line-loc {
+  width: 90px;
+  height: 12px;
+  margin: 0 auto 14px;
+}
+.sk-stat-num {
+  width: 36px;
+  height: 20px;
+  margin: 0 auto 4px;
+}
+.sk-stat-label {
+  width: 28px;
+  height: 11px;
+  margin: 0 auto;
+}
+.sk-social-icon {
+  display: inline-block;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
+}
+.sk-card-title {
+  width: 90px;
+  height: 16px;
+  margin-bottom: 12px;
+}
+.sk-sg-label {
+  width: 60px;
+  height: 13px;
+}
+.sk-sg-val {
+  width: 36px;
+  height: 16px;
 }
 
 @media (max-width: 960px) {

@@ -55,4 +55,10 @@ public class MessageDTO implements Serializable {
 
     // 有回复是否通知，0-否，1-是
     private Integer isNotice;
+
+    // 验证码ID（服务端校验）
+    private String captchaId;
+
+    // 验证码答案
+    private Integer captchaAnswer;
 }

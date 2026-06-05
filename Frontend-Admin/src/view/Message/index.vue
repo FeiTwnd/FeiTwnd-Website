@@ -1,10 +1,11 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
-import { useMessageStore } from '@/stores'
+import { useMessageStore, useUserStore } from '@/stores'
 import dayjs from 'dayjs'
 import EmojiPicker from '@/components/EmojiPicker.vue'
 
 const messageStore = useMessageStore()
+const userStore = useUserStore()
 
 const filterStatus = ref('')
 const page = ref(1)
@@ -151,7 +152,9 @@ const submitReply = async () => {
 /** 格式化时间 */
 const fmtDate = (d) => (d ? dayjs(d).format('YYYY-MM-DD HH:mm') : '-')
 
-onMounted(load)
+onMounted(() => {
+  if (!userStore.isGuest) load()
+})
 </script>
 
 <template>

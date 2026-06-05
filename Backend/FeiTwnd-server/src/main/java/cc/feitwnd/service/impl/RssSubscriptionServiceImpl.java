@@ -101,7 +101,7 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
     }
 
     /**
-     * 根据邮箱取消订阅
+     * 根据邮箱取消订阅（管理端使用）
      * @param email
      */
     public void unsubscribeByEmail(String email) {
@@ -110,6 +110,20 @@ public class RssSubscriptionServiceImpl implements RssSubscriptionService {
             throw new RssSubscriptionException(MessageConstant.RssNotFound);
         }
         if (subscription.getIsActive() == 0) {
+            throw new RssSubscriptionException(MessageConstant.RssNotFound);
+        }
+        subscription.setIsActive(0);
+        subscription.setUnSubscribeTime(LocalDateTime.now());
+        rssSubscriptionMapper.update(subscription);
+    }
+
+    /**
+     * 根据访客ID取消订阅（访客端使用，需token验证）
+     * @param visitorId
+     */
+    public void unsubscribeByVisitorId(Long visitorId) {
+        RssSubscriptions subscription = rssSubscriptionMapper.getActiveByVisitorId(visitorId);
+        if (subscription == null) {
             throw new RssSubscriptionException(MessageConstant.RssNotFound);
         }
         subscription.setIsActive(0);

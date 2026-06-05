@@ -4,8 +4,14 @@ import request from '@/utils/request'
 export const getMessageTree = (visitorId) =>
   request.get('/blog/message', { params: { visitorId } })
 
-/** 提交留言 */
-export const submitMessage = (data) => request.post('/blog/message', data)
+/** 提交留言（需token验证） */
+export const submitMessage = (data, visitorToken, visitorFingerprint) =>
+  request.post('/blog/message', data, {
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
+  })
 
 /** 编辑留言 */
 export const editMessage = (data, visitorToken, visitorFingerprint) =>

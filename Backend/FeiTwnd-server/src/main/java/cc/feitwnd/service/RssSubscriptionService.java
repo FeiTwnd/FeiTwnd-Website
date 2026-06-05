@@ -54,6 +54,12 @@ public interface RssSubscriptionService {
     void unsubscribeByEmail(String email);
 
     /**
+     * 根据访客ID取消订阅（访客端使用，需token验证）
+     * @param visitorId
+     */
+    void unsubscribeByVisitorId(Long visitorId);
+
+    /**
      * 检查访客是否已订阅
      * @param visitorId
      * @return

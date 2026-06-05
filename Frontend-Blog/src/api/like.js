@@ -1,15 +1,28 @@
 import request from '@/utils/request'
 
-/** 点赞文章 */
-export const likeArticle = (articleId, visitorId) =>
+/** 点赞文章（需token验证） */
+export const likeArticle = (articleId, visitorToken, visitorFingerprint) =>
   request.post(`/blog/articleLike/${articleId}`, null, {
-    params: { visitorId }
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
   })
 
-/** 取消点赞 */
-export const unlikeArticle = (articleId, visitorId) =>
-  request.delete(`/blog/articleLike/${articleId}`, { params: { visitorId } })
+/** 取消点赞（需token验证） */
+export const unlikeArticle = (articleId, visitorToken, visitorFingerprint) =>
+  request.delete(`/blog/articleLike/${articleId}`, {
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
+  })
 
-/** 检查是否已点赞 */
-export const hasLiked = (articleId, visitorId) =>
-  request.get(`/blog/articleLike/${articleId}`, { params: { visitorId } })
+/** 检查是否已点赞（需token验证） */
+export const hasLiked = (articleId, visitorToken, visitorFingerprint) =>
+  request.get(`/blog/articleLike/${articleId}`, {
+    headers: {
+      'X-Visitor-Token': visitorToken || '',
+      'X-Visitor-Fingerprint': visitorFingerprint || ''
+    }
+  })

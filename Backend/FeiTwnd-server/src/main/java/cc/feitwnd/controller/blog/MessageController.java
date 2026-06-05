@@ -38,6 +38,9 @@ public class MessageController {
     @RateLimit(type = RateLimit.Type.IP, tokens = 5, burstCapacity = 8,
               timeWindow = 60, message = "留言过于频繁，请稍后再试")
     public Result<String> submitMessage(@Valid @RequestBody MessageDTO messageDTO, HttpServletRequest request) {
+        // 验证访客身份，覆盖DTO中的visitorId，防止伪造
+        Long visitorId = visitorTokenService.resolveVisitorId(request);
+        messageDTO.setVisitorId(visitorId);
         log.info("访客提交留言: {}", messageDTO);
         messageService.submitMessage(messageDTO, request);
         return Result.success();

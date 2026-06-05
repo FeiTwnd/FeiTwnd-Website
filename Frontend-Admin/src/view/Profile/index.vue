@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useProfileStore } from '@/stores'
+import { useProfileStore, useUserStore } from '@/stores'
 import { getPersonalInfo, updatePersonalInfo, uploadFile } from '@/api/settings'
 
 const profileStore = useProfileStore()
+const userStore = useUserStore()
 
 /* ---- 当前 Tab ---- */
 const activeTab = ref('personal')
@@ -272,6 +273,7 @@ const deleteSocial = async (row) => {
 
 /* ---- 初始化 ---- */
 onMounted(() => {
+  if (userStore.isGuest) return
   fetchPersonal()
   loadExperiences()
   profileStore.fetchSkills()

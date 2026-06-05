@@ -51,7 +51,7 @@ const insertMsgEmoji = (char) => {
 }
 
 /* 验证码 */
-const captcha = ref({ question: '', result: null })
+const captcha = ref({ captchaId: '', question: '' })
 const captchaHover = ref(false)
 const captchaFocus = ref(false)
 const loadCaptcha = async () => {
@@ -81,8 +81,8 @@ const handleSubmit = async () => {
   // 新留言需要验证码
   if (!editTarget.value) {
     const answer = parseInt(form.value.captchaAnswer, 10)
-    if (isNaN(answer) || answer !== captcha.value.result) {
-      ElMessage.warning('验证码错误，请重新计算')
+    if (isNaN(answer)) {
+      ElMessage.warning('请输入正确的验证码')
       loadCaptcha()
       return
     }
@@ -90,26 +90,36 @@ const handleSubmit = async () => {
   submitting.value = true
   try {
     if (editTarget.value) {
-      await editMessage({
-        id: editTarget.value.id,
-        content: form.value.content,
-        visitorId: visitorStore.visitorId,
-        isMarkdown: form.value.isMarkdown ? 1 : 0
-      }, visitorStore.visitorToken, visitorStore.fingerprint)
+      await editMessage(
+        {
+          id: editTarget.value.id,
+          content: form.value.content,
+          visitorId: visitorStore.visitorId,
+          isMarkdown: form.value.isMarkdown ? 1 : 0
+        },
+        visitorStore.visitorToken,
+        visitorStore.fingerprint
+      )
       ElMessage.success('修改成功')
     } else {
-      await submitMessage({
-        content: form.value.content,
-        rootId: replyTarget.value?.rootId || replyTarget.value?.id || null,
-        parentId: replyTarget.value?.id || null,
-        parentNickname: replyTarget.value?.nickname || null,
-        nickname: form.value.nickname,
-        emailOrQq: form.value.emailOrQq,
-        visitorId: visitorStore.visitorId,
-        isSecret: form.value.isSecret ? 1 : 0,
-        isNotice: form.value.isNotice ? 1 : 0,
-        isMarkdown: form.value.isMarkdown ? 1 : 0
-      })
+      await submitMessage(
+        {
+          content: form.value.content,
+          rootId: replyTarget.value?.rootId || replyTarget.value?.id || null,
+          parentId: replyTarget.value?.id || null,
+          parentNickname: replyTarget.value?.nickname || null,
+          nickname: form.value.nickname,
+          emailOrQq: form.value.emailOrQq,
+          visitorId: visitorStore.visitorId,
+          isSecret: form.value.isSecret ? 1 : 0,
+          isNotice: form.value.isNotice ? 1 : 0,
+          isMarkdown: form.value.isMarkdown ? 1 : 0,
+          captchaId: captcha.value.captchaId,
+          captchaAnswer: parseInt(form.value.captchaAnswer, 10)
+        },
+        visitorStore.visitorToken,
+        visitorStore.fingerprint
+      )
       ElMessage.success('留言成功，审核通过后将展示')
     }
     visitorStore.nickname = form.value.nickname
@@ -944,12 +954,22 @@ onMounted(() => {
 .placeholder {
   padding: 20px 0;
 }
+@keyframes sk-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
 .sk-line {
   height: 14px;
-  background: #ebeef5;
   border-radius: 4px;
   margin-bottom: 12px;
   width: 60%;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
 }
 .empty {
   text-align: center;

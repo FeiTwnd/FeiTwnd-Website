@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useAnalyticsStore } from '@/stores'
+import { useAnalyticsStore, useUserStore } from '@/stores'
 import dayjs from 'dayjs'
 
 const analyticsStore = useAnalyticsStore()
+const userStore = useUserStore()
 
 const searchForm = ref({ pagePath: '', visitorId: '' })
 const page = ref(1)
@@ -70,7 +71,9 @@ const batchDelete = async () => {
 
 const fmtDate = (d) => (d ? dayjs(d).format('YYYY-MM-DD HH:mm') : '-')
 
-onMounted(load)
+onMounted(() => {
+  if (!userStore.isGuest) load()
+})
 </script>
 
 <template>

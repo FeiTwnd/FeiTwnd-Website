@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { useMusicStore } from '@/stores'
+import { useMusicStore, useUserStore } from '@/stores'
 import { uploadFile } from '@/api/settings'
 
 const musicStore = useMusicStore()
+const userStore = useUserStore()
 
 /* ---- 搜索 + 分页 ---- */
 const searchTitle = ref('')
@@ -210,7 +211,9 @@ const batchDelete = async () => {
   load()
 }
 
-onMounted(load)
+onMounted(() => {
+  if (!userStore.isGuest) load()
+})
 </script>
 
 <template>

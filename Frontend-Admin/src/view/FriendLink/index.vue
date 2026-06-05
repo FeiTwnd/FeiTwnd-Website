@@ -1,9 +1,10 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useFriendLinkStore } from '@/stores'
+import { useFriendLinkStore, useUserStore } from '@/stores'
 import { uploadFile } from '@/api/settings'
 
 const friendLinkStore = useFriendLinkStore()
+const userStore = useUserStore()
 
 /* ---- 弹窗 ---- */
 const dialogVisible = ref(false)
@@ -102,7 +103,9 @@ const batchDelete = async () => {
   ElMessage.success('批量删除成功')
 }
 
-onMounted(() => friendLinkStore.fetchList())
+onMounted(() => {
+  if (!userStore.isGuest) friendLinkStore.fetchList()
+})
 </script>
 
 <template>

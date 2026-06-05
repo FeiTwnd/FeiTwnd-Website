@@ -138,12 +138,22 @@ onMounted(() => {
 .placeholder {
   padding: 20px 0;
 }
+@keyframes sk-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
 .sk-line {
   height: 14px;
-  background: #ebeef5;
   border-radius: 4px;
   margin-bottom: 12px;
   width: 60%;
+  background: linear-gradient(90deg, #ebeef5 25%, #f5f7fa 50%, #ebeef5 75%);
+  background-size: 200% 100%;
+  animation: sk-shimmer 1.5s ease-in-out infinite;
 }
 
 .timeline {

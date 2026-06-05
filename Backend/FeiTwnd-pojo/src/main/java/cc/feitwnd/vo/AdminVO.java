@@ -15,4 +15,5 @@ public class AdminVO implements Serializable {
     private Long id;
     private String nickname;
     private String email;
+    private Integer role;
 }
