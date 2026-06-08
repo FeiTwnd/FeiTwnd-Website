@@ -14,6 +14,8 @@ import {
 } from '@/api/auth'
 import { useUserStore } from '@/stores'
 
+const userStore = useUserStore()
+
 /* ---- Tab ---- */
 const activeTab = ref('config')
 
