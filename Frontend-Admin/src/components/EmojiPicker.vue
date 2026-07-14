@@ -1,6 +1,6 @@
 <script setup>
 import { onBeforeUnmount, onMounted, ref } from 'vue'
-import emojiList from '@/assets/emjio/emjio.json'
+import emojiList from '@/assets/emoji/emoji.json'
 
 const emit = defineEmits(['select'])
 
