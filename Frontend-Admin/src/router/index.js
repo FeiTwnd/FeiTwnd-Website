@@ -103,6 +103,12 @@ const router = createRouter({
           name: 'viewRecord',
           component: () => import('@/view/ViewRecord/index.vue'),
           meta: { title: '浏览记录' }
+        },
+        {
+          path: '/footprint',
+          name: 'footprint',
+          component: () => import('@/view/Footprint/index.vue'),
+          meta: { title: '足迹管理' }
         }
       ]
     },

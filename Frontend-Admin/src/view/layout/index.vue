@@ -34,6 +34,7 @@ const navItems = [
   { path: '/rss', icon: 'icon-rss', label: 'RSS 订阅' },
   { path: '/visitor', icon: 'icon-user', label: '访客管理' },
   { path: '/view-record', icon: 'icon-eye', label: '浏览记录' },
+  { path: '/footprint', icon: 'icon-zuji', label: '足迹管理' },
   { path: '/operation-log', icon: 'icon-wj-rz', label: '操作日志' },
   { path: '/profile', icon: 'icon-iconfontprofile', label: '个人资料' },
   { path: '/settings', icon: 'icon-setting', label: '系统设置' }
