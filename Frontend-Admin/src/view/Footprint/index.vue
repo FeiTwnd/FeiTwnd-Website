@@ -379,7 +379,7 @@ onMounted(() => {
           <template #default="{ row }">
             <div class="row-actions">
               <el-button link size="small" @click="openImageDialog(row)">
-                详情
+                图集
               </el-button>
               <el-divider direction="vertical" />
               <el-button link size="small" @click="openDialog(row)">
