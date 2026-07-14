@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.feitwnd.mapper.CityImageMapper">
+    <insert id="insert">
+        insert into city_images (city_id, image_url, sort, is_visible, create_time, update_time)
+        values (#{cityId}, #{imageUrl}, #{sort}, #{isVisible}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update">
+        update city_images
+        <set>
+            <if test="cityId != null">city_id = #{cityId},</if>
+            <if test="imageUrl != null">image_url = #{imageUrl},</if>
+            <if test="sort != null">sort = #{sort},</if>
+            <if test="isVisible != null">is_visible = #{isVisible},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+</mapper>
