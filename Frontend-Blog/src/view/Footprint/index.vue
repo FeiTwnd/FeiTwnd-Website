@@ -100,19 +100,37 @@ const chartRef = ref(null)
 let chart = null
 let resizeObserver = null
 
-// 预构建全量 adcode -> { cityName, provinceName } 映射
+// adcode -> { cityName, provinceName }
 const nameMap = new Map()
 for (const f of cityGeoJSON.features) {
   const code = f.properties.adcode
   const provinceCode = getProvinceAdcode(f)
   const provinceName = provinceCode ? provinceMap[provinceCode] || '' : ''
-  if (f.properties.level === 'city') {
-    nameMap.set(code, { cityName: f.properties.name, provinceName })
-  }
+  nameMap.set(code, { cityName: f.properties.name, provinceName })
 }
 for (const [code, name] of Object.entries(provinceMap)) {
-  nameMap.set(Number(code), { cityName: name, provinceName: name })
+  if (!nameMap.has(Number(code))) {
+    nameMap.set(Number(code), { cityName: name, provinceName: name })
+  }
 }
+
+const formatDate = (d) => {
+  if (!d) return ''
+  const [y, m, day] = d.split('-')
+  return `${parseInt(y)}年${parseInt(m)}月${parseInt(day)}日`
+}
+
+/* ---- 统计 ---- */
+const visitedCities = computed(() => footprints.value.length)
+
+const visitedProvinces = computed(() => {
+  const provinces = new Set()
+  footprints.value.forEach((f) => {
+    const info = nameMap.get(Number(f.cityCode))
+    if (info?.provinceName) provinces.add(info.provinceName)
+  })
+  return provinces.size
+})
 
 /* ---- 图片弹窗 ---- */
 const imageVisible = ref(false)
@@ -130,7 +148,7 @@ const openImages = async (cityCode, cityName) => {
   imageLoading.value = true
   try {
     const res = await getCityImages(footprint.id)
-    imageList.value = res.data ?? []
+    imageList.value = res.data?.data ?? []
   } finally {
     imageLoading.value = false
   }
@@ -142,48 +160,62 @@ const getChartOptions = () => {
     backgroundColor: dark ? '#181818' : '#fff',
     tooltip: {
       trigger: 'item',
-      backgroundColor: dark ? '#2c2c2c' : '#fff',
-      borderColor: dark ? '#444' : '#e4e7ed',
-      textStyle: { color: dark ? '#e5e5e5' : '#303133', fontSize: 13 },
+      backgroundColor: dark ? '#232323' : '#fff',
+      borderColor: dark ? '#333' : '#e4e7ed',
+      borderWidth: 1,
+      padding: [12, 16],
+      extraCssText: dark
+        ? 'border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,0.3);'
+        : 'border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,0.06);',
       formatter: (params) => {
         const adcode = Number(params.name)
         const info = nameMap.get(adcode)
-        const displayName = info ? info.cityName : params.name
-        let html = `<strong>${displayName}</strong>`
-        if (info && info.provinceName && info.provinceName !== info.cityName) {
-          html += `<br/>${info.provinceName}`
+        if (!info) return params.name
+        const sameAsProvince = info.provinceName === info.cityName
+        const fp = footprints.value.find(
+          (f) => String(f.cityCode) === String(adcode)
+        )
+        let html = `<span style="font-family:'Noto Serif SC',Georgia,serif;font-size:15px;font-weight:600;color:${dark ? '#e5e5e5' : '#303133'};">${info.cityName}</span>`
+        if (!sameAsProvince) {
+          html += `<br/><span style="font-size:12px;color:${dark ? '#808080' : '#909399'};">${info.provinceName}</span>`
         }
-        const fp = footprints.value.find((f) => String(f.cityCode) === String(adcode))
-        if (fp && fp.visitTime) html += `<br/>${fp.visitTime}`
+        if (fp?.visitTime) {
+          html += `<br/><span style="font-size:12px;color:${dark ? '#808080' : '#909399'};">${formatDate(fp.visitTime)}</span>`
+        }
         return html
       }
     },
-    geo: {
-      map: 'china-cities',
-      roam: false,
-      zoom: 1.6,
-      center: [104.5, 36],
-      aspectScale: 0.85,
-      label: { show: false },
-      itemStyle: {
-        areaColor: dark ? '#2a2a2a' : '#f2f2f2',
-        borderColor: dark ? '#444' : '#d4d4d4',
-        borderWidth: 0.6
-      },
-      emphasis: {
+    series: [
+      {
+        type: 'map',
+        map: 'china-cities',
+        roam: false,
+        selectedMode: false,
+        zoom: 1.6,
+        center: [104.5, 36],
+        aspectScale: 0.85,
         label: { show: false },
-        itemStyle: { areaColor: dark ? '#3a3a3a' : '#e8e8e8' }
-      },
-      regions: footprints.value.map((f) => ({
-        name: String(f.cityCode),
         itemStyle: {
-          areaColor: dark ? '#555' : '#c8c8c8',
-          borderColor: dark ? '#666' : '#aaa'
+          areaColor: dark ? '#252525' : '#ededed',
+          borderColor: dark ? '#333' : '#d4d4d4',
+          borderWidth: 0.6
         },
-        emphasis: { itemStyle: { areaColor: dark ? '#666' : '#b8b8b8' } }
-      })),
-      silent: false
-    }
+        emphasis: {
+          label: { show: false },
+          itemStyle: { areaColor: dark ? '#2e2e2e' : '#e0e0e0' }
+        },
+        data: footprints.value.map((f) => ({
+          name: String(f.cityCode),
+          itemStyle: {
+            areaColor: dark ? '#666' : '#5a5a5a',
+            borderColor: dark ? '#777' : '#888'
+          },
+          emphasis: {
+            itemStyle: { areaColor: dark ? '#808080' : '#404040' }
+          }
+        }))
+      }
+    ]
   }
 }
 
@@ -193,16 +225,12 @@ const initChart = () => {
   chart = echarts.init(chartRef.value)
   chart.setOption(getChartOptions())
 
-  chart.on('click', (params) => {
-    if (params.componentType === 'geo' && params.region) {
-      const code = String(params.name)
-      const footprint = footprints.value.find(
-        (f) => String(f.cityCode) === code
-      )
-      if (footprint) {
-        const info = nameMap.get(Number(code))
-        openImages(code, info ? info.cityName : footprint.cityName)
-      }
+  chart.on('click', 'map', (params) => {
+    const code = String(params.name)
+    const footprint = footprints.value.find((f) => String(f.cityCode) === code)
+    if (footprint) {
+      const info = nameMap.get(Number(code))
+      openImages(code, info ? info.cityName : footprint.cityName)
     }
   })
 }
@@ -219,7 +247,7 @@ onMounted(async () => {
 
   try {
     const res = await getVisibleFootprints()
-    footprints.value = res.data ?? []
+    footprints.value = res.data?.data ?? []
     chart?.setOption(getChartOptions(), true)
   } catch {
     /* ignore */
@@ -241,6 +269,25 @@ onUnmounted(() => {
 <template>
   <div class="footprint-fullpage" :class="{ dark: isDark }">
     <div ref="chartRef" class="map-full" />
+
+    <!-- 底栏 -->
+    <div class="map-footer">
+      <div class="footer-stat">
+        <span class="stat-num">{{ visitedCities }}</span>
+        <span class="stat-label">座城市</span>
+      </div>
+      <div class="footer-divider" />
+      <div class="footer-stat">
+        <span class="stat-num">{{ visitedProvinces }}</span>
+        <span class="stat-label">个省</span>
+      </div>
+      <div class="footer-legend">
+        <span class="legend-dot visited" />
+        <span class="legend-label">已访</span>
+        <span class="legend-dot" />
+        <span class="legend-label">未访</span>
+      </div>
+    </div>
 
     <Teleport to="body">
       <Transition name="img-fade">
@@ -308,6 +355,7 @@ html.dark.footprint-page body {
   position: fixed;
   inset: 0;
   background: #fff;
+  user-select: none;
 }
 .footprint-fullpage.dark {
   background: #181818;
@@ -317,6 +365,104 @@ html.dark.footprint-page body {
   height: 100%;
 }
 
+/* ---- 底栏 ---- */
+.map-footer {
+  position: absolute;
+  bottom: 28px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 12px 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+.dark .map-footer {
+  background: rgba(35, 35, 35, 0.92);
+  border-color: #333;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.footer-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.stat-num {
+  font-family: 'Noto Serif SC', Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  color: #303133;
+  transition: color 0.3s;
+}
+.dark .stat-num {
+  color: #e5e5e5;
+}
+.stat-label {
+  font-size: 12px;
+  color: #909399;
+  transition: color 0.3s;
+}
+.dark .stat-label {
+  color: #808080;
+}
+
+.footer-divider {
+  width: 1px;
+  height: 20px;
+  background: #e4e7ed;
+  transition: background-color 0.3s;
+}
+.dark .footer-divider {
+  background: #333;
+}
+
+.footer-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 4px;
+}
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #ededed;
+  border: 0.6px solid #d4d4d4;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+.legend-dot.visited {
+  background: #5a5a5a;
+  border-color: #888;
+}
+.dark .legend-dot {
+  background: #252525;
+  border-color: #333;
+}
+.dark .legend-dot.visited {
+  background: #666;
+  border-color: #777;
+}
+.legend-label {
+  font-size: 11px;
+  color: #909399;
+  transition: color 0.3s;
+}
+.dark .legend-label {
+  color: #808080;
+}
+
+/* ---- 图片弹窗 ---- */
 .image-overlay {
   position: fixed;
   inset: 0;
@@ -405,6 +551,15 @@ html.dark.footprint-page body {
 }
 
 @media (max-width: 600px) {
+  .map-footer {
+    bottom: 16px;
+    right: 16px;
+    gap: 12px;
+    padding: 10px 16px;
+  }
+  .stat-num {
+    font-size: 18px;
+  }
   .image-dialog {
     max-height: 90vh;
     border-radius: 8px;
