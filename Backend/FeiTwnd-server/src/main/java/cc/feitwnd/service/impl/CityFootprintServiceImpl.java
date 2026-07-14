@@ -56,4 +56,9 @@ public class CityFootprintServiceImpl implements CityFootprintService {
         }
         cityFootprintMapper.batchDelete(ids);
     }
+
+    @Override
+    public List<CityFootprint> getVisible() {
+        return cityFootprintMapper.getVisible();
+    }
 }

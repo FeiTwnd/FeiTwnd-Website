@@ -65,6 +65,12 @@ const router = createRouter({
       meta: { title: '访问受限' }
     },
     {
+      path: '/footprint',
+      name: 'footprint',
+      component: () => import('@/view/Footprint/index.vue'),
+      meta: { title: '足迹' }
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: 'notFound',
       component: () => import('@/view/NotFound/index.vue'),

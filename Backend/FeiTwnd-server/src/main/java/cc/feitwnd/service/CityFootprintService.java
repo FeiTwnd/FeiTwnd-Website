@@ -2,6 +2,7 @@ package cc.feitwnd.service;
 
 import cc.feitwnd.dto.CityFootprintDTO;
 import cc.feitwnd.dto.CityFootprintPageQueryDTO;
+import cc.feitwnd.entity.CityFootprint;
 import cc.feitwnd.result.PageResult;
 
 import java.util.List;
@@ -27,4 +28,9 @@ public interface CityFootprintService {
      * 批量删除城市足迹（同时删除关联图片）
      */
     void batchDelete(List<Long> ids);
+
+    /**
+     * 博客端获取可见城市足迹
+     */
+    List<CityFootprint> getVisible();
 }
