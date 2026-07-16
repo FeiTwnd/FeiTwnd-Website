@@ -4,6 +4,7 @@ import * as echarts from 'echarts'
 import cityGeoJSON from '@/assets/city/city.json'
 import { getVisibleFootprints, getCityImages } from '@/api/footprint'
 import { useThemeStore } from '@/stores'
+import FootprintSplash from '@/components/FootprintSplash.vue'
 
 const themeStore = useThemeStore()
 const isDark = computed(() => {
@@ -268,6 +269,8 @@ onUnmounted(() => {
 
 <template>
   <div class="footprint-fullpage" :class="{ dark: isDark }">
+    <FootprintSplash :dark="isDark" />
+
     <div ref="chartRef" class="map-full" />
 
     <!-- 底栏 -->
