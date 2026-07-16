@@ -2,6 +2,7 @@
 import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useBlogStore, useThemeStore } from '@/stores'
+import { getConfigByKey } from '@/api/systemConfig'
 
 const router = useRouter()
 const blogStore = useBlogStore()
@@ -18,9 +19,13 @@ const scrolled = ref(false)
 const handleScroll = () => {
   scrolled.value = window.scrollY > 60
 }
-onMounted(() =>
+onMounted(async () => {
   window.addEventListener('scroll', handleScroll, { passive: true })
-)
+  try {
+    const res = await getConfigByKey('use-footprint')
+    footprintEnabled.value = res?.data?.data?.configValue === 'true'
+  } catch { /* keep false */ }
+})
 onUnmounted(() => window.removeEventListener('scroll', handleScroll))
 
 /* 搜索 */
@@ -28,6 +33,9 @@ const searchVisible = ref(false)
 const keyword = ref('')
 const searchInputRef = ref(null)
 const mobileNavVisible = ref(false)
+
+/* 足迹开关 */
+const footprintEnabled = ref(false)
 
 /* 音乐播放 */
 const isPlaying = ref(false)
@@ -72,26 +80,31 @@ const toggleMusicList = () => {
   musicListVisible.value = !musicListVisible.value
 }
 
-const navItems = [
-  {
-    label: '主页',
-    icon: 'icon-zhuye',
-    href: 'https://feitwnd.cc',
-    external: true
-  },
-  { label: '博客', icon: 'icon-boke', to: '/' },
-  { label: '归档', icon: 'icon-guidang', to: '/archive' },
-  { label: '友链', icon: 'icon-lianjie', to: '/links' },
-  { label: '留言', icon: 'icon-liuyan', to: '/message' },
-  { label: '足迹', icon: 'icon-zuji', href: '/footprint', external: true },
-  { label: '关于', icon: 'icon-guanyu', to: '/about' },
-  {
-    label: '开往',
-    icon: 'icon-subway',
-    href: 'https://www.travellings.cn/go.html',
-    external: true
+const navItems = computed(() => {
+  const items = [
+    {
+      label: '主页',
+      icon: 'icon-zhuye',
+      href: 'https://feitwnd.cc',
+      external: true
+    },
+    { label: '博客', icon: 'icon-boke', to: '/' },
+    { label: '归档', icon: 'icon-guidang', to: '/archive' },
+    { label: '友链', icon: 'icon-lianjie', to: '/links' },
+    { label: '留言', icon: 'icon-liuyan', to: '/message' },
+    { label: '关于', icon: 'icon-guanyu', to: '/about' },
+    {
+      label: '开往',
+      icon: 'icon-subway',
+      href: 'https://www.travellings.cn/go.html',
+      external: true
+    }
+  ]
+  if (footprintEnabled.value) {
+    items.splice(5, 0, { label: '足迹', icon: 'icon-zuji', to: '/footprint' })
   }
-]
+  return items
+})
 
 const doSearch = () => {
   const kw = keyword.value.trim()

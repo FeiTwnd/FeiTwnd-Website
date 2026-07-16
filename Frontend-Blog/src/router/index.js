@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+let footprintEnabled = null
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   scrollBehavior: () => ({ top: 0 }),
@@ -66,9 +68,20 @@ const router = createRouter({
     },
     {
       path: '/footprint',
-      name: 'footprint',
       component: () => import('@/view/Footprint/index.vue'),
-      meta: { title: '足迹' }
+      children: [
+        {
+          path: '',
+          name: 'footprint',
+          meta: { title: '足迹' }
+        },
+        {
+          path: 'city/:id',
+          name: 'cityGallery',
+          component: () => import('@/view/Footprint/CityGallery.vue'),
+          meta: { title: '城市图集' }
+        }
+      ]
     },
     {
       path: '/:pathMatch(.*)*',
@@ -79,9 +92,21 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   document.title = to.meta.title ? `${to.meta.title} - FeiTwnd` : 'FeiTwnd'
-  return true
+
+  if (to.path.startsWith('/footprint')) {
+    if (footprintEnabled === null) {
+      try {
+        const { getConfigByKey } = await import('@/api/systemConfig')
+        const res = await getConfigByKey('use-footprint')
+        footprintEnabled = res?.data?.data?.configValue === 'true'
+      } catch {
+        footprintEnabled = true
+      }
+    }
+    if (!footprintEnabled) return { name: 'home' }
+  }
 })
 
 export default router

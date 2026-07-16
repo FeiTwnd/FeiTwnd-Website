@@ -273,6 +273,7 @@ onUnmounted(() => timers.forEach(clearTimeout))
 }
 .footprint-splash.fading {
   opacity: 0;
+  pointer-events: none;
 }
 
 .hiker-svg {

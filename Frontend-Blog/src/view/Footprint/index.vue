@@ -1,10 +1,13 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import cityGeoJSON from '@/assets/city/city.json'
-import { getVisibleFootprints, getCityImages } from '@/api/footprint'
+import { getVisibleFootprints } from '@/api/footprint'
 import { useThemeStore } from '@/stores'
 import FootprintSplash from '@/components/FootprintSplash.vue'
+
+const router = useRouter()
 
 const themeStore = useThemeStore()
 const isDark = computed(() => {
@@ -133,28 +136,6 @@ const visitedProvinces = computed(() => {
   return provinces.size
 })
 
-/* ---- 图片弹窗 ---- */
-const imageVisible = ref(false)
-const imageCityName = ref('')
-const imageList = ref([])
-const imageLoading = ref(false)
-
-const openImages = async (cityCode, cityName) => {
-  const footprint = footprints.value.find(
-    (f) => String(f.cityCode) === String(cityCode)
-  )
-  if (!footprint) return
-  imageCityName.value = cityName || footprint.cityName
-  imageVisible.value = true
-  imageLoading.value = true
-  try {
-    const res = await getCityImages(footprint.id)
-    imageList.value = res.data?.data ?? []
-  } finally {
-    imageLoading.value = false
-  }
-}
-
 const getChartOptions = () => {
   const dark = isDark.value
   return {
@@ -226,12 +207,12 @@ const initChart = () => {
   chart = echarts.init(chartRef.value)
   chart.setOption(getChartOptions())
 
-  chart.on('click', 'map', (params) => {
+  chart.on('click', (params) => {
+    if (params.componentType !== 'series' || params.seriesType !== 'map') return
     const code = String(params.name)
     const footprint = footprints.value.find((f) => String(f.cityCode) === code)
     if (footprint) {
-      const info = nameMap.get(Number(code))
-      openImages(code, info ? info.cityName : footprint.cityName)
+      router.push(`/footprint/city/${footprint.id}`)
     }
   })
 }
@@ -292,53 +273,7 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <Teleport to="body">
-      <Transition name="img-fade">
-        <div
-          v-if="imageVisible"
-          class="image-overlay"
-          @click.self="imageVisible = false"
-        >
-          <div class="image-dialog">
-            <div class="image-dialog-header">
-              <h3>{{ imageCityName }}</h3>
-              <button class="image-close" @click="imageVisible = false">
-                <svg
-                  viewBox="0 0 24 24"
-                  width="20"
-                  height="20"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <line x1="18" y1="6" x2="6" y2="18" />
-                  <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-              </button>
-            </div>
-            <div v-loading="imageLoading" class="image-dialog-body">
-              <div
-                v-if="!imageList.length && !imageLoading"
-                class="image-empty"
-              >
-                暂无图片
-              </div>
-              <div class="image-grid">
-                <div v-for="img in imageList" :key="img.id" class="image-item">
-                  <img
-                    :src="img.imageUrl"
-                    :alt="imageCityName"
-                    loading="lazy"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </Transition>
-    </Teleport>
+    <router-view />
   </div>
 </template>
 
@@ -465,94 +400,6 @@ html.dark.footprint-page body {
   color: #808080;
 }
 
-/* ---- 图片弹窗 ---- */
-.image-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: rgba(0, 0, 0, 0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-.image-dialog {
-  background: #fff;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 760px;
-  max-height: 80vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-.image-dialog-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid #ebeef5;
-}
-.image-dialog-header h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  color: #303133;
-}
-.image-close {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  color: #909399;
-  border-radius: 4px;
-  display: flex;
-  transition:
-    color 0.15s,
-    background 0.15s;
-}
-.image-close:hover {
-  color: #303133;
-  background: #f5f7fa;
-}
-.image-dialog-body {
-  padding: 16px 20px 20px;
-  overflow-y: auto;
-  min-height: 100px;
-}
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-}
-.image-item {
-  border-radius: 6px;
-  overflow: hidden;
-  aspect-ratio: 4 / 3;
-  background: #f5f7fa;
-}
-.image-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-.image-empty {
-  text-align: center;
-  padding: 32px 0;
-  color: #909399;
-  font-size: 14px;
-}
-
-.img-fade-enter-active,
-.img-fade-leave-active {
-  transition: opacity 0.2s;
-}
-.img-fade-enter-from,
-.img-fade-leave-to {
-  opacity: 0;
-}
-
 @media (max-width: 600px) {
   .map-footer {
     bottom: 16px;
@@ -562,13 +409,6 @@ html.dark.footprint-page body {
   }
   .stat-num {
     font-size: 18px;
-  }
-  .image-dialog {
-    max-height: 90vh;
-    border-radius: 8px;
-  }
-  .image-grid {
-    grid-template-columns: repeat(2, 1fr);
   }
 }
 </style>
