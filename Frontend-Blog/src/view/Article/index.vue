@@ -204,7 +204,7 @@ const handleSubmitComment = async () => {
       content: content,
       nickname: nick,
       visitorId: visitorStore.visitorId,
-      emailOrQq: commentForm.value.emailOrQq || visitorStore.email || '',
+      emailOrQq: commentForm.value.emailOrQq || '',
       isMarkdown: commentForm.value.isMarkdown ? 1 : 0,
       isSecret: commentForm.value.isSecret ? 1 : 0,
       isNotice: commentForm.value.isNotice ? 1 : 0,
@@ -294,6 +294,10 @@ const doDelete = async (c) => {
 }
 
 const fmtDate = (d) => (d ? d.slice(0, 16).replace('T', ' ') : '')
+const toProvince = (loc) => {
+  if (!loc) return '未知'
+  return loc.split('-')[0]
+}
 const isOwn = (c) => c.visitorId && c.visitorId === visitorStore.visitorId
 
 /* 头像 */
@@ -575,7 +579,7 @@ onMounted(() => {
                             d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
                           />
                           <circle cx="12" cy="10" r="3" /></svg
-                        >{{ c.location || '未知' }}</span
+                        >{{ toProvince(c.location) }}</span
                       >
                       <span class="c-meta-item"
                         ><svg
@@ -679,7 +683,7 @@ onMounted(() => {
                                   d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
                                 />
                                 <circle cx="12" cy="10" r="3" /></svg
-                              >{{ child.location || '未知' }}</span
+                              >{{ toProvince(child.location) }}</span
                             >
                             <span class="c-meta-item"
                               ><svg
