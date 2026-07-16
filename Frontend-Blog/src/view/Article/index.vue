@@ -338,6 +338,9 @@ const flatCommentCount = computed(() => {
   return count
 })
 
+/* 目录是否存在 */
+const hasToc = computed(() => /<h[1-4]\b/i.test(article.value?.contentHtml || ''))
+
 /* 文章内容：优先 MdPreview（需要 contentMarkdown），否则回退 v-html */
 const hasMarkdown = computed(() => !!article.value?.contentMarkdown?.trim())
 const lazyContentHtml = computed(() => {
@@ -374,7 +377,7 @@ onMounted(() => {
     </div>
 
     <template v-else-if="article">
-      <div class="article-layout">
+      <div class="article-layout" :class="{ centered: !hasToc }">
         <!-- 左侧: 文章内容 -->
         <div class="article-main">
           <div class="article-card">
@@ -777,7 +780,7 @@ onMounted(() => {
         </div>
 
         <!-- 右侧: 目录 -->
-        <aside class="article-sidebar">
+        <aside v-if="hasToc" class="article-sidebar">
           <TableOfContents
             :content-html="article.contentMarkdown || article.contentHtml"
           />
@@ -828,6 +831,10 @@ onMounted(() => {
   display: flex;
   gap: 24px;
   align-items: flex-start;
+}
+.article-layout.centered .article-main {
+  max-width: 800px;
+  margin: 0 auto;
 }
 .article-main {
   flex: 1;
