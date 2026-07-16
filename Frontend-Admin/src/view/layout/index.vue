@@ -2,13 +2,20 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores'
+import { getConfigByKey } from '@/api/settings'
 
 const route = useRoute()
 const userStore = useUserStore()
 
 // 页面刷新时恢复用户信息（含role，用于游客检测）
-onMounted(() => {
+const footprintEnabled = ref(false)
+
+onMounted(async () => {
   if (userStore.token) userStore.fetchUserInfo()
+  try {
+    const res = await getConfigByKey('use-footprint')
+    footprintEnabled.value = res?.data?.configValue === 'true'
+  } catch { /* keep false */ }
 })
 
 /** 侧边栏是否收起 */
@@ -19,26 +26,33 @@ const activeMenu = computed(() => route.path)
 /** 文章编辑页需要全高无内边距布局 */
 const isEditorPage = computed(() => route.path.startsWith('/article/edit'))
 
-const navItems = [
-  { path: '/dashboard', icon: 'icon-yibiaopan', label: '仪表盘' },
-  {
-    path: '/article/list',
-    icon: 'icon-bianjiwenzhang_huaban',
-    label: '文章管理'
-  },
-  { path: '/category', icon: 'icon-folder', label: '分类 / 标签' },
-  { path: '/comment', icon: 'icon-comment', label: '评论管理' },
-  { path: '/message', icon: 'icon-liuyan', label: '留言管理' },
-  { path: '/friend-link', icon: 'icon-link', label: '友链管理' },
-  { path: '/music', icon: 'icon-music', label: '音乐管理' },
-  { path: '/rss', icon: 'icon-rss', label: 'RSS 订阅' },
-  { path: '/visitor', icon: 'icon-user', label: '访客管理' },
-  { path: '/view-record', icon: 'icon-eye', label: '浏览记录' },
-  { path: '/footprint', icon: 'icon-zuji', label: '足迹管理' },
-  { path: '/operation-log', icon: 'icon-wj-rz', label: '操作日志' },
-  { path: '/profile', icon: 'icon-iconfontprofile', label: '个人资料' },
-  { path: '/settings', icon: 'icon-setting', label: '系统设置' }
-]
+const navItems = computed(() => {
+  const items = [
+    { path: '/dashboard', icon: 'icon-yibiaopan', label: '仪表盘' },
+    {
+      path: '/article/list',
+      icon: 'icon-bianjiwenzhang_huaban',
+      label: '文章管理'
+    },
+    { path: '/category', icon: 'icon-folder', label: '分类 / 标签' },
+    { path: '/comment', icon: 'icon-comment', label: '评论管理' },
+    { path: '/message', icon: 'icon-liuyan', label: '留言管理' },
+    { path: '/friend-link', icon: 'icon-link', label: '友链管理' },
+    { path: '/music', icon: 'icon-music', label: '音乐管理' },
+    { path: '/rss', icon: 'icon-rss', label: 'RSS 订阅' },
+    { path: '/visitor', icon: 'icon-user', label: '访客管理' },
+    { path: '/view-record', icon: 'icon-eye', label: '浏览记录' },
+  ]
+  if (footprintEnabled.value) {
+    items.push({ path: '/footprint', icon: 'icon-zuji', label: '足迹管理' })
+  }
+  items.push(
+    { path: '/operation-log', icon: 'icon-wj-rz', label: '操作日志' },
+    { path: '/profile', icon: 'icon-iconfontprofile', label: '个人资料' },
+    { path: '/settings', icon: 'icon-setting', label: '系统设置' }
+  )
+  return items
+})
 
 const handleLogout = () => {
   ElMessageBox.confirm('确认退出登录？', '提示', {

@@ -1,5 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
+let footprintEnabled = null
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -121,7 +123,7 @@ const router = createRouter({
   ]
 })
 
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const isLoggedIn = !!localStorage.getItem('admin_token')
 
   // 未登录 → 跳登录页（已在登录页则放行）
@@ -132,6 +134,20 @@ router.beforeEach((to) => {
   // 已登录 → 禁止再访问登录页，直接进首页
   if (isLoggedIn && to.path === '/login') {
     return { path: '/dashboard', replace: true }
+  }
+
+  // 足迹模块开关
+  if (isLoggedIn && to.path.startsWith('/footprint')) {
+    if (footprintEnabled === null) {
+      try {
+        const { getConfigByKey } = await import('@/api/settings')
+        const res = await getConfigByKey('use-footprint')
+        footprintEnabled = res?.data?.configValue === 'true'
+      } catch {
+        footprintEnabled = true
+      }
+    }
+    if (!footprintEnabled) return { path: '/dashboard', replace: true }
   }
 
   document.title = `${to.meta?.title || '管理'} - FeiTwnd管理`
