@@ -14,11 +14,6 @@ const dataReady = ref(false)
 const goHome = () => router.push('/')
 
 const themeStore = useThemeStore()
-const isDark = computed(() => {
-  if (themeStore.mode === 'dark') return true
-  if (themeStore.mode === 'light') return false
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-})
 
 const provinceMap = {
   110000: '北京市',
@@ -141,7 +136,7 @@ const visitedProvinces = computed(() => {
 })
 
 const getChartOptions = () => {
-  const dark = isDark.value
+  const dark = themeStore.isDark
   return {
     backgroundColor: dark ? '#181818' : '#fff',
     tooltip: {
@@ -241,9 +236,12 @@ onMounted(async () => {
   dataReady.value = true
 })
 
-const themeWatchStop = watch(isDark, () => {
-  if (chart) chart.setOption(getChartOptions(), true)
-})
+const themeWatchStop = watch(
+  () => themeStore.isDark,
+  () => {
+    if (chart) chart.setOption(getChartOptions(), true)
+  }
+)
 
 onUnmounted(() => {
   document.documentElement.classList.remove('footprint-page')
@@ -254,8 +252,8 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="footprint-fullpage" :class="{ dark: isDark }">
-    <FootprintSplash :dark="isDark" :ready="dataReady" />
+  <div class="footprint-fullpage" :class="{ dark: themeStore.isDark }">
+    <FootprintSplash :dark="themeStore.isDark" :ready="dataReady" />
 
     <div ref="chartRef" class="map-full" />
 

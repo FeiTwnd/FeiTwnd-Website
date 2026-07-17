@@ -8,12 +8,6 @@ const route = useRoute()
 const router = useRouter()
 const themeStore = useThemeStore()
 
-const isDark = computed(() => {
-  if (themeStore.mode === 'dark') return true
-  if (themeStore.mode === 'light') return false
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-})
-
 const cityId = computed(() => Number(route.params.id))
 const cityName = ref('')
 const images = ref([])
@@ -100,7 +94,7 @@ const goBack = () => router.push('/footprint')
 </script>
 
 <template>
-  <div class="gallery-page" :class="{ dark: isDark }">
+  <div class="gallery-page" :class="{ dark: themeStore.isDark }">
     <!-- 顶栏 -->
     <header class="gallery-header">
       <button class="back-btn" @click="goBack" aria-label="返回足迹">
