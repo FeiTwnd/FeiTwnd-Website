@@ -1,10 +1,12 @@
 package cc.feitwnd.utils;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.stereotype.Component;
+import org.lionsoul.ip2region.xdb.LongByteArray;
+import org.lionsoul.ip2region.xdb.Searcher;
+import org.lionsoul.ip2region.xdb.Version;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,9 +15,19 @@ import java.util.Map;
  */
 @Slf4j
 public class IpUtil {
-    // IP地址查询接口
-    public static final String IP_API = "http://ip-api.com/json/";
-    public static final String LANGUAGE = "zh-CN";
+    // ip2region 离线地址库（resources 路径）
+    private static final String XDB_PATH = "/ip2region/ip2region_v4.xdb";
+    // 基于全量缓存的 Searcher，线程安全可全局复用
+    private static Searcher searcher;
+
+    static {
+        try (InputStream is = IpUtil.class.getResourceAsStream(XDB_PATH)) {
+            LongByteArray cBuff = Searcher.loadContentFromInputStream(is);
+            searcher = Searcher.newWithBuffer(Version.IPv4, cBuff);
+        } catch (Exception e) {
+            log.error("ip2region地址库加载失败", e);
+        }
+    }
 
     // 获取真实IP地址（兼容CDN/反向代理）
     public static String getClientIp(HttpServletRequest request) {
@@ -53,30 +65,38 @@ public class IpUtil {
     }
 
     // 获取IP地址信息
+    // ip2region 返回格式：国家|省份|城市|ISP|国家代码
     public static Map<String, String> getGeoInfo(String ip){
-        Map<String,String> params = new HashMap<>();
-        params.put("lang",LANGUAGE);
-        String doneGet = HttpClientUtil.doGet(IP_API + ip, params);
-        log.info("IP地址信息查询结果：{}",doneGet);
-        // 封装返回结果
         Map<String, String> geoInfo = new HashMap<>();
-
+        geoInfo.put("country", "");
+        geoInfo.put("province", "");
+        geoInfo.put("city", "");
+        if (searcher == null || ip == null || ip.isEmpty()) {
+            return geoInfo;
+        }
         try {
-            // 使用Jackson ObjectMapper解析JSON
-            ObjectMapper mapper = new ObjectMapper();
-            Map<String, Object> jsonMap = mapper.readValue(doneGet, Map.class);
-
-            // 提取需要的信息
-            geoInfo.put("country", (String) jsonMap.getOrDefault("country", ""));
-            geoInfo.put("province", stripAdminSuffix((String) jsonMap.getOrDefault("regionName", "")));
-            geoInfo.put("city", stripAdminSuffix((String) jsonMap.getOrDefault("city", "")));
-            geoInfo.put("latitude", String.valueOf(jsonMap.getOrDefault("lat", "")));
-            geoInfo.put("longitude", String.valueOf(jsonMap.getOrDefault("lon", "")));
-
+            String region = searcher.search(ip);
+            log.info("IP地址信息查询结果：{}", region);
+            if (region != null && !region.isEmpty()) {
+                String[] parts = region.split("\\|");
+                geoInfo.put("country", normalizeField(parts.length > 0 ? parts[0] : ""));
+                geoInfo.put("province", stripAdminSuffix(normalizeField(parts.length > 1 ? parts[1] : "")));
+                geoInfo.put("city", stripAdminSuffix(normalizeField(parts.length > 2 ? parts[2] : "")));
+            }
         } catch (Exception e) {
             log.error("解析IP地址信息失败", e);
         }
         return geoInfo;
+    }
+
+    /**
+     * ip2region 未知字段返回 0 或 Reserved，统一置空
+     */
+    private static String normalizeField(String field) {
+        if (field == null || field.isEmpty() || "0".equals(field) || "Reserved".equalsIgnoreCase(field)) {
+            return "";
+        }
+        return field;
     }
 
     /**

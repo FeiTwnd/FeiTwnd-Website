@@ -423,3 +423,9 @@ values ('gongan-beian','xxx','string','公安备案',now(),now());
 -- 网站建立时间
 insert into system_config(config_key, config_value, config_type, description, create_time, update_time)
 values ('start-time','xxxx-xx-xx','string','网站建立时间',now(),now());
+
+-- 是否使用扩展模块，前端会根据这个配置来决定是否显示扩展模块的入口，默认不使用
+
+-- 足迹模块
+insert into system_config(config_key, config_value, config_type, description, create_time, update_time)
+values ('use-footprint','false','boolean','是否使用足迹模块',now(),now());

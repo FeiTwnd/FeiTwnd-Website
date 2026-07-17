@@ -42,6 +42,7 @@
         <bucket4j-core>8.3.0</bucket4j-core>
         <bucket4j-jcache>8.3.0</bucket4j-jcache>
         <cache-api>1.1.1</cache-api>
+        <ip2region>3.3.7</ip2region>
     </properties>
 
     <dependencyManagement>
@@ -223,6 +224,13 @@
                 <groupId>javax.cache</groupId>
                 <artifactId>cache-api</artifactId>
                 <version>${cache-api}</version>
+            </dependency>
+
+            <!-- ip2region 离线IP地址库 -->
+            <dependency>
+                <groupId>org.lionsoul</groupId>
+                <artifactId>ip2region</artifactId>
+                <version>${ip2region}</version>
             </dependency>
 
         </dependencies>

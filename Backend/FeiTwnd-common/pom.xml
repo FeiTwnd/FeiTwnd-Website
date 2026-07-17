@@ -132,6 +132,12 @@
             <artifactId>jsoup</artifactId>
         </dependency>
 
+        <!-- ip2region 离线IP地址库 -->
+        <dependency>
+            <groupId>org.lionsoul</groupId>
+            <artifactId>ip2region</artifactId>
+        </dependency>
+
     </dependencies>
 
     <build>
