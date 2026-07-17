@@ -294,10 +294,6 @@ const doDelete = async (c) => {
 }
 
 const fmtDate = (d) => (d ? d.slice(0, 16).replace('T', ' ') : '')
-const toProvince = (loc) => {
-  if (!loc) return '未知'
-  return loc.split('-')[0]
-}
 const isOwn = (c) => c.visitorId && c.visitorId === visitorStore.visitorId
 
 /* 头像 */
@@ -339,7 +335,9 @@ const flatCommentCount = computed(() => {
 })
 
 /* 目录是否存在 */
-const hasToc = computed(() => /<h[1-4]\b/i.test(article.value?.contentHtml || ''))
+const hasToc = computed(() =>
+  /<h[1-4]\b/i.test(article.value?.contentHtml || '')
+)
 
 /* 文章内容：优先 MdPreview（需要 contentMarkdown），否则回退 v-html */
 const hasMarkdown = computed(() => !!article.value?.contentMarkdown?.trim())
@@ -582,7 +580,7 @@ onMounted(() => {
                             d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
                           />
                           <circle cx="12" cy="10" r="3" /></svg
-                        >{{ toProvince(c.location) }}</span
+                        >{{ c.location }}</span
                       >
                       <span class="c-meta-item"
                         ><svg
@@ -686,7 +684,7 @@ onMounted(() => {
                                   d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
                                 />
                                 <circle cx="12" cy="10" r="3" /></svg
-                              >{{ toProvince(child.location) }}</span
+                              >{{ child.location }}</span
                             >
                             <span class="c-meta-item"
                               ><svg

@@ -200,10 +200,6 @@ const getAvatarUrl = (msg) => {
 }
 const getInitial = (name) => (name ? name.charAt(0).toUpperCase() : '?')
 
-const toProvince = (loc) => {
-  if (!loc) return '未知'
-  return loc.split('-')[0]
-}
 const fmtDate = (d) => {
   if (!d) return ''
   return d.slice(0, 16).replace('T', ' ')
@@ -371,7 +367,7 @@ onMounted(() => {
                     >
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
                       <circle cx="12" cy="10" r="3" /></svg
-                    >{{ toProvince(msg.location) }}</span
+                    >{{ msg.location }}</span
                   >
                   <span class="msg-meta-item"
                     ><svg
@@ -466,7 +462,7 @@ onMounted(() => {
                               d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
                             />
                             <circle cx="12" cy="10" r="3" /></svg
-                          >{{ toProvince(child.location) }}</span
+                          >{{ child.location }}</span
                         >
                         <span class="msg-meta-item"
                           ><svg
