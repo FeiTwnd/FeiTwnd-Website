@@ -9,6 +9,8 @@ import FootprintSplash from '@/components/FootprintSplash.vue'
 
 const router = useRouter()
 
+const dataReady = ref(false)
+
 const goHome = () => router.push('/')
 
 const themeStore = useThemeStore()
@@ -236,6 +238,7 @@ onMounted(async () => {
   } catch {
     /* ignore */
   }
+  dataReady.value = true
 })
 
 const themeWatchStop = watch(isDark, () => {
@@ -252,7 +255,7 @@ onUnmounted(() => {
 
 <template>
   <div class="footprint-fullpage" :class="{ dark: isDark }">
-    <FootprintSplash :dark="isDark" />
+    <FootprintSplash :dark="isDark" :ready="dataReady" />
 
     <div ref="chartRef" class="map-full" />
 

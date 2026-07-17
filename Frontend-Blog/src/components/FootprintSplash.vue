@@ -1,23 +1,44 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
-  dark: { type: Boolean, default: false }
+  dark: { type: Boolean, default: false },
+  ready: { type: Boolean, default: false }
 })
 
 const phase = ref('playing')
 const timers = []
+const mountedAt = Date.now()
+const MIN_DISPLAY = 2500
 
-onMounted(() => {
+function startFade() {
+  if (phase.value !== 'playing') return
+  const elapsed = Date.now() - mountedAt
+  const delay = Math.max(0, MIN_DISPLAY - elapsed)
   timers.push(
     setTimeout(() => {
       phase.value = 'fading'
-    }, 3000)
+    }, delay)
   )
   timers.push(
     setTimeout(() => {
       phase.value = 'done'
-    }, 4500)
+    }, delay + 1500)
+  )
+}
+
+watch(
+  () => props.ready,
+  (v) => {
+    if (v) startFade()
+  }
+)
+
+onMounted(() => {
+  timers.push(
+    setTimeout(() => {
+      if (phase.value === 'playing') startFade()
+    }, 6000)
   )
 })
 
@@ -195,95 +216,98 @@ onUnmounted(() => timers.forEach(clearTimeout))
         d="M-5 226 L25 213 L48 210 L68 204 L85 196 L100 190 L118 184 L140 178 L168 170"
       />
 
-      <!-- 登山小人 -->
-      <g class="hiker">
-        <!-- 投影 -->
-        <ellipse class="shadow" cx="102" cy="196" rx="26" ry="5" />
+      <!-- 登山小人（外层沿小径漂移） -->
+      <g class="hiker-wrap">
+        <g class="hiker">
+          <!-- 投影 -->
+          <ellipse class="shadow" cx="102" cy="196" rx="26" ry="5" />
 
-        <!-- 后腿（大腿 + 小腿/靴，膝关节分段） -->
-        <g class="leg back-leg">
-          <path class="thigh" d="M100 148 L100 172" />
-          <g class="shin-group">
-            <path
-              class="shin"
-              d="M100 172 L100 191 Q100 194 103 194 L111 194"
+          <!-- 后腿（大腿 + 小腿/靴，膝关节分段） -->
+          <g class="leg back-leg">
+            <path class="thigh" d="M100 148 L100 172" />
+            <g class="shin-group">
+              <path
+                class="shin"
+                d="M100 172 L100 191 Q100 194 103 194 L111 194"
+              />
+            </g>
+          </g>
+
+          <!-- 后臂（上臂 + 前臂，肘关节分段） -->
+          <g class="arm back-arm">
+            <path class="upper-arm" d="M100 103 L100 125" />
+            <g class="forearm-group">
+              <path class="forearm" d="M100 125 L98 141" />
+            </g>
+          </g>
+
+          <!-- 登山包 -->
+          <g class="backpack">
+            <rect
+              class="pack-roll"
+              x="77"
+              y="95"
+              width="26"
+              height="9"
+              rx="4.5"
             />
+            <rect
+              class="pack-main"
+              x="76"
+              y="102"
+              width="27"
+              height="45"
+              rx="9"
+            />
+            <rect
+              class="pack-pocket"
+              x="81"
+              y="126"
+              width="15"
+              height="11"
+              rx="4"
+            />
+            <path class="pack-strap" d="M99 105 Q89 113 87 128" />
           </g>
-        </g>
 
-        <!-- 后臂（上臂 + 前臂，肘关节分段） -->
-        <g class="arm back-arm">
-          <path class="upper-arm" d="M100 103 L100 125" />
-          <g class="forearm-group">
-            <path class="forearm" d="M100 125 L98 141" />
-          </g>
-        </g>
-
-        <!-- 登山包 -->
-        <g class="backpack">
-          <rect
-            class="pack-roll"
-            x="77"
-            y="95"
-            width="26"
-            height="9"
-            rx="4.5"
-          />
-          <rect
-            class="pack-main"
-            x="76"
-            y="102"
-            width="27"
-            height="45"
-            rx="9"
-          />
-          <rect
-            class="pack-pocket"
-            x="81"
-            y="126"
-            width="15"
-            height="11"
-            rx="4"
-          />
-          <path class="pack-strap" d="M99 105 Q89 113 87 128" />
-        </g>
-
-        <!-- 躯干 -->
-        <path
-          class="torso"
-          d="M95 100 Q100 96 105 100 L109 150 Q100 155 91 150 Z"
-        />
-
-        <!-- 头部与遮阳帽 -->
-        <g class="head-group">
-          <circle class="head" cx="104" cy="87" r="12" />
+          <!-- 躯干 -->
           <path
-            class="hat"
-            d="M90 82 Q90 69 104 68 Q118 69 118 80 L127 82 Q129 85 123 85 L94 86 Q88 86 90 82 Z"
+            class="torso"
+            d="M95 100 Q100 96 105 100 L109 150 Q100 155 91 150 Z"
           />
-        </g>
 
-        <!-- 前腿 -->
-        <g class="leg front-leg">
-          <path class="thigh" d="M100 148 L100 172" />
-          <g class="shin-group">
+          <!-- 头部与遮阳帽 -->
+          <g class="head-group">
+            <circle class="head" cx="104" cy="87" r="12" />
             <path
-              class="shin"
-              d="M100 172 L100 191 Q100 194 103 194 L111 194"
+              class="hat"
+              d="M90 82 Q90 69 104 68 Q118 69 118 80 L127 82 Q129 85 123 85 L94 86 Q88 86 90 82 Z"
             />
           </g>
-        </g>
 
-        <!-- 前臂（握持登山杖随臂摆动） -->
-        <g class="arm front-arm">
-          <path class="upper-arm" d="M100 103 L100 125" />
-          <g class="forearm-group">
-            <path class="forearm" d="M100 125 L104 141" />
-            <line class="pole" x1="103" y1="132" x2="120" y2="190" />
+          <!-- 前腿 -->
+          <g class="leg front-leg">
+            <path class="thigh" d="M100 148 L100 172" />
+            <g class="shin-group">
+              <path
+                class="shin"
+                d="M100 172 L100 191 Q100 194 103 194 L111 194"
+              />
+            </g>
+          </g>
+
+          <!-- 前臂（握持登山杖随臂摆动） -->
+          <g class="arm front-arm">
+            <path class="upper-arm" d="M100 103 L100 125" />
+            <g class="forearm-group">
+              <path class="forearm" d="M100 125 L104 141" />
+              <line class="pole" x1="103" y1="132" x2="120" y2="190" />
+            </g>
           </g>
         </g>
       </g>
     </svg>
+    <p class="splash-copy">正在打包行囊…</p>
   </div>
 </template>
 
@@ -293,8 +317,10 @@ onUnmounted(() => timers.forEach(clearTimeout))
   inset: 0;
   z-index: 10000;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: 10px;
   background: #ffffff;
   opacity: 1;
   transition: opacity 1.5s ease;
@@ -312,6 +338,27 @@ onUnmounted(() => timers.forEach(clearTimeout))
   width: 420px;
   height: 504px;
   overflow: visible;
+}
+
+.splash-copy {
+  font-family: 'Noto Serif SC', Georgia, 'Times New Roman', serif;
+  font-size: 13px;
+  color: #909399;
+  letter-spacing: 0.08em;
+  user-select: none;
+  animation: copy-breathe 2s ease-in-out infinite;
+}
+@keyframes copy-breathe {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+.dark .splash-copy {
+  color: #808080;
 }
 
 /* ======== 太阳 ======== */
@@ -518,6 +565,18 @@ onUnmounted(() => timers.forEach(clearTimeout))
 }
 
 /* ============ 登山小人动画（步态周期 1.2s，一次循环两步） ============ */
+
+.hiker-wrap {
+  animation: drift-forward 3s ease-out forwards;
+}
+@keyframes drift-forward {
+  from {
+    translate: 0 0;
+  }
+  to {
+    translate: 16px -5px;
+  }
+}
 
 .hiker {
   rotate: 5deg;
@@ -772,6 +831,18 @@ onUnmounted(() => timers.forEach(clearTimeout))
   .hiker-svg {
     width: 320px;
     height: 384px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hiker-svg * {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    animation-iteration-count: 1 !important;
+  }
+  .splash-copy {
+    animation: none !important;
+    opacity: 0.6;
   }
 }
 </style>
