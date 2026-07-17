@@ -9,6 +9,8 @@ import FootprintSplash from '@/components/FootprintSplash.vue'
 
 const router = useRouter()
 
+const goHome = () => router.push('/')
+
 const themeStore = useThemeStore()
 const isDark = computed(() => {
   if (themeStore.mode === 'dark') return true
@@ -271,6 +273,15 @@ onUnmounted(() => {
         <span class="legend-dot" />
         <span class="legend-label">未访</span>
       </div>
+      <div class="footer-divider" />
+      <button
+        class="home-btn"
+        aria-label="返回首页"
+        title="返回首页"
+        @click="goHome"
+      >
+        <span class="iconfont icon-zhuye" />
+      </button>
     </div>
 
     <router-view />
@@ -301,6 +312,37 @@ html.dark.footprint-page body {
 .map-full {
   width: 100%;
   height: 100%;
+}
+
+/* ---- 返回首页按钮 ---- */
+.home-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid #e4e7ed;
+  border-radius: 50%;
+  color: #909399;
+  font-size: 15px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+}
+.home-btn:hover {
+  background: #f5f5f5;
+  color: #303133;
+}
+.dark .home-btn {
+  border-color: #333;
+  color: #808080;
+}
+.dark .home-btn:hover {
+  background: #2e2e2e;
+  color: #e5e5e5;
 }
 
 /* ---- 底栏 ---- */

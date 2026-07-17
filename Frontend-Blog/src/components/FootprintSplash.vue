@@ -198,57 +198,89 @@ onUnmounted(() => timers.forEach(clearTimeout))
       <!-- 登山小人 -->
       <g class="hiker">
         <!-- 投影 -->
-        <ellipse class="shadow" cx="100" cy="200" rx="28" ry="6" />
+        <ellipse class="shadow" cx="102" cy="196" rx="26" ry="5" />
+
+        <!-- 后腿（大腿 + 小腿/靴，膝关节分段） -->
+        <g class="leg back-leg">
+          <path class="thigh" d="M100 148 L100 172" />
+          <g class="shin-group">
+            <path
+              class="shin"
+              d="M100 172 L100 191 Q100 194 103 194 L111 194"
+            />
+          </g>
+        </g>
+
+        <!-- 后臂（上臂 + 前臂，肘关节分段） -->
+        <g class="arm back-arm">
+          <path class="upper-arm" d="M100 103 L100 125" />
+          <g class="forearm-group">
+            <path class="forearm" d="M100 125 L98 141" />
+          </g>
+        </g>
 
         <!-- 登山包 -->
         <g class="backpack">
-          <rect x="76" y="96" width="26" height="44" rx="8" />
-          <rect x="80" y="122" width="18" height="12" rx="3" />
+          <rect
+            class="pack-roll"
+            x="77"
+            y="95"
+            width="26"
+            height="9"
+            rx="4.5"
+          />
+          <rect
+            class="pack-main"
+            x="76"
+            y="102"
+            width="27"
+            height="45"
+            rx="9"
+          />
+          <rect
+            class="pack-pocket"
+            x="81"
+            y="126"
+            width="15"
+            height="11"
+            rx="4"
+          />
+          <path class="pack-strap" d="M99 105 Q89 113 87 128" />
         </g>
 
-        <!-- 后腿 (左腿) -->
-        <g class="limb leg back-leg">
-          <path d="M104 160 L72 206" stroke-width="9" stroke-linecap="round" />
-        </g>
-
-        <!-- 后臂 (左臂) -->
-        <g class="limb arm back-arm">
-          <path d="M104 108 L72 144" stroke-width="8" stroke-linecap="round" />
-        </g>
-
-        <!-- 身体 -->
-        <rect class="body" x="94" y="100" width="20" height="60" rx="10" />
+        <!-- 躯干 -->
+        <path
+          class="torso"
+          d="M95 100 Q100 96 105 100 L109 150 Q100 155 91 150 Z"
+        />
 
         <!-- 头部与遮阳帽 -->
         <g class="head-group">
-          <circle class="head" cx="104" cy="88" r="13" />
+          <circle class="head" cx="104" cy="87" r="12" />
           <path
             class="hat"
-            d="M82 83 C82 83 88 63 104 61 C120 63 126 83 126 83 C126 87 120 89 104 89 C88 89 82 87 82 83 Z"
+            d="M90 82 Q90 69 104 68 Q118 69 118 80 L127 82 Q129 85 123 85 L94 86 Q88 86 90 82 Z"
           />
         </g>
 
-        <!-- 前腿 (右腿) -->
-        <g class="limb leg front-leg">
-          <path d="M104 160 L136 206" stroke-width="9" stroke-linecap="round" />
+        <!-- 前腿 -->
+        <g class="leg front-leg">
+          <path class="thigh" d="M100 148 L100 172" />
+          <g class="shin-group">
+            <path
+              class="shin"
+              d="M100 172 L100 191 Q100 194 103 194 L111 194"
+            />
+          </g>
         </g>
 
-        <!-- 前臂 (右臂) -->
-        <g class="limb arm front-arm">
-          <path d="M104 108 L136 146" stroke-width="8" stroke-linecap="round" />
-        </g>
-
-        <!-- 登山杖 -->
-        <g class="pole-group">
-          <line
-            class="pole"
-            x1="136"
-            y1="138"
-            x2="150"
-            y2="220"
-            stroke-width="3"
-            stroke-linecap="round"
-          />
+        <!-- 前臂（握持登山杖随臂摆动） -->
+        <g class="arm front-arm">
+          <path class="upper-arm" d="M100 103 L100 125" />
+          <g class="forearm-group">
+            <path class="forearm" d="M100 125 L104 141" />
+            <line class="pole" x1="103" y1="132" x2="120" y2="190" />
+          </g>
         </g>
       </g>
     </svg>
@@ -442,87 +474,100 @@ onUnmounted(() => timers.forEach(clearTimeout))
 }
 
 /* ======== 主体色彩 ======== */
-.body,
-.backpack,
+.torso,
 .head,
-.hat {
+.hat,
+.pack-roll,
+.pack-main {
   fill: #303133;
 }
-.backpack rect:last-child {
+.pack-pocket {
   fill: rgba(48, 49, 51, 0.18);
 }
-.limb path,
+.thigh,
+.shin,
+.upper-arm,
+.forearm,
+.pack-strap,
 .pole {
   stroke: #303133;
-}
-.limb path {
   fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.thigh {
+  stroke-width: 10;
+}
+.shin {
+  stroke-width: 8.5;
+}
+.upper-arm {
+  stroke-width: 8;
+}
+.forearm {
+  stroke-width: 7;
+}
+.pack-strap {
+  stroke-width: 3;
+}
+.pole {
+  stroke-width: 3;
 }
 .shadow {
   fill: rgba(48, 49, 51, 0.12);
 }
 
-/* ============ 登山小人动画 ============ */
+/* ============ 登山小人动画（步态周期 1.2s，一次循环两步） ============ */
 
 .hiker {
-  transform: rotate(-6deg);
-  transform-origin: 100px 180px;
-  animation: hiker-bounce 1.4s ease-in-out infinite;
+  rotate: 5deg;
+  transform-origin: 100px 190px;
+  animation: hiker-bob 1.2s ease-in-out infinite;
 }
-@keyframes hiker-bounce {
+@keyframes hiker-bob {
   0%,
+  50%,
   100% {
     translate: 0 0;
   }
-  15% {
-    translate: 0 -7px;
-  }
-  50% {
-    translate: 0 0;
-  }
-  65% {
-    translate: 0 -7px;
+  25%,
+  75% {
+    translate: 0 -3.5px;
   }
 }
 
 .shadow {
-  animation: shadow-pulse 1.4s ease-in-out infinite;
-  transform-origin: 100px 200px;
+  animation: shadow-pulse 1.2s ease-in-out infinite;
+  transform-origin: 102px 196px;
 }
 @keyframes shadow-pulse {
   0%,
+  50%,
   100% {
-    transform: scale(1, 1);
+    transform: scale(1);
     opacity: 1;
   }
-  15% {
-    transform: scale(0.78, 0.78);
-    opacity: 0.55;
-  }
-  50% {
-    transform: scale(1, 1);
-    opacity: 1;
-  }
-  65% {
-    transform: scale(0.78, 0.78);
-    opacity: 0.55;
+  25%,
+  75% {
+    transform: scale(0.84);
+    opacity: 0.6;
   }
 }
 
-.body {
-  animation: torso-sway 1.4s ease-in-out infinite;
-  transform-origin: 104px 160px;
+.torso {
+  animation: torso-sway 1.2s ease-in-out infinite;
+  transform-origin: 100px 149px;
 }
 @keyframes torso-sway {
   0%,
   100% {
-    transform: rotate(1.2deg);
+    transform: rotate(1.6deg);
   }
   25% {
     transform: rotate(0deg);
   }
   50% {
-    transform: rotate(-1.2deg);
+    transform: rotate(-1.6deg);
   }
   75% {
     transform: rotate(0deg);
@@ -530,165 +575,140 @@ onUnmounted(() => timers.forEach(clearTimeout))
 }
 
 .head-group {
-  animation: head-bob 1.4s ease-in-out infinite;
-  transform-origin: 104px 130px;
+  animation: head-bob 1.2s ease-in-out infinite;
+  transform-origin: 104px 99px;
 }
 @keyframes head-bob {
   0%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(-1.2deg);
   }
-  20% {
-    transform: translateY(-3px);
+  25% {
+    transform: translateY(-1.5px) rotate(0deg);
   }
   50% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(1.2deg);
   }
-  70% {
-    transform: translateY(-3px);
+  75% {
+    transform: translateY(-1.5px) rotate(0deg);
   }
 }
 
 .backpack {
-  animation: pack-bob 1.4s ease-in-out infinite;
-  transform-origin: 89px 118px;
+  animation: pack-lag 1.2s ease-in-out infinite;
+  transform-origin: 89px 125px;
 }
-@keyframes pack-bob {
+@keyframes pack-lag {
   0%,
+  50%,
   100% {
-    transform: translateY(0);
+    transform: translateY(0) rotate(0deg);
   }
-  15% {
-    transform: translateY(-5px) rotate(1deg);
-  }
-  50% {
-    transform: translateY(0);
-  }
-  65% {
-    transform: translateY(-5px) rotate(-1deg);
+  30%,
+  80% {
+    transform: translateY(-2px) rotate(-1.4deg);
   }
 }
 
-/* 四肢：交叉爬升步态 */
-.back-leg {
-  animation: climb-back-leg 1.4s ease-in-out infinite;
-  transform-origin: 104px 160px;
-}
+/* 四肢共用步态关键帧，对侧肢体用 -0.6s 负延迟严格反相 */
 .front-leg {
-  animation: climb-front-leg 1.4s ease-in-out infinite;
-  transform-origin: 104px 160px;
+  animation: gait-thigh 1.2s ease-in-out infinite;
+  transform-origin: 100px 148px;
 }
-.back-arm {
-  animation: climb-back-arm 1.4s ease-in-out infinite;
-  transform-origin: 104px 108px;
+.back-leg {
+  animation: gait-thigh 1.2s ease-in-out -0.6s infinite;
+  transform-origin: 100px 148px;
+}
+.front-leg .shin-group {
+  animation: gait-shin 1.2s ease-in-out infinite;
+  transform-origin: 100px 172px;
+}
+.back-leg .shin-group {
+  animation: gait-shin 1.2s ease-in-out -0.6s infinite;
+  transform-origin: 100px 172px;
 }
 .front-arm {
-  animation: climb-front-arm 1.4s ease-in-out infinite;
-  transform-origin: 104px 108px;
+  animation: gait-uarm 1.2s ease-in-out infinite;
+  transform-origin: 100px 103px;
+}
+.back-arm {
+  animation: gait-uarm 1.2s ease-in-out -0.6s infinite;
+  transform-origin: 100px 103px;
+}
+.front-arm .forearm-group {
+  animation: gait-farm 1.2s ease-in-out infinite;
+  transform-origin: 100px 125px;
+}
+.back-arm .forearm-group {
+  animation: gait-farm 1.2s ease-in-out -0.6s infinite;
+  transform-origin: 100px 125px;
 }
 
-@keyframes climb-back-leg {
+/* 大腿绕髋部摆动（负角度 = 向前迈）：0% 脚跟着地 → 50% 脚尖离地 → 100% 再次着地 */
+@keyframes gait-thigh {
   0%,
   100% {
-    transform: rotate(-30deg);
+    transform: rotate(-20deg);
   }
-  18% {
-    transform: rotate(-14deg);
-  }
-  35% {
-    transform: rotate(6deg);
+  25% {
+    transform: rotate(0deg);
   }
   50% {
-    transform: rotate(30deg);
+    transform: rotate(20deg);
   }
-  68% {
-    transform: rotate(14deg);
-  }
-  85% {
-    transform: rotate(-6deg);
-  }
-}
-@keyframes climb-front-leg {
-  0%,
-  100% {
-    transform: rotate(30deg);
-  }
-  18% {
-    transform: rotate(14deg);
-  }
-  35% {
-    transform: rotate(-6deg);
-  }
-  50% {
-    transform: rotate(-30deg);
-  }
-  68% {
-    transform: rotate(-14deg);
-  }
-  85% {
-    transform: rotate(6deg);
-  }
-}
-@keyframes climb-back-arm {
-  0%,
-  100% {
-    transform: rotate(24deg);
-  }
-  18% {
-    transform: rotate(10deg);
-  }
-  35% {
-    transform: rotate(-8deg);
-  }
-  50% {
-    transform: rotate(-22deg);
-  }
-  68% {
-    transform: rotate(-10deg);
-  }
-  85% {
-    transform: rotate(8deg);
-  }
-}
-@keyframes climb-front-arm {
-  0%,
-  100% {
-    transform: rotate(-22deg);
-  }
-  18% {
-    transform: rotate(-10deg);
-  }
-  35% {
-    transform: rotate(8deg);
-  }
-  50% {
-    transform: rotate(24deg);
-  }
-  68% {
-    transform: rotate(10deg);
-  }
-  85% {
-    transform: rotate(-8deg);
+  75% {
+    transform: rotate(0deg);
   }
 }
 
-.pole-group {
-  animation: pole-plant 1.4s ease-in-out infinite;
-  transform-origin: 136px 138px;
-}
-@keyframes pole-plant {
+/* 膝关节屈膝（正角度 = 向后勾，符合人体关节方向）：支撑期接近伸直，摆动中期屈膝抬踵 */
+@keyframes gait-shin {
   0%,
   100% {
-    transform: rotate(-4deg);
+    transform: rotate(2deg);
   }
   25% {
     transform: rotate(8deg);
   }
   50% {
-    transform: rotate(-4deg);
+    transform: rotate(12deg);
+  }
+  62% {
+    transform: rotate(32deg);
+  }
+  72% {
+    transform: rotate(40deg);
+  }
+  85% {
+    transform: rotate(15deg);
+  }
+}
+
+/* 手臂绕肩摆动，与同侧腿反相 */
+@keyframes gait-uarm {
+  0%,
+  100% {
+    transform: rotate(15deg);
+  }
+  25% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-15deg);
   }
   75% {
-    transform: rotate(8deg);
+    transform: rotate(0deg);
+  }
+}
+
+/* 肘部弯曲（负角度 = 向前弯，符合关节方向）：前摆时弯曲加深 */
+@keyframes gait-farm {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(-20deg);
   }
 }
 
@@ -729,16 +749,21 @@ onUnmounted(() => timers.forEach(clearTimeout))
 .dark .shadow {
   fill: rgba(0, 0, 0, 0.3);
 }
-.dark .body,
-.dark .backpack,
+.dark .torso,
 .dark .head,
-.dark .hat {
+.dark .hat,
+.dark .pack-roll,
+.dark .pack-main {
   fill: #e5e5e5;
 }
-.dark .backpack rect:last-child {
+.dark .pack-pocket {
   fill: rgba(229, 229, 229, 0.15);
 }
-.dark .limb path,
+.dark .thigh,
+.dark .shin,
+.dark .upper-arm,
+.dark .forearm,
+.dark .pack-strap,
 .dark .pole {
   stroke: #e5e5e5;
 }
