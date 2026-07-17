@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import { useUserStore } from '@/stores'
 import { getConfigByKey } from '@/api/settings'
@@ -10,13 +10,26 @@ const userStore = useUserStore()
 // 页面刷新时恢复用户信息（含role，用于游客检测）
 const footprintEnabled = ref(false)
 
-onMounted(async () => {
-  if (userStore.token) userStore.fetchUserInfo()
+const fetchFootprintEnabled = async () => {
   try {
     const res = await getConfigByKey('use-footprint')
     footprintEnabled.value = res?.data?.configValue === 'true'
-  } catch { /* keep false */ }
+  } catch {
+    /* keep false */
+  }
+}
+
+onMounted(async () => {
+  if (userStore.token) userStore.fetchUserInfo()
+  fetchFootprintEnabled()
 })
+
+watch(
+  () => route.path,
+  () => {
+    fetchFootprintEnabled()
+  }
+)
 
 /** 侧边栏是否收起 */
 const collapsed = ref(false)
@@ -41,7 +54,7 @@ const navItems = computed(() => {
     { path: '/music', icon: 'icon-music', label: '音乐管理' },
     { path: '/rss', icon: 'icon-rss', label: 'RSS 订阅' },
     { path: '/visitor', icon: 'icon-user', label: '访客管理' },
-    { path: '/view-record', icon: 'icon-eye', label: '浏览记录' },
+    { path: '/view-record', icon: 'icon-eye', label: '浏览记录' }
   ]
   if (footprintEnabled.value) {
     items.push({ path: '/footprint', icon: 'icon-zuji', label: '足迹管理' })
