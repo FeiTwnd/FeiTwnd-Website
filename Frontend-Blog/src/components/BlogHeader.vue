@@ -1,33 +1,49 @@
 <script setup>
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useBlogStore, useThemeStore } from '@/stores'
+import { getConfigByKey } from '@/api/systemConfig'
 
 const router = useRouter()
+const route = useRoute()
 const blogStore = useBlogStore()
 const themeStore = useThemeStore()
-
-const isDark = computed(() => {
-  if (themeStore.mode === 'dark') return true
-  if (themeStore.mode === 'light') return false
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-})
 
 /* 滚动检测 */
 const scrolled = ref(false)
 const handleScroll = () => {
   scrolled.value = window.scrollY > 60
 }
-onMounted(() =>
+onMounted(async () => {
   window.addEventListener('scroll', handleScroll, { passive: true })
-)
+  fetchFootprintConfig()
+})
 onUnmounted(() => window.removeEventListener('scroll', handleScroll))
+
+watch(
+  () => route.path,
+  () => {
+    fetchFootprintConfig()
+  }
+)
 
 /* 搜索 */
 const searchVisible = ref(false)
 const keyword = ref('')
 const searchInputRef = ref(null)
 const mobileNavVisible = ref(false)
+
+/* 足迹开关 */
+const footprintEnabled = ref(false)
+
+const fetchFootprintConfig = async () => {
+  try {
+    const res = await getConfigByKey('use-footprint')
+    footprintEnabled.value = res?.data?.data?.configValue === 'true'
+  } catch {
+    /* keep false */
+  }
+}
 
 /* 音乐播放 */
 const isPlaying = ref(false)
@@ -72,25 +88,31 @@ const toggleMusicList = () => {
   musicListVisible.value = !musicListVisible.value
 }
 
-const navItems = [
-  {
-    label: '主页',
-    icon: 'icon-zhuye',
-    href: 'https://feitwnd.cc',
-    external: true
-  },
-  { label: '博客', icon: 'icon-boke', to: '/' },
-  { label: '归档', icon: 'icon-guidang', to: '/archive' },
-  { label: '友链', icon: 'icon-lianjie', to: '/links' },
-  { label: '留言', icon: 'icon-liuyan', to: '/message' },
-  { label: '关于', icon: 'icon-guanyu', to: '/about' },
-  {
-    label: '开往',
-    icon: 'icon-subway',
-    href: 'https://www.travellings.cn/go.html',
-    external: true
+const navItems = computed(() => {
+  const items = [
+    {
+      label: '主页',
+      icon: 'icon-zhuye',
+      href: 'https://feitwnd.cc',
+      external: true
+    },
+    { label: '博客', icon: 'icon-boke', to: '/' },
+    { label: '归档', icon: 'icon-guidang', to: '/archive' },
+    { label: '友链', icon: 'icon-lianjie', to: '/links' },
+    { label: '留言', icon: 'icon-liuyan', to: '/message' },
+    { label: '关于', icon: 'icon-guanyu', to: '/about' },
+    {
+      label: '开往',
+      icon: 'icon-subway',
+      href: 'https://www.travellings.cn/go.html',
+      external: true
+    }
+  ]
+  if (footprintEnabled.value) {
+    items.splice(5, 0, { label: '足迹', icon: 'icon-zuji', to: '/footprint' })
   }
-]
+  return items
+})
 
 const doSearch = () => {
   const kw = keyword.value.trim()
@@ -125,7 +147,7 @@ const navTo = (item) => {
 </script>
 
 <template>
-  <header class="site-header" :class="{ scrolled, dark: isDark }">
+  <header class="site-header" :class="{ scrolled, dark: themeStore.isDark }">
     <div class="header-inner">
       <div class="header-left">
         <router-link to="/" class="site-title">FeiTwnd's Blog</router-link>
@@ -211,12 +233,12 @@ const navTo = (item) => {
         <!-- 暗色模式切换 -->
         <button
           class="theme-toggle"
-          :title="isDark ? '切换到浅色模式' : '切换到暗色模式'"
+          :title="themeStore.isDark ? '切换到浅色模式' : '切换到暗色模式'"
           @click="themeStore.toggle"
         >
           <!-- 太阳图标（暗色时显示，点击切换到亮色） -->
           <svg
-            v-if="isDark"
+            v-if="themeStore.isDark"
             viewBox="0 0 24 24"
             width="17"
             height="17"
@@ -289,7 +311,7 @@ const navTo = (item) => {
         <i class="iconfont icon-sousuo" /> 搜索
       </a>
       <a class="nav-mobile-link" @click="themeStore.toggle">
-        <template v-if="isDark">
+        <template v-if="themeStore.isDark">
           <svg
             viewBox="0 0 24 24"
             width="15"

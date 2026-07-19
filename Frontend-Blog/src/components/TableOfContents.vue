@@ -68,10 +68,9 @@ const extractHeadings = () => {
 }
 
 const handleScroll = () => {
-  const offset = 100
   for (let i = headings.value.length - 1; i >= 0; i--) {
     const el = document.getElementById(headings.value[i].id)
-    if (el && el.getBoundingClientRect().top <= offset) {
+    if (el && el.getBoundingClientRect().top <= 110) {
       activeId.value = headings.value[i].id
       return
     }
@@ -81,9 +80,7 @@ const handleScroll = () => {
 
 const scrollTo = (id) => {
   const el = document.getElementById(id)
-  if (el) {
-    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 watch(() => props.contentHtml, extractHeadings)

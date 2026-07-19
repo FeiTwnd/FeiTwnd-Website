@@ -77,6 +77,7 @@ const load = async () => {
 
 const handleSubmit = async () => {
   if (!form.value.nickname.trim()) return ElMessage.warning('请输入昵称')
+  if (!form.value.emailOrQq.trim()) return ElMessage.warning('请输入邮箱或QQ号')
   if (!form.value.content.trim()) return ElMessage.warning('请输入内容')
   // 新留言需要验证码
   if (!editTarget.value) {
@@ -201,7 +202,6 @@ const getInitial = (name) => (name ? name.charAt(0).toUpperCase() : '?')
 
 const fmtDate = (d) => {
   if (!d) return ''
-  // 格式化为 YYYY-MM-DD HH:mm
   return d.slice(0, 16).replace('T', ' ')
 }
 
@@ -270,7 +270,7 @@ onMounted(() => {
               <input
                 v-model="form.emailOrQq"
                 type="text"
-                placeholder="邮箱/QQ号"
+                placeholder="邮箱/QQ号 *"
                 class="form-input"
                 :disabled="!!editTarget"
               />
@@ -367,7 +367,7 @@ onMounted(() => {
                     >
                       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" />
                       <circle cx="12" cy="10" r="3" /></svg
-                    >{{ msg.location || '未知' }}</span
+                    >{{ msg.location }}</span
                   >
                   <span class="msg-meta-item"
                     ><svg
@@ -462,7 +462,7 @@ onMounted(() => {
                               d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
                             />
                             <circle cx="12" cy="10" r="3" /></svg
-                          >{{ child.location || '未知' }}</span
+                          >{{ child.location }}</span
                         >
                         <span class="msg-meta-item"
                           ><svg

@@ -204,7 +204,7 @@ const handleSubmitComment = async () => {
       content: content,
       nickname: nick,
       visitorId: visitorStore.visitorId,
-      emailOrQq: commentForm.value.emailOrQq || visitorStore.email || '',
+      emailOrQq: commentForm.value.emailOrQq || '',
       isMarkdown: commentForm.value.isMarkdown ? 1 : 0,
       isSecret: commentForm.value.isSecret ? 1 : 0,
       isNotice: commentForm.value.isNotice ? 1 : 0,
@@ -334,6 +334,11 @@ const flatCommentCount = computed(() => {
   return count
 })
 
+/* 目录是否存在 */
+const hasToc = computed(() =>
+  /<h[1-4]\b/i.test(article.value?.contentHtml || '')
+)
+
 /* 文章内容：优先 MdPreview（需要 contentMarkdown），否则回退 v-html */
 const hasMarkdown = computed(() => !!article.value?.contentMarkdown?.trim())
 const lazyContentHtml = computed(() => {
@@ -370,7 +375,7 @@ onMounted(() => {
     </div>
 
     <template v-else-if="article">
-      <div class="article-layout">
+      <div class="article-layout" :class="{ centered: !hasToc }">
         <!-- 左侧: 文章内容 -->
         <div class="article-main">
           <div class="article-card">
@@ -575,7 +580,7 @@ onMounted(() => {
                             d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
                           />
                           <circle cx="12" cy="10" r="3" /></svg
-                        >{{ c.location || '未知' }}</span
+                        >{{ c.location }}</span
                       >
                       <span class="c-meta-item"
                         ><svg
@@ -679,7 +684,7 @@ onMounted(() => {
                                   d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"
                                 />
                                 <circle cx="12" cy="10" r="3" /></svg
-                              >{{ child.location || '未知' }}</span
+                              >{{ child.location }}</span
                             >
                             <span class="c-meta-item"
                               ><svg
@@ -773,7 +778,7 @@ onMounted(() => {
         </div>
 
         <!-- 右侧: 目录 -->
-        <aside class="article-sidebar">
+        <aside v-if="hasToc" class="article-sidebar">
           <TableOfContents
             :content-html="article.contentMarkdown || article.contentHtml"
           />
@@ -824,6 +829,10 @@ onMounted(() => {
   display: flex;
   gap: 24px;
   align-items: flex-start;
+}
+.article-layout.centered .article-main {
+  max-width: 800px;
+  margin: 0 auto;
 }
 .article-main {
   flex: 1;

@@ -57,8 +57,6 @@ public class AsyncVisitorServiceImpl implements AsyncVisitorService {
                                 .country(country)
                                 .province(province)
                                 .city(city)
-                                .longitude(geoInfo.get("longitude"))
-                                .latitude(geoInfo.get("latitude"))
                                 .build();
                         visitorMapper.updateById(geoUpdate);
                     }

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cc.feitwnd.mapper.CityFootprintMapper">
+    <insert id="insert">
+        insert into city_footprints (city_code, city_name, visit_time, is_visible, create_time, update_time)
+        values (#{cityCode}, #{cityName}, #{visitTime}, #{isVisible}, #{createTime}, #{updateTime})
+    </insert>
+
+    <update id="update">
+        update city_footprints
+        <set>
+            <if test="cityCode != null">city_code = #{cityCode},</if>
+            <if test="cityName != null">city_name = #{cityName},</if>
+            <if test="visitTime != null">visit_time = #{visitTime},</if>
+            <if test="isVisible != null">is_visible = #{isVisible},</if>
+            <if test="updateTime != null">update_time = #{updateTime}</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="pageQuery" resultType="cc.feitwnd.entity.CityFootprint">
+        select * from city_footprints
+        <where>
+            <if test="cityName != null and cityName != ''">
+                and city_name like concat('%', #{cityName}, '%')
+            </if>
+        </where>
+        order by visit_time desc, id asc
+    </select>
+
+    <delete id="batchDelete">
+        delete from city_footprints where id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

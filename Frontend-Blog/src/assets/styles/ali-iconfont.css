@@ -15,6 +15,10 @@
   line-height: 1;
 }
 
+.icon-zuji:before {
+  content: "\e604";
+}
+
 .icon-zhinengyouhua:before {
   content: "\e69a";
 }

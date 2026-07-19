@@ -1,0 +1,457 @@
+<script setup>
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
+import { useRouter } from 'vue-router'
+import * as echarts from 'echarts'
+import cityGeoJSON from '@/assets/city/city.json'
+import { getVisibleFootprints } from '@/api/footprint'
+import { useThemeStore } from '@/stores'
+import FootprintSplash from '@/components/FootprintSplash.vue'
+
+const router = useRouter()
+
+const dataReady = ref(false)
+
+const goHome = () => router.push('/')
+
+const themeStore = useThemeStore()
+
+const provinceMap = {
+  110000: '北京市',
+  120000: '天津市',
+  130000: '河北省',
+  140000: '山西省',
+  150000: '内蒙古自治区',
+  210000: '辽宁省',
+  220000: '吉林省',
+  230000: '黑龙江省',
+  310000: '上海市',
+  320000: '江苏省',
+  330000: '浙江省',
+  340000: '安徽省',
+  350000: '福建省',
+  360000: '江西省',
+  370000: '山东省',
+  410000: '河南省',
+  420000: '湖北省',
+  430000: '湖南省',
+  440000: '广东省',
+  450000: '广西壮族自治区',
+  460000: '海南省',
+  500000: '重庆市',
+  510000: '四川省',
+  520000: '贵州省',
+  530000: '云南省',
+  540000: '西藏自治区',
+  610000: '陕西省',
+  620000: '甘肃省',
+  630000: '青海省',
+  640000: '宁夏回族自治区',
+  650000: '新疆维吾尔自治区',
+  710000: '台湾省',
+  810000: '香港特别行政区',
+  820000: '澳门特别行政区'
+}
+
+const getProvinceAdcode = (feature) => {
+  if (!feature) return null
+  if (feature.properties.level === 'province') return feature.properties.adcode
+  const acroutes = feature.properties.acroutes
+  return acroutes && acroutes.length > 1 ? acroutes[1] : null
+}
+
+const SPECIAL_ADCODES = new Set([
+  110000, 120000, 310000, 500000, 710000, 810000, 820000
+])
+
+const buildMapGeoJSON = () => {
+  const features = []
+  const specialGroups = {}
+
+  for (const f of cityGeoJSON.features) {
+    const provinceCode = getProvinceAdcode(f)
+    if (SPECIAL_ADCODES.has(provinceCode)) {
+      if (!specialGroups[provinceCode]) specialGroups[provinceCode] = []
+      specialGroups[provinceCode].push(f)
+    } else if (f.properties.level === 'city') {
+      features.push({
+        type: 'Feature',
+        properties: { name: String(f.properties.adcode) },
+        geometry: f.geometry
+      })
+    }
+  }
+
+  for (const [code, subFeatures] of Object.entries(specialGroups)) {
+    const allCoords = []
+    for (const f of subFeatures) {
+      if (f.geometry.type === 'Polygon') allCoords.push(f.geometry.coordinates)
+      else if (f.geometry.type === 'MultiPolygon')
+        allCoords.push(...f.geometry.coordinates)
+    }
+    features.push({
+      type: 'Feature',
+      properties: { name: String(code) },
+      geometry: { type: 'MultiPolygon', coordinates: allCoords }
+    })
+  }
+
+  return { type: 'FeatureCollection', features }
+}
+
+const footprints = ref([])
+const chartRef = ref(null)
+let chart = null
+let resizeObserver = null
+
+// adcode -> { cityName, provinceName }
+const nameMap = new Map()
+for (const f of cityGeoJSON.features) {
+  const code = f.properties.adcode
+  const provinceCode = getProvinceAdcode(f)
+  const provinceName = provinceCode ? provinceMap[provinceCode] || '' : ''
+  nameMap.set(code, { cityName: f.properties.name, provinceName })
+}
+for (const [code, name] of Object.entries(provinceMap)) {
+  if (!nameMap.has(Number(code))) {
+    nameMap.set(Number(code), { cityName: name, provinceName: name })
+  }
+}
+
+const formatDate = (d) => {
+  if (!d) return ''
+  const [y, m, day] = d.split('-')
+  return `${parseInt(y)}年${parseInt(m)}月${parseInt(day)}日`
+}
+
+/* ---- 统计 ---- */
+const visitedCities = computed(() => footprints.value.length)
+
+const visitedProvinces = computed(() => {
+  const provinces = new Set()
+  footprints.value.forEach((f) => {
+    const info = nameMap.get(Number(f.cityCode))
+    if (info?.provinceName) provinces.add(info.provinceName)
+  })
+  return provinces.size
+})
+
+const getChartOptions = () => {
+  const dark = themeStore.isDark
+  return {
+    backgroundColor: dark ? '#181818' : '#fff',
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: dark ? '#232323' : '#fff',
+      borderColor: dark ? '#333' : '#e4e7ed',
+      borderWidth: 1,
+      padding: [12, 16],
+      extraCssText: dark
+        ? 'border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,0.3);'
+        : 'border-radius:6px;box-shadow:0 2px 12px rgba(0,0,0,0.06);',
+      formatter: (params) => {
+        const adcode = Number(params.name)
+        const info = nameMap.get(adcode)
+        if (!info) return params.name
+        const sameAsProvince = info.provinceName === info.cityName
+        const fp = footprints.value.find(
+          (f) => String(f.cityCode) === String(adcode)
+        )
+        let html = `<span style="font-family:'Noto Serif SC',Georgia,serif;font-size:15px;font-weight:600;color:${dark ? '#e5e5e5' : '#303133'};">${info.cityName}</span>`
+        if (!sameAsProvince) {
+          html += `<br/><span style="font-size:12px;color:${dark ? '#808080' : '#909399'};">${info.provinceName}</span>`
+        }
+        if (fp?.visitTime) {
+          html += `<br/><span style="font-size:12px;color:${dark ? '#808080' : '#909399'};">${formatDate(fp.visitTime)}</span>`
+        }
+        return html
+      }
+    },
+    series: [
+      {
+        type: 'map',
+        map: 'china-cities',
+        roam: false,
+        selectedMode: false,
+        zoom: 1.6,
+        center: [104.5, 36],
+        aspectScale: 0.85,
+        label: { show: false },
+        itemStyle: {
+          areaColor: dark ? '#252525' : '#ededed',
+          borderColor: dark ? '#333' : '#d4d4d4',
+          borderWidth: 0.6
+        },
+        emphasis: {
+          label: { show: false },
+          itemStyle: { areaColor: dark ? '#2e2e2e' : '#e0e0e0' }
+        },
+        data: footprints.value.map((f) => ({
+          name: String(f.cityCode),
+          itemStyle: {
+            areaColor: dark ? '#666' : '#5a5a5a',
+            borderColor: dark ? '#777' : '#888'
+          },
+          emphasis: {
+            itemStyle: { areaColor: dark ? '#808080' : '#404040' }
+          }
+        }))
+      }
+    ]
+  }
+}
+
+const initChart = () => {
+  if (!chartRef.value) return
+  echarts.registerMap('china-cities', buildMapGeoJSON())
+  chart = echarts.init(chartRef.value)
+  chart.setOption(getChartOptions())
+
+  chart.on('click', (params) => {
+    if (params.componentType !== 'series' || params.seriesType !== 'map') return
+    const code = String(params.name)
+    const footprint = footprints.value.find((f) => String(f.cityCode) === code)
+    if (footprint) {
+      router.push(`/footprint/city/${footprint.id}`)
+    }
+  })
+}
+
+onMounted(async () => {
+  document.documentElement.classList.add('footprint-page')
+  document.title = '足迹 - FeiTwnd'
+
+  await nextTick()
+  initChart()
+
+  resizeObserver = new ResizeObserver(() => chart?.resize())
+  if (chartRef.value) resizeObserver.observe(chartRef.value)
+
+  try {
+    const res = await getVisibleFootprints()
+    footprints.value = res.data?.data ?? []
+    chart?.setOption(getChartOptions(), true)
+  } catch {
+    /* ignore */
+  }
+  dataReady.value = true
+})
+
+const themeWatchStop = watch(
+  () => themeStore.isDark,
+  () => {
+    if (chart) chart.setOption(getChartOptions(), true)
+  }
+)
+
+onUnmounted(() => {
+  document.documentElement.classList.remove('footprint-page')
+  resizeObserver?.disconnect()
+  themeWatchStop?.()
+  chart?.dispose()
+})
+</script>
+
+<template>
+  <div class="footprint-fullpage" :class="{ dark: themeStore.isDark }">
+    <FootprintSplash :dark="themeStore.isDark" :ready="dataReady" />
+
+    <div ref="chartRef" class="map-full" />
+
+    <!-- 底栏 -->
+    <div class="map-footer">
+      <div class="footer-stat">
+        <span class="stat-num">{{ visitedCities }}</span>
+        <span class="stat-label">座城市</span>
+      </div>
+      <div class="footer-divider" />
+      <div class="footer-stat">
+        <span class="stat-num">{{ visitedProvinces }}</span>
+        <span class="stat-label">个省</span>
+      </div>
+      <div class="footer-legend">
+        <span class="legend-dot visited" />
+        <span class="legend-label">已访</span>
+        <span class="legend-dot" />
+        <span class="legend-label">未访</span>
+      </div>
+      <div class="footer-divider" />
+      <button
+        class="home-btn"
+        aria-label="返回首页"
+        title="返回首页"
+        @click="goHome"
+      >
+        <span class="iconfont icon-zhuye" />
+      </button>
+    </div>
+
+    <router-view />
+  </div>
+</template>
+
+<style>
+html.footprint-page,
+html.footprint-page body {
+  background: #fff !important;
+}
+html.dark.footprint-page,
+html.dark.footprint-page body {
+  background: #181818 !important;
+}
+</style>
+
+<style scoped>
+.footprint-fullpage {
+  position: fixed;
+  inset: 0;
+  background: #fff;
+  user-select: none;
+}
+.footprint-fullpage.dark {
+  background: #181818;
+}
+.map-full {
+  width: 100%;
+  height: 100%;
+}
+
+/* ---- 返回首页按钮 ---- */
+.home-btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid #e4e7ed;
+  border-radius: 50%;
+  color: #909399;
+  font-size: 15px;
+  cursor: pointer;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+}
+.home-btn:hover {
+  background: #f5f5f5;
+  color: #303133;
+}
+.dark .home-btn {
+  border-color: #333;
+  color: #808080;
+}
+.dark .home-btn:hover {
+  background: #2e2e2e;
+  color: #e5e5e5;
+}
+
+/* ---- 底栏 ---- */
+.map-footer {
+  position: absolute;
+  bottom: 28px;
+  right: 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid #e4e7ed;
+  border-radius: 8px;
+  padding: 12px 20px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+.dark .map-footer {
+  background: rgba(35, 35, 35, 0.92);
+  border-color: #333;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+}
+
+.footer-stat {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+}
+.stat-num {
+  font-family: 'Noto Serif SC', Georgia, 'Times New Roman', serif;
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+  color: #303133;
+  transition: color 0.3s;
+}
+.dark .stat-num {
+  color: #e5e5e5;
+}
+.stat-label {
+  font-size: 12px;
+  color: #909399;
+  transition: color 0.3s;
+}
+.dark .stat-label {
+  color: #808080;
+}
+
+.footer-divider {
+  width: 1px;
+  height: 20px;
+  background: #e4e7ed;
+  transition: background-color 0.3s;
+}
+.dark .footer-divider {
+  background: #333;
+}
+
+.footer-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 4px;
+}
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: #ededed;
+  border: 0.6px solid #d4d4d4;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s;
+}
+.legend-dot.visited {
+  background: #5a5a5a;
+  border-color: #888;
+}
+.dark .legend-dot {
+  background: #252525;
+  border-color: #333;
+}
+.dark .legend-dot.visited {
+  background: #666;
+  border-color: #777;
+}
+.legend-label {
+  font-size: 11px;
+  color: #909399;
+  transition: color 0.3s;
+}
+.dark .legend-label {
+  color: #808080;
+}
+
+@media (max-width: 600px) {
+  .map-footer {
+    bottom: 16px;
+    right: 16px;
+    gap: 12px;
+    padding: 10px 16px;
+  }
+  .stat-num {
+    font-size: 18px;
+  }
+}
+</style>

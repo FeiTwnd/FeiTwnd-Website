@@ -1,37 +1,38 @@
 import { defineStore } from 'pinia'
-import { ref, watch } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 export const useThemeStore = defineStore(
   'theme',
   () => {
-    // 'light' | 'dark' | 'auto'
     const mode = ref('auto')
+    const systemDark = ref(
+      window.matchMedia('(prefers-color-scheme: dark)').matches
+    )
+
+    const isDark = computed(() => {
+      if (mode.value === 'dark') return true
+      if (mode.value === 'light') return false
+      return systemDark.value
+    })
 
     const applyTheme = () => {
-      const prefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)'
-      ).matches
-      const isDark =
-        mode.value === 'dark' || (mode.value === 'auto' && prefersDark)
-      document.documentElement.classList.toggle('dark', isDark)
+      document.documentElement.classList.toggle('dark', isDark.value)
     }
 
-    // 响应系统主题变化
     const mql = window.matchMedia('(prefers-color-scheme: dark)')
-    mql.addEventListener('change', () => {
+    mql.addEventListener('change', (e) => {
+      systemDark.value = e.matches
       if (mode.value === 'auto') applyTheme()
     })
 
     const toggle = () => {
-      const prefersDark = mql.matches
-      const currentIsDark =
-        mode.value === 'dark' || (mode.value === 'auto' && prefersDark)
+      const currentIsDark = isDark.value
       mode.value = currentIsDark ? 'light' : 'dark'
     }
 
-    watch(mode, applyTheme, { immediate: true })
+    watch(isDark, applyTheme)
 
-    return { mode, toggle, applyTheme }
+    return { mode, isDark, toggle, applyTheme }
   },
   {
     persist: {

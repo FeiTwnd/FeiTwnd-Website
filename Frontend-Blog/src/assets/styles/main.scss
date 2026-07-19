@@ -52,6 +52,7 @@ html {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   scroll-behavior: smooth;
+  scroll-padding-top: 74px;
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -301,6 +302,20 @@ html.dark .el-input__wrapper {
   background: var(--blog-card) !important;
   box-shadow: 0 0 0 1px var(--blog-border) inset !important;
 }
+/* MessageBox 按钮暗色 */
+html.dark .el-message-box__btns .el-button--primary {
+  background: #e5e5e5 !important;
+  border-color: #e5e5e5 !important;
+  color: #181818 !important;
+}
+html.dark .el-message-box__btns .el-button--primary:hover {
+  background: #fff !important;
+}
+html.dark .el-message-box__btns .el-button:not(.el-button--primary) {
+  background: #2a2a2a !important;
+  border-color: var(--blog-border) !important;
+  color: var(--blog-text2) !important;
+}
 
 /* === 暗色模式 — 全局 scoped 组件覆盖 === */
 html.dark .side-card,
@@ -447,6 +462,37 @@ html.dark .msg-form-textarea:focus {
 html.dark .c-body,
 html.dark .msg-body {
   color: var(--blog-text2) !important;
+}
+/* 评论/留言内 Markdown 元素暗色 */
+html.dark .c-body h1,
+html.dark .c-body h2,
+html.dark .c-body h3,
+html.dark .c-body h4,
+html.dark .msg-body h1,
+html.dark .msg-body h2,
+html.dark .msg-body h3,
+html.dark .msg-body h4 {
+  color: var(--blog-text) !important;
+}
+html.dark .c-body code,
+html.dark .msg-body code {
+  background: #2a2a2a !important;
+  color: #e5c07b !important;
+}
+html.dark .c-body pre,
+html.dark .msg-body pre {
+  background: #1e1e1e !important;
+}
+html.dark .c-body blockquote,
+html.dark .msg-body blockquote {
+  border-left-color: #555 !important;
+  color: var(--blog-text3) !important;
+  background: #1e1e1e !important;
+}
+/* 评论区/留言板标题暗色 */
+html.dark .section-title,
+html.dark .form-title {
+  color: var(--blog-text) !important;
 }
 html.dark .c-nick,
 html.dark .msg-nick {
