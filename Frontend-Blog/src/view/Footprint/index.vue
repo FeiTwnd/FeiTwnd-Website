@@ -208,6 +208,12 @@ const initChart = () => {
 
   chart.on('click', (params) => {
     if (params.componentType !== 'series' || params.seriesType !== 'map') return
+    chart.dispatchAction({ type: 'hideTip' })
+    const viewport = document.querySelector('meta[name="viewport"]')
+    if (viewport) {
+      viewport.content =
+        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+    }
     const code = String(params.name)
     const footprint = footprints.value.find((f) => String(f.cityCode) === code)
     if (footprint) {

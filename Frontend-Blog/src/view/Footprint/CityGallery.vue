@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getVisibleFootprints, getCityImages } from '@/api/footprint'
 import { useThemeStore } from '@/stores'
@@ -33,6 +33,150 @@ const animDuration = computed(() => {
 /* ---- 暂停控制 ---- */
 const leftPaused = ref(false)
 const rightPaused = ref(false)
+
+/* ---- 移动端 JS 滚动（调速 + 拖动，桌面端保持 CSS 动画） ---- */
+const mediaQuery = window.matchMedia('(max-width: 480px)')
+const isMobile = ref(mediaQuery.matches)
+const onMediaChange = (e) => {
+  isMobile.value = e.matches
+}
+
+const leftColRef = ref(null)
+const rightColRef = ref(null)
+const leftTrackRef = ref(null)
+const rightTrackRef = ref(null)
+
+const jsDriven = computed(() => isMobile.value && shouldAnimate.value)
+
+const MOBILE_SPEED = 55 // px/s
+
+let rafId = 0
+let lastTs = 0
+let leftOffset = 0
+let rightOffset = 0
+let leftPeriod = 0
+let rightPeriod = 0
+let leftDragging = false
+let rightDragging = false
+
+const wrapOffset = (v, p) => ((v % p) + p) % p
+
+const measurePeriod = (track, count) => {
+  if (!track || !count) return 0
+  const first = track.children[0]
+  const dup = track.children[count]
+  if (!first || !dup) return 0
+  return dup.offsetLeft - first.offsetLeft
+}
+
+const applyTransform = () => {
+  if (leftTrackRef.value && leftPeriod > 0) {
+    const x = wrapOffset(leftOffset, leftPeriod) - leftPeriod
+    leftTrackRef.value.style.transform = `translateX(${x}px)`
+  }
+  if (rightTrackRef.value && rightPeriod > 0) {
+    const x = -wrapOffset(rightOffset, rightPeriod)
+    rightTrackRef.value.style.transform = `translateX(${x}px)`
+  }
+}
+
+const tick = (ts) => {
+  if (!lastTs) lastTs = ts
+  const dt = Math.min((ts - lastTs) / 1000, 0.1)
+  lastTs = ts
+  if (!leftDragging) leftOffset += MOBILE_SPEED * dt
+  if (!rightDragging) rightOffset += MOBILE_SPEED * dt
+  applyTransform()
+  rafId = requestAnimationFrame(tick)
+}
+
+const remeasure = () => {
+  leftPeriod = measurePeriod(leftTrackRef.value, leftImages.value.length)
+  rightPeriod = measurePeriod(rightTrackRef.value, rightImages.value.length)
+}
+
+const startJsScroll = async () => {
+  await nextTick()
+  if (!jsDriven.value) return
+  remeasure()
+  if (!leftPeriod || !rightPeriod) return
+  lastTs = 0
+  applyTransform()
+  cancelAnimationFrame(rafId)
+  rafId = requestAnimationFrame(tick)
+}
+
+const stopJsScroll = () => {
+  cancelAnimationFrame(rafId)
+  rafId = 0
+  if (leftTrackRef.value) leftTrackRef.value.style.transform = ''
+  if (rightTrackRef.value) rightTrackRef.value.style.transform = ''
+}
+
+watch(
+  jsDriven,
+  (v) => {
+    if (v) startJsScroll()
+    else stopJsScroll()
+  },
+  { flush: 'post' }
+)
+
+const onResize = () => {
+  if (jsDriven.value) remeasure()
+}
+
+/* ---- 移动端拖动 ---- */
+const dragCleanups = []
+
+const setupDrag = (el, isLeft) => {
+  let startX = 0
+  let startOffset = 0
+  let moved = false
+
+  const onDown = (e) => {
+    if (!jsDriven.value) return
+    if (isLeft) leftDragging = true
+    else rightDragging = true
+    startX = e.clientX
+    startOffset = isLeft ? leftOffset : rightOffset
+    moved = false
+    el.setPointerCapture?.(e.pointerId)
+  }
+  const onMove = (e) => {
+    if (isLeft ? !leftDragging : !rightDragging) return
+    const dx = e.clientX - startX
+    if (Math.abs(dx) > 6) moved = true
+    if (isLeft) leftOffset = startOffset + dx
+    else rightOffset = startOffset - dx
+    applyTransform()
+  }
+  const onUp = () => {
+    if (isLeft) leftDragging = false
+    else rightDragging = false
+  }
+  const onClickCapture = (e) => {
+    if (moved) {
+      e.stopPropagation()
+      e.preventDefault()
+      moved = false
+    }
+  }
+
+  el.addEventListener('pointerdown', onDown)
+  el.addEventListener('pointermove', onMove)
+  el.addEventListener('pointerup', onUp)
+  el.addEventListener('pointercancel', onUp)
+  el.addEventListener('click', onClickCapture, true)
+
+  dragCleanups.push(() => {
+    el.removeEventListener('pointerdown', onDown)
+    el.removeEventListener('pointermove', onMove)
+    el.removeEventListener('pointerup', onUp)
+    el.removeEventListener('pointercancel', onUp)
+    el.removeEventListener('click', onClickCapture, true)
+  })
+}
 
 /* ---- 灯箱 ---- */
 const lightboxVisible = ref(false)
@@ -70,6 +214,15 @@ onMounted(async () => {
   document.documentElement.classList.add('city-gallery-page')
   document.title = '城市图集 - FeiTwnd'
 
+  const viewport = document.querySelector('meta[name="viewport"]')
+  if (viewport) {
+    viewport.content =
+      'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+  }
+
+  mediaQuery.addEventListener('change', onMediaChange)
+  window.addEventListener('resize', onResize)
+
   try {
     const [fpRes, imgRes] = await Promise.all([
       getVisibleFootprints(),
@@ -84,10 +237,25 @@ onMounted(async () => {
   } finally {
     loading.value = false
   }
+
+  await nextTick()
+  if (leftColRef.value && rightColRef.value) {
+    setupDrag(leftColRef.value, true)
+    setupDrag(rightColRef.value, false)
+  }
 })
 
 onUnmounted(() => {
   document.documentElement.classList.remove('city-gallery-page')
+  mediaQuery.removeEventListener('change', onMediaChange)
+  window.removeEventListener('resize', onResize)
+  dragCleanups.forEach((fn) => fn())
+  cancelAnimationFrame(rafId)
+
+  const viewport = document.querySelector('meta[name="viewport"]')
+  if (viewport) {
+    viewport.content = 'width=device-width, initial-scale=1.0'
+  }
 })
 
 const goBack = () => router.push('/footprint')
@@ -136,16 +304,19 @@ const goBack = () => router.push('/footprint')
     <main v-else class="gallery-main">
       <!-- 左列 — 向下滚动 -->
       <div
+        ref="leftColRef"
         class="film-col"
         :class="{ paused: leftPaused }"
         @mouseenter="leftPaused = true"
         @mouseleave="leftPaused = false"
       >
         <div
+          ref="leftTrackRef"
           class="film-track"
           :class="{
             'anim-down': shouldAnimate && leftImages.length > 0,
-            'no-anim': !shouldAnimate || !leftImages.length
+            'no-anim': !shouldAnimate || !leftImages.length,
+            'js-driven': jsDriven
           }"
           :style="shouldAnimate ? { '--dur': animDuration + 's' } : {}"
         >
@@ -182,16 +353,19 @@ const goBack = () => router.push('/footprint')
 
       <!-- 右列 — 向上滚动 -->
       <div
+        ref="rightColRef"
         class="film-col right"
         :class="{ paused: rightPaused }"
         @mouseenter="rightPaused = true"
         @mouseleave="rightPaused = false"
       >
         <div
+          ref="rightTrackRef"
           class="film-track"
           :class="{
             'anim-up': shouldAnimate && rightImages.length > 0,
-            'no-anim': !shouldAnimate || !rightImages.length
+            'no-anim': !shouldAnimate || !rightImages.length,
+            'js-driven': jsDriven
           }"
           :style="shouldAnimate ? { '--dur': animDuration + 's' } : {}"
         >
@@ -522,10 +696,10 @@ html.dark.city-gallery-page body {
 }
 
 /* ===== 滚动轨道 ===== */
+/* 不用 gap：帧间距必须计入循环周期，否则 -50% 位移与真实周期差半个间距，每轮回绕时跳变 */
 .film-track {
   display: flex;
   flex-direction: column;
-  gap: 20px;
 }
 
 /* 向下滚动 */
@@ -540,6 +714,12 @@ html.dark.city-gallery-page body {
 .film-col.paused .film-track.anim-down,
 .film-col.paused .film-track.anim-up {
   animation-play-state: paused;
+}
+
+/* 移动端 JS 驱动时关闭 CSS 动画 */
+.film-track.js-driven {
+  animation: none !important;
+  will-change: transform;
 }
 
 @keyframes scrollDown {
@@ -564,6 +744,7 @@ html.dark.city-gallery-page body {
   position: relative;
   background: #111;
   padding: 22px 5px;
+  margin-bottom: 20px;
   border-radius: 3px;
   cursor: pointer;
   flex-shrink: 0;
@@ -782,10 +963,10 @@ html.dark.city-gallery-page body {
       transparent 100%
     );
     overflow: hidden;
+    touch-action: none;
   }
   .film-track {
     flex-direction: row;
-    gap: 12px;
     height: 100%;
     align-items: center;
   }
@@ -814,6 +995,8 @@ html.dark.city-gallery-page body {
   .film-frame {
     width: 200px;
     flex-shrink: 0;
+    margin-right: 12px;
+    margin-bottom: 0;
   }
   .gallery-fade-top,
   .gallery-fade-bottom {
