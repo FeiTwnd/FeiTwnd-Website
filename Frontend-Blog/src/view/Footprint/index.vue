@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router'
 import * as echarts from 'echarts'
 import cityGeoJSON from '@/assets/city/city.json'
 import { getVisibleFootprints } from '@/api/footprint'
-import { useThemeStore } from '@/stores'
+import { useThemeStore, useVisitorStore } from '@/stores'
 import FootprintSplash from '@/components/FootprintSplash.vue'
 
 const router = useRouter()
@@ -225,6 +225,8 @@ const initChart = () => {
 onMounted(async () => {
   document.documentElement.classList.add('footprint-page')
   document.title = '足迹 - FeiTwnd'
+
+  useVisitorStore().record()
 
   await nextTick()
   initChart()

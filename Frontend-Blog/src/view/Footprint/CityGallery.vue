@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getVisibleFootprints, getCityImages } from '@/api/footprint'
-import { useThemeStore } from '@/stores'
+import { useThemeStore, useVisitorStore } from '@/stores'
 
 const route = useRoute()
 const router = useRouter()
@@ -213,6 +213,8 @@ watch(lightboxVisible, (v) => {
 onMounted(async () => {
   document.documentElement.classList.add('city-gallery-page')
   document.title = '城市图集 - FeiTwnd'
+
+  useVisitorStore().record()
 
   const viewport = document.querySelector('meta[name="viewport"]')
   if (viewport) {
