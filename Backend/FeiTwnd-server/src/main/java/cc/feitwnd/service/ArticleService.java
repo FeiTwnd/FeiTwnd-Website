@@ -5,7 +5,9 @@ import cc.feitwnd.dto.ArticlePageQueryDTO;
 import cc.feitwnd.entity.Articles;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.vo.ArticleArchiveVO;
+import cc.feitwnd.vo.ArticleImportVO;
 import cc.feitwnd.vo.BlogArticleDetailVO;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -19,6 +21,13 @@ public interface ArticleService {
      * @param articleDTO
      */
     void createArticle(ArticleDTO articleDTO);
+
+    /**
+     * 导入Markdown文件
+     * @param file .md 文件
+     * @return 解析后的文章数据
+     */
+    ArticleImportVO importMd(MultipartFile file) throws Exception;
 
     /**
      * 分页条件查询文章列表（含草稿）

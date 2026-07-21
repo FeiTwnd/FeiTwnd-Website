@@ -16,11 +16,7 @@ import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleService;
 import cc.feitwnd.service.AsyncEmailService;
 import cc.feitwnd.utils.MarkdownUtil;
-import cc.feitwnd.vo.ArticleArchiveItemVO;
-import cc.feitwnd.vo.ArticleArchiveVO;
-import cc.feitwnd.vo.ArticleVO;
-import cc.feitwnd.vo.BlogArticleDetailVO;
-import cc.feitwnd.vo.BlogArticleVO;
+import cc.feitwnd.vo.*;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +28,8 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.web.multipart.MultipartFile;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -124,6 +121,173 @@ public class ArticleServiceImpl implements ArticleService {
         // 仅首次发布时通知RSS订阅者
         if (firstPublishNow) {
             notifyRssSubscribers(articles);
+        }
+    }
+
+    /**
+     * 导入Markdown文件，解析frontmatter和正文
+     * @param file .md 文件
+     * @return
+     */
+    @Override
+    public ArticleImportVO importMd(MultipartFile file) throws Exception {
+        // 1. 读取文件全部内容
+        String content = new String(file.getBytes(), StandardCharsets.UTF_8);
+
+        String title = null;
+        String slug = null;
+        String summary = null;
+        String coverImage = null;
+        String category = null;
+        List<String> tags = new ArrayList<>();
+        String contentMarkdown;
+
+        // 2. 检测并解析 frontmatter
+        if (content.startsWith("---")) {
+            int endIndex = content.indexOf("---", 4); // 从第4个字符开始找第二个 ---
+            if (endIndex > 0) {
+                String frontmatter = content.substring(4, endIndex); // 去掉开头的 ---
+                contentMarkdown = content.substring(endIndex + 3).trim(); // 正文
+
+                // 逐行解析 frontmatter
+                String currentKey = null;
+                StringBuilder currentListValue = null;
+                for (String line : frontmatter.split("\n")) {
+                    // 跳过空行和注释
+                    String trimmed = line.trim();
+                    if (trimmed.isEmpty() || trimmed.startsWith("#")) continue;
+
+                    // 检测列表项（tags 等）
+                    if (trimmed.startsWith("- ") && currentKey != null) {
+                        if (currentListValue == null) {
+                            currentListValue = new StringBuilder();
+                        }
+                        // 去掉开头的 "- " 和可能的引号
+                        String item = trimmed.substring(2).trim()
+                                .replaceAll("^[\"']|[\"']$", "");
+                        if (currentListValue.length() > 0) {
+                            currentListValue.append("||"); // 临时分隔符
+                        }
+                        currentListValue.append(item);
+                        continue;
+                    }
+
+                    // 遇到新的 key: value，先保存上一个 key 的列表值
+                    if (currentKey != null && currentListValue != null) {
+                        saveParsedField(currentKey, currentListValue.toString(), tags);
+                        currentListValue = null;
+                    }
+
+                    // 解析 key: value
+                    int colonIdx = trimmed.indexOf(':');
+                    if (colonIdx > 0) {
+                        currentKey = trimmed.substring(0, colonIdx).trim().toLowerCase();
+                        String value = trimmed.substring(colonIdx + 1).trim()
+                                .replaceAll("^[\"']|[\"']$", ""); // 去掉首尾引号
+
+                        if ("tags".equals(currentKey) && value.isEmpty()) {
+                            // tags 是列表格式，等后续行
+                            continue;
+                        }
+
+                        // 单行值直接赋值
+                        switch (currentKey) {
+                            case "title":   title = value; break;
+                            case "slug":    slug = value; break;
+                            case "summary": summary = value; break;
+                            case "cover":   coverImage = value; break;
+                            case "category": category = value; break;
+                            case "tags":
+                                // 行内数组格式 tags: [tag1, tag2]
+                                tags.clear();
+                                for (String t : value.replaceAll("[\\[\\]]", "").split(",")) {
+                                    String tag = t.trim().replaceAll("^[\"']|[\"']$", "");
+                                    if (!tag.isEmpty()) tags.add(tag);
+                                }
+                                break;
+                        }
+                        currentKey = null; // 已处理
+                    }
+                }
+                // 处理最后一组列表
+                if (currentKey != null && currentListValue != null) {
+                    saveParsedField(currentKey, currentListValue.toString(), tags);
+                }
+            } else {
+                // 只有一个 ---，不是合法的 frontmatter，整篇当正文
+                contentMarkdown = content;
+            }
+        } else {
+            contentMarkdown = content;
+        }
+
+        // 3. 如果没有从 frontmatter 提取到 title，从正文第一个 # 标题提取
+        if (title == null || title.isEmpty()) {
+            for (String line : contentMarkdown.split("\n")) {
+                String t = line.trim();
+                if (t.startsWith("# ")) {
+                    title = t.substring(2).trim();
+                    break;
+                }
+                if (t.startsWith("#") && t.length() > 1 && t.charAt(1) != '#') {
+                    title = t.substring(1).trim();
+                    break;
+                }
+            }
+        }
+
+        // 4. 如果还是没有 title，用文件名
+        if (title == null || title.isEmpty()) {
+            title = file.getOriginalFilename() != null
+                    ? file.getOriginalFilename().replaceAll("\\.md$", "")
+                    : "未命名文章";
+        }
+
+        // 5. 自动生成 slug（从标题）
+        if (slug == null || slug.isEmpty()) {
+            slug = title.toLowerCase()
+                    .replaceAll("[\\u4e00-\\u9fff]+", "-")       // 中文 → -
+                    .replaceAll("[^a-z0-9-]", "-")                // 特殊字符 → -
+                    .replaceAll("-{2,}", "-")                     // 多个 - 合并
+                    .replaceAll("^-|-$", "");                     // 去掉首尾 -
+            if (slug.isEmpty()) {
+                slug = "article-" + System.currentTimeMillis();
+            }
+        }
+
+        // 6. 提取摘要（如果 frontmatter 没提供，取正文第一段非空非标题文字）
+        if (summary == null || summary.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            for (String line : contentMarkdown.split("\n")) {
+                String t = line.trim();
+                if (t.isEmpty() || t.startsWith("#") || t.startsWith("```")) continue;
+                sb.append(t).append(" ");
+                if (sb.length() > 200) break; // 最多200字
+            }
+            summary = sb.toString().trim();
+        }
+
+        return ArticleImportVO.builder()
+                .title(title)
+                .slug(slug)
+                .summary(summary)
+                .coverImage(coverImage)
+                .category(category)
+                .tags(tags)
+                .contentMarkdown(contentMarkdown)
+                .build();
+    }
+
+    /**
+     * 处理列表格式的 field 值
+     */
+    private void saveParsedField(String key, String value, List<String> tags) {
+        if ("tags".equals(key)) {
+            tags.clear();
+            for (String t : value.split("\\|\\|")) {
+                String tag = t.trim();
+                if (!tag.isEmpty()) tags.add(tag);
+            }
         }
     }
 
