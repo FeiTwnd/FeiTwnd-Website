@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useArticleStore } from '@/stores'
 import { uploadFile } from '@/api/settings'
+import { importMd } from '@/api/article'
 import { MdEditor } from 'md-editor-v3'
 import EmojiPicker from '@/components/EmojiPicker.vue'
 import 'md-editor-v3/lib/style.css'
@@ -33,6 +34,8 @@ const onHtmlChanged = (html) => {
 
 const saving = ref(false)
 const uploadingCover = ref(false)
+const importing = ref(false)
+const importFileInput = ref(null)
 const editorPanelRef = ref(null)
 
 /* ---- 图片上传（md-editor-v3 回调格式） ---- */
@@ -65,6 +68,57 @@ const handleCoverUpload = async (options) => {
     ElMessage.success('封面上传成功')
   } finally {
     uploadingCover.value = false
+  }
+}
+
+/* ---- MD 文件导入 ---- */
+const triggerImport = () => {
+  importFileInput.value?.click()
+}
+
+const handleImportMd = async (e) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+
+  // 检查文件类型
+  if (!file.name.endsWith('.md') && !file.name.endsWith('.markdown')) {
+    ElMessage.warning('仅支持 .md 或 .markdown 文件')
+    return
+  }
+
+  importing.value = true
+  try {
+    const res = await importMd(file)
+    const data = res.data
+    // 自动填入表单
+    if (data.title && !form.value.title) form.value.title = data.title
+    if (data.slug && !form.value.slug) form.value.slug = data.slug
+    if (data.summary && !form.value.summary) form.value.summary = data.summary
+    if (data.coverImage && !form.value.coverImage) form.value.coverImage = data.coverImage
+    if (data.contentMarkdown) form.value.contentMarkdown = data.contentMarkdown
+
+    // 分类和标签需要手动映射
+    if (data.category) {
+      const matched = articleStore.categories.find(
+        c => c.name === data.category || c.slug === data.category
+      )
+      if (matched) form.value.categoryId = matched.id
+    }
+    if (data.tags?.length) {
+      const matchedIds = data.tags
+        .map(tagName => articleStore.tags.find(t => t.name === tagName))
+        .filter(Boolean)
+        .map(t => t.id)
+      if (matchedIds.length) form.value.tagIds = matchedIds
+    }
+
+    ElMessage.success(`已导入：${data.title}`)
+  } catch {
+    // 错误已由拦截器统一处理
+  } finally {
+    importing.value = false
+    // 清空 input，允许重复导入同一个文件
+    if (importFileInput.value) importFileInput.value.value = ''
   }
 }
 
@@ -234,6 +288,19 @@ onBeforeUnmount(() => {
       <div class="edit-actions">
         <el-button size="small" @click="router.push('/article/list')"
           >返回</el-button
+        >
+        <input
+          ref="importFileInput"
+          type="file"
+          accept=".md,.markdown"
+          style="display: none"
+          @change="handleImportMd"
+        />
+        <el-button
+          size="small"
+          :loading="importing"
+          @click="triggerImport"
+          >导入 MD</el-button
         >
         <el-button size="small" :loading="saving" @click="handleSave(0)"
           >保存草稿</el-button
