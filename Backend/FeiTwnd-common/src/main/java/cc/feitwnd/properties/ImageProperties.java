@@ -12,4 +12,6 @@ public class ImageProperties {
     private Long maxSizeKb;
     private Double quality;
     private String outPutFormat;
+    // 图片最长边像素上限，超过则等比缩小，防止大分辨率图片解码时占用巨量内存
+    private Integer maxDimension;
 }

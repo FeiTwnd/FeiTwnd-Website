@@ -7,11 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.stream.ImageInputStream;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -35,28 +39,31 @@ public class ImageCompressUtil {
      * @return
      */
     public byte[] compress(MultipartFile file) throws IOException {
-        // 如果不需要压缩，直接返回原文件字节
-        if(!shouldCompress(file)){
-           return file.getBytes();
-        }
-
-        // 记录原文件信息
-        long originalSize = file.getSize();
+        // 只读取一次字节，避免同一张图被多次加载进内存
+        byte[] originalBytes = file.getBytes();
         String originalName = file.getOriginalFilename();
 
+        // 如果不需要压缩，直接返回原文件字节
+        if (!shouldCompress(originalName, originalBytes)) {
+            return originalBytes;
+        }
+
+        long originalSize = originalBytes.length;
         log.info("开始压缩: {} ({}KB)", originalName, originalSize / 1024);
 
-        // 保留原始字节，每次压缩都基于原图，避免二次有损压缩导致色彩失真
-        byte[] originalBytes = file.getBytes();
-        byte[] compressedBytes = compressWithQuality(originalBytes, imageProperties.getQuality());
+        // 解码为受控分辨率的图片：超过最长边上限时在解码阶段就按倍数下采样，
+        // 直接降低解码内存峰值，防止超大分辨率图片撑爆堆内存
+        BufferedImage image = decodeWithLimit(originalBytes);
+
+        // 复用同一张已解码的图片反复编码，而非每次重新解码原始字节；
+        // 每次都是从相同像素源单次编码，不会造成累积的二次有损压缩
+        double currentQuality = imageProperties.getQuality();
+        byte[] compressedBytes = encode(image, currentQuality);
 
         int attempts = 0;
-        double currentQuality = imageProperties.getQuality();
-
         while (isOversized(compressedBytes) && attempts < 10) {
             currentQuality = Math.max(0.3, currentQuality - 0.05);
-            // 始终从原图重新压缩，而非压缩已压缩的数据
-            compressedBytes = compressWithQuality(originalBytes, currentQuality);
+            compressedBytes = encode(image, currentQuality);
             attempts++;
         }
 
@@ -75,14 +82,39 @@ public class ImageCompressUtil {
     }
 
     /**
-     * 使用指定质量压缩图片
+     * 解码图片，超过最长边上限时在解码阶段按整数倍下采样，降低内存峰值
      */
-    private byte[] compressWithQuality(byte[] inputBytes, double quality) throws IOException {
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(inputBytes);
-             ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+    private BufferedImage decodeWithLimit(byte[] inputBytes) throws IOException {
+        try (ImageInputStream iis = ImageIO.createImageInputStream(new ByteArrayInputStream(inputBytes))) {
+            Iterator<ImageReader> readers = ImageIO.getImageReaders(iis);
+            if (!readers.hasNext()) {
+                throw new IOException("不支持的图片格式，无法解码");
+            }
+            ImageReader reader = readers.next();
+            try {
+                reader.setInput(iis);
+                int longest = Math.max(reader.getWidth(0), reader.getHeight(0));
 
-            Thumbnails.of(inputStream)
-                    .scale(1.0)  // 保持原尺寸
+                javax.imageio.ImageReadParam param = reader.getDefaultReadParam();
+                Integer maxDimension = imageProperties.getMaxDimension();
+                if (maxDimension != null && maxDimension > 0 && longest > maxDimension) {
+                    int sample = (int) Math.ceil((double) longest / maxDimension);
+                    param.setSourceSubsampling(sample, sample, 0, 0);
+                }
+                return reader.read(0, param);
+            } finally {
+                reader.dispose();
+            }
+        }
+    }
+
+    /**
+     * 使用指定质量编码图片
+     */
+    private byte[] encode(BufferedImage image, double quality) throws IOException {
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            Thumbnails.of(image)
+                    .scale(1.0)  // 尺寸已在解码阶段控制
                     .imageType(BufferedImage.TYPE_INT_RGB) // 强制标准RGB，防止WebP色彩空间转换偏绿
                     .outputFormat(imageProperties.getOutPutFormat())
                     .outputQuality(quality)
@@ -92,13 +124,12 @@ public class ImageCompressUtil {
         }
     }
 
-    private boolean shouldCompress(MultipartFile file) throws IOException {
+    private boolean shouldCompress(String originalName, byte[] bytes) {
         // 检查是否开启图片压缩
-        if(!imageProperties.isEnabled()){
+        if (!imageProperties.isEnabled()) {
             return false;
         }
         // 检查文件类型
-        String originalName = file.getOriginalFilename();
         if (originalName == null) {
             return false;
         }
@@ -108,7 +139,7 @@ public class ImageCompressUtil {
         }
 
         // 检查文件大小, 如果没超过限制，不压缩
-        if(!isOversized(file.getBytes())){
+        if (!isOversized(bytes)) {
             return false;
         }
 

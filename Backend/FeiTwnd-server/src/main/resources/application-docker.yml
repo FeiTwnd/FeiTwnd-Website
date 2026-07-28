@@ -77,6 +77,7 @@ feitwnd:
       max-size-kb: ${IMAGE_COMPRESS_MAX_SIZE:500}
       quality: ${IMAGE_COMPRESS_QUALITY:0.9}
       output-format: webp
+      max-dimension: ${IMAGE_COMPRESS_MAX_DIMENSION:2560}
   website:
     title: ${WEBSITE_TITLE:}
     home: ${WEBSITE_HOME:}

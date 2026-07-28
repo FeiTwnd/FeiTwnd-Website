@@ -91,6 +91,7 @@ feitwnd:
       max-size-kb: 500          # 最大500KB
       quality: 0.9              # 压缩质量(0-1)
       output-format: webp       # 输出格式: webp
+      max-dimension: 2560       # 图片最长边像素上限，超过则等比缩小，防止大图解码占用巨量内存
   website:
     title:       # 网站标题(或你的昵称)
     home:        # 首页地址
