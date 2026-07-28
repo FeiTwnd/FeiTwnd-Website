@@ -179,6 +179,9 @@ const goTag = (slug) => {
         </div>
         <h3 class="info-name">{{ info.nickname || 'FeiTwnd' }}</h3>
         <p v-if="info.tag" class="info-tag">{{ info.tag }}</p>
+        <p v-if="info.description" class="info-description">
+          {{ info.description }}
+        </p>
         <p v-if="info.location" class="info-location">
           <i class="iconfont icon-position" />
           {{ info.location }}
@@ -444,6 +447,12 @@ const goTag = (slug) => {
 }
 .info-tag {
   font-size: 12px;
+  color: #909399;
+  margin: 0 0 6px;
+}
+.info-description {
+  font-size: 11px;
+  line-height: 1.6;
   color: #909399;
   margin: 0 0 6px;
 }

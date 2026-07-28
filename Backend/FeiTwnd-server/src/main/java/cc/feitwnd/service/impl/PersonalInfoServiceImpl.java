@@ -30,7 +30,7 @@ public class PersonalInfoServiceImpl implements PersonalInfoService {
 
     /**
      * 管理端更新个人信息
-     * @param personalInfo
+     * @param personalInfoDTO
      */
     @CacheEvict(value = "personalInfo", allEntries = true)
     public void updatePersonalInfo(PersonalInfoDTO personalInfoDTO) {
