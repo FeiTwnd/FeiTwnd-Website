@@ -1,9 +1,17 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import * as echarts from 'echarts'
-import cityGeoJSON from '@/assets/city/city.json'
+import * as echarts from 'echarts/core'
+import { MapChart } from 'echarts/charts'
+import { TooltipComponent } from 'echarts/components'
+import { CanvasRenderer } from 'echarts/renderers'
 import { getVisibleFootprints } from '@/api/footprint'
+
+echarts.use([MapChart, TooltipComponent, CanvasRenderer])
+
+// 城市 GeoJSON 数据量大（约 6MB），改为运行时从静态文件按需拉取，
+// 避免打进 JS chunk 阻塞首屏解析。
+let cityGeoJSON = null
 import { useThemeStore, useVisitorStore } from '@/stores'
 import FootprintSplash from '@/components/FootprintSplash.vue'
 
@@ -103,17 +111,19 @@ const chartRef = ref(null)
 let chart = null
 let resizeObserver = null
 
-// adcode -> { cityName, provinceName }
+// adcode -> { cityName, provinceName }，在城市数据加载完成后构建
 const nameMap = new Map()
-for (const f of cityGeoJSON.features) {
-  const code = f.properties.adcode
-  const provinceCode = getProvinceAdcode(f)
-  const provinceName = provinceCode ? provinceMap[provinceCode] || '' : ''
-  nameMap.set(code, { cityName: f.properties.name, provinceName })
-}
-for (const [code, name] of Object.entries(provinceMap)) {
-  if (!nameMap.has(Number(code))) {
-    nameMap.set(Number(code), { cityName: name, provinceName: name })
+const buildNameMap = () => {
+  for (const f of cityGeoJSON.features) {
+    const code = f.properties.adcode
+    const provinceCode = getProvinceAdcode(f)
+    const provinceName = provinceCode ? provinceMap[provinceCode] || '' : ''
+    nameMap.set(code, { cityName: f.properties.name, provinceName })
+  }
+  for (const [code, name] of Object.entries(provinceMap)) {
+    if (!nameMap.has(Number(code))) {
+      nameMap.set(Number(code), { cityName: name, provinceName: name })
+    }
   }
 }
 
@@ -200,6 +210,14 @@ const getChartOptions = () => {
   }
 }
 
+// 运行时加载城市 GeoJSON，加载后构建 nameMap
+const loadCityData = async () => {
+  if (cityGeoJSON) return
+  const res = await fetch(`${import.meta.env.BASE_URL}city/city.json`)
+  cityGeoJSON = await res.json()
+  buildNameMap()
+}
+
 const initChart = () => {
   if (!chartRef.value) return
   echarts.registerMap('china-cities', buildMapGeoJSON())
@@ -228,6 +246,7 @@ onMounted(async () => {
 
   useVisitorStore().record()
 
+  await loadCityData()
   await nextTick()
   initChart()
 

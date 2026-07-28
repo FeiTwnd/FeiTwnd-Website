@@ -2,7 +2,10 @@
 import { ref, computed, onMounted } from 'vue'
 import { useFootprintStore, useUserStore } from '@/stores'
 import { uploadFile } from '@/api/settings'
-import cityGeoJSON from '@/assets/city/city.json'
+
+// 城市 GeoJSON 数据量大（约 6MB），改为运行时从静态文件按需拉取，
+// 避免打进 JS chunk 阻塞首屏解析。
+const cityGeoJSON = ref({ features: [] })
 
 const footprintStore = useFootprintStore()
 const userStore = useUserStore()
@@ -55,7 +58,7 @@ const getProvinceAdcode = (feature) => {
 
 // 通过 city_code 反查省名
 const getProvinceName = (cityCode) => {
-  const feature = cityGeoJSON.features.find(
+  const feature = cityGeoJSON.value.features.find(
     (f) => f.properties.adcode === Number(cityCode)
   )
   if (!feature) return ''
@@ -66,7 +69,7 @@ const getProvinceName = (cityCode) => {
 // 省列表：从所有 feature 的 acroutes 中收集（仅有台湾省是 level=province）
 const provinceList = computed(() => {
   const adcodes = new Set()
-  cityGeoJSON.features.forEach((f) => {
+  cityGeoJSON.value.features.forEach((f) => {
     const adcode = getProvinceAdcode(f)
     if (adcode && cityMap[adcode]) adcodes.add(adcode)
   })
@@ -78,7 +81,7 @@ const provinceList = computed(() => {
 // 选中省后获取市列表：有市级子级则列市级，否则列省自身（直辖市/特区/台湾）
 const getCityList = (provinceAdcode) => {
   if (!provinceAdcode) return []
-  const cities = cityGeoJSON.features
+  const cities = cityGeoJSON.value.features
     .filter(
       (f) =>
         f.properties.level === 'city' &&
@@ -155,7 +158,7 @@ const openDialog = (row = null) => {
       visitTime: row.visitTime ?? '',
       isVisible: row.isVisible ?? 1
     }
-    const feature = cityGeoJSON.features.find(
+    const feature = cityGeoJSON.value.features.find(
       (f) => f.properties.adcode === Number(row.cityCode)
     )
     const provinceAdcode = getProvinceAdcode(feature)
@@ -314,7 +317,14 @@ const deleteImage = async (row) => {
   ElMessage.success('删除成功')
 }
 
+// 运行时加载城市 GeoJSON
+const loadCityData = async () => {
+  const res = await fetch(`${import.meta.env.BASE_URL}city/city.json`)
+  cityGeoJSON.value = await res.json()
+}
+
 onMounted(() => {
+  loadCityData()
   if (!userStore.isGuest) load()
 })
 </script>
