@@ -75,6 +75,11 @@ public interface ArticleMapper {
     BlogArticleDetailVO getBySlug(String slug);
 
     /**
+     * 批量根据slug获取文章正文（仅id、slug、正文字段，用于RSS等批量场景）
+     */
+    List<BlogArticleDetailVO> getContentsBySlugs(@Param("slugs") List<String> slugs);
+
+    /**
      * 根据分类ID获取已发布文章列表（分页）
      */
     Page<BlogArticleVO> getPublishedByCategoryId(Long categoryId);

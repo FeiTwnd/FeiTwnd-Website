@@ -67,10 +67,27 @@ public interface ArticleCommentMapper {
     void decrementCommentCount(Long articleId);
 
     /**
+     * 评论数批量+N
+     */
+    @Update("update articles set comment_count = comment_count + #{count} where id = #{articleId}")
+    void addCommentCount(@Param("articleId") Long articleId, @Param("count") int count);
+
+    /**
+     * 评论数批量-N（最小为0）
+     */
+    @Update("update articles set comment_count = case when comment_count > #{count} then comment_count - #{count} else 0 end where id = #{articleId}")
+    void subtractCommentCount(@Param("articleId") Long articleId, @Param("count") int count);
+
+    /**
      * 根据ID查询评论
      */
     @Select("select * from article_comments where id = #{id}")
     ArticleComments getById(Long id);
+
+    /**
+     * 根据ID批量查询评论
+     */
+    List<ArticleComments> getByIds(@Param("ids") List<Long> ids);
 
     /**
      * 更新评论内容（访客编辑）

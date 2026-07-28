@@ -82,6 +82,11 @@ public interface ArticleService {
     BlogArticleDetailVO getBySlug(String slug);
 
     /**
+     * 批量根据slug获取文章正文（仅正文字段，用于RSS等批量场景）
+     */
+    List<BlogArticleDetailVO> getContentsBySlugs(List<String> slugs);
+
+    /**
      * 文章浏览量+1（写入Redis，基于文章ID）
      */
     void incrementViewCount(Long articleId);

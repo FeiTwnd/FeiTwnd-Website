@@ -94,6 +94,15 @@
         where a.slug = #{slug} and a.is_published = 1
     </select>
 
+    <select id="getContentsBySlugs" resultType="cc.feitwnd.vo.BlogArticleDetailVO">
+        select id, slug, content_html, content_markdown
+        from articles
+        where is_published = 1 and slug in
+        <foreach collection="slugs" item="slug" open="(" separator="," close=")">
+            #{slug}
+        </foreach>
+    </select>
+
     <select id="getPublishedByCategoryId" resultType="cc.feitwnd.vo.BlogArticleVO">
         select a.id, a.title, a.slug, a.summary, a.cover_image, a.category_id,
                ac.name as category_name,

@@ -365,6 +365,13 @@ public class ArticleServiceImpl implements ArticleService {
         return articleDetail;
     }
 
+    public List<BlogArticleDetailVO> getContentsBySlugs(List<String> slugs) {
+        if (slugs == null || slugs.isEmpty()) {
+            return List.of();
+        }
+        return articleMapper.getContentsBySlugs(slugs);
+    }
+
     /**
      * 文章浏览量+1（写入Redis，定时同步MySQL）
      */

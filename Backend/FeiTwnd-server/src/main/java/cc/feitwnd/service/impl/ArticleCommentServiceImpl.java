@@ -27,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -79,14 +80,18 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      */
     @Transactional
     public void batchApprove(List<Long> ids) {
-        // 先查询每条评论，只对"当前未审核"的评论增加文章评论数
-        for (Long id : ids) {
-            ArticleComments comment = articleCommentMapper.getById(id);
-            if (comment != null && comment.getArticleId() != null
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        // 批量查询，只对"当前未审核"的评论按文章聚合评论数增量，避免循环内逐条查询/更新
+        Map<Long, Integer> incrementByArticle = new HashMap<>();
+        for (ArticleComments comment : articleCommentMapper.getByIds(ids)) {
+            if (comment.getArticleId() != null
                     && (comment.getIsApproved() == null || comment.getIsApproved() == 0)) {
-                articleCommentMapper.incrementCommentCount(comment.getArticleId());
+                incrementByArticle.merge(comment.getArticleId(), 1, Integer::sum);
             }
         }
+        incrementByArticle.forEach(articleCommentMapper::addCommentCount);
         articleCommentMapper.batchApprove(ids);
     }
 
@@ -96,27 +101,30 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
      */
     @Transactional
     public void batchDelete(List<Long> ids) {
-        for (Long id : ids) {
-            ArticleComments comment = articleCommentMapper.getById(id);
-            if (comment == null || comment.getArticleId() == null) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+        // 批量查询后按文章聚合评论数减量，避免循环内逐条查询与逐次递减
+        Map<Long, Integer> decrementByArticle = new HashMap<>();
+        for (ArticleComments comment : articleCommentMapper.getByIds(ids)) {
+            if (comment.getArticleId() == null) {
                 continue;
             }
             // 如果是根评论，级联删除所有子评论
             if (comment.getRootId() == null || comment.getRootId() == 0) {
                 // 只对已审核的子评论减少评论数
-                Integer approvedChildCount = articleCommentMapper.countApprovedByRootId(id);
+                Integer approvedChildCount = articleCommentMapper.countApprovedByRootId(comment.getId());
                 if (approvedChildCount != null && approvedChildCount > 0) {
-                    for (int i = 0; i < approvedChildCount; i++) {
-                        articleCommentMapper.decrementCommentCount(comment.getArticleId());
-                    }
+                    decrementByArticle.merge(comment.getArticleId(), approvedChildCount, Integer::sum);
                 }
-                articleCommentMapper.deleteByRootId(id);
+                articleCommentMapper.deleteByRootId(comment.getId());
             }
             // 只有已审核的评论才减少文章评论数
             if (comment.getIsApproved() != null && comment.getIsApproved() == 1) {
-                articleCommentMapper.decrementCommentCount(comment.getArticleId());
+                decrementByArticle.merge(comment.getArticleId(), 1, Integer::sum);
             }
         }
+        decrementByArticle.forEach(articleCommentMapper::subtractCommentCount);
         articleCommentMapper.batchDelete(ids);
     }
 
@@ -319,9 +327,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
             // 只对已审核的子评论减少评论数
             Integer approvedChildCount = articleCommentMapper.countApprovedByRootId(id);
             if (approvedChildCount != null && approvedChildCount > 0) {
-                for (int i = 0; i < approvedChildCount; i++) {
-                    articleCommentMapper.decrementCommentCount(comment.getArticleId());
-                }
+                articleCommentMapper.subtractCommentCount(comment.getArticleId(), approvedChildCount);
             }
             Integer totalChildCount = articleCommentMapper.countByRootId(id);
             if (totalChildCount != null && totalChildCount > 0) {

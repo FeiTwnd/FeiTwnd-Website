@@ -13,7 +13,9 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class RssFeedServiceImpl implements RssFeedService {
@@ -46,6 +48,15 @@ public class RssFeedServiceImpl implements RssFeedService {
         @SuppressWarnings("unchecked")
         List<BlogArticleVO> articles = (List<BlogArticleVO>) pageResult.getRecords();
 
+        // 批量获取正文，避免循环内逐篇查询详情（N+1）
+        Map<String, BlogArticleDetailVO> contentMap = new HashMap<>();
+        if (articles != null && !articles.isEmpty()) {
+            List<String> slugs = articles.stream().map(BlogArticleVO::getSlug).toList();
+            for (BlogArticleDetailVO detail : articleService.getContentsBySlugs(slugs)) {
+                contentMap.put(detail.getSlug(), detail);
+            }
+        }
+
         StringBuilder xml = new StringBuilder();
         xml.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         xml.append("<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\" xmlns:content=\"http://purl.org/rss/1.0/modules/content/\">\n");
@@ -67,7 +78,7 @@ public class RssFeedServiceImpl implements RssFeedService {
                     xml.append("      <description>").append(escapeXml(article.getSummary())).append("</description>\n");
                 }
 
-                BlogArticleDetailVO detail = articleService.getBySlug(article.getSlug());
+                BlogArticleDetailVO detail = contentMap.get(article.getSlug());
                 String fullContent = detail != null
                         ? (detail.getContentHtml() != null && !detail.getContentHtml().isBlank()
                         ? detail.getContentHtml()
