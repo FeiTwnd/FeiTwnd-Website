@@ -70,8 +70,8 @@ const deleteOne = async (row) => {
     await messageStore.remove([row.id])
     ElMessage.success('删除成功')
     load()
-  } catch (e) {
-    ElMessage.error(e.response?.data?.msg || '删除失败')
+  } catch {
+    // 错误提示由响应拦截器统一处理
   }
 }
 
@@ -90,8 +90,8 @@ const batchDelete = async () => {
     await messageStore.remove(selected.value.map((r) => r.id))
     ElMessage.success('批量删除成功')
     load()
-  } catch (e) {
-    ElMessage.error(e.response?.data?.msg || '批量删除失败')
+  } catch {
+    // 错误提示由响应拦截器统一处理
   }
 }
 

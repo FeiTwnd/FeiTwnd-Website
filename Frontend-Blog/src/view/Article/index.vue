@@ -267,7 +267,7 @@ const doEdit = async (c) => {
     ElMessage.success('修改成功')
     loadComments()
   } catch {
-    ElMessage.error('修改失败')
+    // 错误提示由响应拦截器统一处理
   }
 }
 const doDelete = async (c) => {
@@ -288,8 +288,8 @@ const doDelete = async (c) => {
     )
     ElMessage.success('删除成功')
     loadComments()
-  } catch (e) {
-    ElMessage.error(e.response?.data?.msg || '删除失败')
+  } catch {
+    // 错误提示由响应拦截器统一处理
   }
 }
 

@@ -65,7 +65,7 @@ const handleRssSubscribe = async () => {
     rssEditMode.value = false
     showRssModal.value = false
   } catch {
-    ElMessage.error('操作失败')
+    // 错误提示由响应拦截器统一处理
   } finally {
     rssSubmitting.value = false
   }
@@ -81,7 +81,7 @@ const handleRssUnsubscribe = async () => {
     rssEditMode.value = false
     showRssModal.value = false
   } catch {
-    ElMessage.error('取消失败')
+    // 错误提示由响应拦截器统一处理
   } finally {
     rssSubmitting.value = false
   }

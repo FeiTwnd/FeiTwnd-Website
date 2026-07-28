@@ -96,23 +96,25 @@ public class GlobalExceptionHandler {
         return Result.error("参数类型错误：" + ex.getName());
     }
 
+    /**
+     * 数据库唯一约束/外键约束异常（SQL 层直接抛出）
+     */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result exceptionHandler(SQLIntegrityConstraintViolationException ex){
-        return Result.error(resolveDuplicateKeyMessage(ex.getMessage()));
+        log.warn("数据库约束异常：{}", ex.getMessage());
+        return Result.error(resolveConstraintMessage(ex));
     }
 
     /**
-     * 数据库唯一约束/外键约束异常
+     * 数据库唯一约束/外键约束异常（Spring 翻译后抛出）
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Result exceptionHandler(DataIntegrityViolationException ex){
-        String message = ex.getMostSpecificCause() != null
-                ? ex.getMostSpecificCause().getMessage()
-                : ex.getMessage();
-        log.warn("数据库约束异常：{}", message);
-        return Result.error(resolveDuplicateKeyMessage(message));
+        log.warn("数据库约束异常：{}", ex.getMostSpecificCause() != null
+                ? ex.getMostSpecificCause().getMessage() : ex.getMessage());
+        return Result.error(resolveConstraintMessage(ex));
     }
 
     /**
@@ -157,28 +159,64 @@ public class GlobalExceptionHandler {
 
     /**
      * 兜底异常处理
+     * <p>
+     * MyBatis 的约束异常在部分场景下顶层类型是未被 Spring 翻译的 PersistenceException，
+     * 会直接命中本兜底分支。这里先遍历异常链尝试识别数据库约束冲突，
+     * 识别不到才返回带异常类型的可诊断信息，便于排查。
      */
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public Result exceptionHandler(Exception ex){
-        log.error("未知异常：", ex);
-        return Result.error(MessageConstant.UNKNOWN_ERROR);
+        String constraintMessage = matchConstraintMessage(ex);
+        if (constraintMessage != null) {
+            log.warn("数据库约束异常（兜底捕获）：{}", ex.getMessage());
+            return Result.error(constraintMessage);
+        }
+        log.error("未知异常（{}）：", ex.getClass().getName(), ex);
+        return Result.error(MessageConstant.UNKNOWN_ERROR + "：" + ex.getClass().getSimpleName());
+    }
+
+    /**
+     * 解析约束异常的友好信息（已知是约束异常，从异常链中提取）
+     */
+    private String resolveConstraintMessage(Throwable ex) {
+        String message = matchConstraintMessage(ex);
+        return message != null ? message : "数据校验失败，请检查提交的内容";
+    }
+
+    /**
+     * 遍历异常链，识别数据库唯一/外键约束冲突并返回友好信息；无法识别返回 null。
+     * 遍历整条 cause 链，兼容异常已被 Spring 翻译或仍为原始 MyBatis/JDBC 异常两种情况。
+     */
+    private String matchConstraintMessage(Throwable ex) {
+        Throwable current = ex;
+        int depth = 0;
+        while (current != null && depth++ < 10) {
+            String message = current.getMessage();
+            if (message != null) {
+                if (message.contains("Duplicate entry")) {
+                    return resolveDuplicateKeyMessage(message);
+                }
+                if (message.contains("foreign key constraint fails")) {
+                    return "操作失败：存在关联数据，请先处理关联项";
+                }
+                if (message.contains("cannot be null")) {
+                    return "必填字段不能为空";
+                }
+            }
+            current = current.getCause();
+        }
+        return null;
     }
 
     private String resolveDuplicateKeyMessage(String message) {
-        if (message == null) {
-            return MessageConstant.UNKNOWN_ERROR;
+        String friendly = mapDuplicateKeyToMessage(message);
+        if (friendly != null) {
+            return friendly;
         }
-        if (message.contains("Duplicate entry")) {
-            String friendly = mapDuplicateKeyToMessage(message);
-            if (friendly != null) {
-                return friendly;
-            }
-            String[] split = message.split(" ");
-            String value = split.length > 2 ? split[2] : "";
-            return value + MessageConstant.ALREADY_EXIST;
-        }
-        return MessageConstant.UNKNOWN_ERROR;
+        String[] split = message.split(" ");
+        String value = split.length > 2 ? split[2] : "";
+        return value + MessageConstant.ALREADY_EXIST;
     }
 
     private String mapDuplicateKeyToMessage(String message) {

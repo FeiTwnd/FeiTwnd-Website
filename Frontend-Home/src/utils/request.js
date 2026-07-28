@@ -20,13 +20,17 @@ instance.interceptors.response.use(
     if (res.data.code === 1) {
       return res
     }
+    // 业务错误（HTTP 200 + code≠1）：统一展示后端返回的错误信息
+    ElMessage.error(res.data?.msg || '请求失败')
     return Promise.reject(res.data)
   },
   (err) => {
-    console.log(err)
     if (err?.response?.status === 403) {
       router.replace('/403')
+      return Promise.reject(err)
     }
+    // 后端约束/校验异常以非 2xx 状态码返回，错误信息在 response.data.msg
+    ElMessage.error(err?.response?.data?.msg || '网络错误，请稍后重试')
     return Promise.reject(err)
   }
 )
