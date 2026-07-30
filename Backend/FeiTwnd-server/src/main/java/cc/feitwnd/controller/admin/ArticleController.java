@@ -8,10 +8,12 @@ import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.ArticleService;
+import cc.feitwnd.vo.ArticleImportVO;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -61,6 +63,19 @@ public class ArticleController {
         log.info("创建文章: {}", articleDTO);
         articleService.createArticle(articleDTO);
         return Result.success();
+    }
+
+    /**
+     * 导入Markdown文件
+     * 前端拿到数据后填入表单，用户确认后再调 createArticle 保存
+     * @param file
+     * @return
+     */
+    @PostMapping("/import")
+    public Result<ArticleImportVO> importMd(@RequestParam("file") MultipartFile file) throws Exception {
+        log.info("导入Markdown文件: {}", file.getOriginalFilename());
+        ArticleImportVO result = articleService.importMd(file);
+        return Result.success(result);
     }
 
     /**
