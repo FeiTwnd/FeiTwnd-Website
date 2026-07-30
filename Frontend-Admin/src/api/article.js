@@ -20,6 +20,19 @@ export const getArticleById = (id) => http.get(`/admin/article/${id}`)
 export const createArticle = (data) => http.post('/admin/article', data)
 
 /**
+ * 导入Markdown文件
+ * @param {File} file
+ * @returns {Promise<{title, slug, summary, coverImage, category, tags, contentMarkdown}>}
+ */
+export const importMd = (file) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return http.post('/admin/article/import', fd, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  })
+}
+
+/**
  * 更新文章
  * @param {ArticleDTO} data
  */
