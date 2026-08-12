@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.web.util.HtmlUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -164,6 +165,29 @@ public class EmailServiceImpl implements EmailService {
         }
     }
 
+    @Override
+    public void sendAdminContentNotification(String type, String nickname, String content) {
+        String toEmail = emailProperties.getAdminNotifyTo();
+        if (toEmail == null || toEmail.isBlank()) {
+            log.warn("未配置站长内容通知邮箱，跳过 {} 通知", type);
+            return;
+        }
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            String typeText = "comment".equals(type) ? "文章评论" : "留言";
+            helper.setFrom(emailProperties.getFrom(), emailProperties.getPersonal());
+            helper.setTo(toEmail);
+            helper.setSubject(websiteProperties.getTitle() + " - 有新的" + typeText + "待处理");
+            helper.setText(buildAdminContentNotificationEmailContent(typeText, nickname, content), true);
+            mailSender.send(message);
+            log.info("发送站长内容通知邮件成功: to={}, type={}", toEmail, type);
+        } catch (Exception e) {
+            log.error("发送站长内容通知邮件失败: to={}, type={}, ex={}", toEmail, type, e.getMessage());
+        }
+    }
+
     /**
      * 构建回复通知邮件内容
      */
@@ -206,6 +230,46 @@ public class EmailServiceImpl implements EmailService {
                 "        </div>" +
                 "        <div class='footer'>" +
                 "            <p style='margin: 0; line-height: 1.5;'>此为系统自动发送的邮件，请勿直接回复<br>© " + year + " "+websiteProperties.getTitle()+" - 保留所有权利</p>" +
+                "        </div>" +
+                "    </div>" +
+                "</body>" +
+                "</html>";
+    }
+
+    private String buildAdminContentNotificationEmailContent(String typeText, String nickname, String content) {
+        String year = String.valueOf(LocalDate.now().getYear());
+        String safeNickname = HtmlUtils.htmlEscape(nickname);
+        String safeContent = HtmlUtils.htmlEscape(content).replace("\n", "<br>");
+        return "<!DOCTYPE html>" +
+                "<html lang='zh-CN'>" +
+                "<head>" +
+                "    <meta charset='UTF-8'>" +
+                "    <meta name='viewport' content='width=device-width, initial-scale=1.0'>" +
+                "    <title>" + websiteProperties.getTitle() + "新" + typeText + "通知</title>" +
+                "    <style>" +
+                "        body { margin: 0; padding: 0; font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif; background-color: #f5f5f5; }" +
+                "        .email-container { max-width: 600px; margin: 40px auto; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); overflow: hidden; }" +
+                "        .email-header { background: #333; padding: 24px 0; text-align: center; border-bottom: 1px solid #222; }" +
+                "        .email-content { padding: 36px 30px; }" +
+                "        .content-block { background: #f0f7ff; border-left: 4px solid #4a90d9; padding: 16px 20px; margin: 16px 0; border-radius: 0 8px 8px 0; }" +
+                "        .footer { background: #222; padding: 16px; text-align: center; color: #aaa; font-size: 12px; }" +
+                "    </style>" +
+                "</head>" +
+                "<body>" +
+                "    <div class='email-container'>" +
+                "        <div class='email-header'>" +
+                "            <h1 style='color: white; margin: 0; font-size: 24px; font-weight: 500;'>" + websiteProperties.getTitle() + "</h1>" +
+                "            <p style='color: #bbb; margin: 8px 0 0; font-size: 14px;'>—— 新" + typeText + "通知 ——</p>" +
+                "        </div>" +
+                "        <div class='email-content'>" +
+                "            <h2 style='color: #333; margin: 0 0 20px; font-size: 20px; font-weight: 500;'>有新的" + typeText + "待处理</h2>" +
+                "            <p style='color: #555; font-size: 15px; line-height: 1.6; margin: 0 0 16px;'><strong>" + safeNickname + "</strong> 提交了新的" + typeText + "：</p>" +
+                "            <div class='content-block'>" +
+                "                <p style='color: #333; margin: 0; font-size: 14px; line-height: 1.6;'>" + safeContent + "</p>" +
+                "            </div>" +
+                "        </div>" +
+                "        <div class='footer'>" +
+                "            <p style='margin: 0; line-height: 1.5;'>此为系统自动发送的邮件，请勿直接回复<br>© " + year + " " + websiteProperties.getTitle() + " - 保留所有权利</p>" +
                 "        </div>" +
                 "    </div>" +
                 "</body>" +

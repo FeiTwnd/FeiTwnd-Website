@@ -280,6 +280,8 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
                     articleCommentDTO.getNickname(), articleCommentDTO.getContent(), "comment");
         }
 
+        notifyAdminIfNeeded(articleCommentDTO.getParentId(), articleCommentDTO.getNickname(), articleCommentDTO.getContent());
+
         log.info("访客提交文章评论成功: {}", articleComments);
     }
 
@@ -378,6 +380,18 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
             }
         } catch (Exception e) {
             log.error("发送评论回复通知邮件异常: parentId={}, ex={}", parentId, e.getMessage());
+        }
+    }
+
+    private void notifyAdminIfNeeded(Long parentId, String nickname, String content) {
+        if (parentId == null) {
+            asyncEmailService.sendAdminContentNotificationAsync("comment", nickname, content);
+            return;
+        }
+
+        ArticleComments parentComment = articleCommentMapper.getById(parentId);
+        if (parentComment != null && StatusConstant.ENABLE.equals(parentComment.getIsAdminReply())) {
+            asyncEmailService.sendAdminContentNotificationAsync("comment", nickname, content);
         }
     }
 

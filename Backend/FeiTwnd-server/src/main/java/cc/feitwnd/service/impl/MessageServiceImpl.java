@@ -134,6 +134,8 @@ public class MessageServiceImpl implements MessageService {
                     messageDTO.getNickname(), messageDTO.getContent(), "message");
         }
 
+        notifyAdminIfNeeded(messageDTO.getParentId(), messageDTO.getNickname(), messageDTO.getContent());
+
         log.info("访客提交留言成功: {}", messages);
     }
 
@@ -369,6 +371,18 @@ public class MessageServiceImpl implements MessageService {
             }
         } catch (Exception e) {
             log.error("发送留言回复通知邮件异常: parentId={}, ex={}", parentId, e.getMessage());
+        }
+    }
+
+    private void notifyAdminIfNeeded(Long parentId, String nickname, String content) {
+        if (parentId == null) {
+            asyncEmailService.sendAdminContentNotificationAsync("message", nickname, content);
+            return;
+        }
+
+        Messages parentMessage = messageMapper.getById(parentId);
+        if (parentMessage != null && StatusConstant.ENABLE.equals(parentMessage.getIsAdminReply())) {
+            asyncEmailService.sendAdminContentNotificationAsync("message", nickname, content);
         }
     }
 }

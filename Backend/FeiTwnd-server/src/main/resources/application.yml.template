@@ -83,6 +83,7 @@ feitwnd:
   email:
     personal:    #SMTP邮件发送者昵称
     from:   #SMTP邮件发送者邮箱，跟上面那个邮箱配置的username一致即可
+    admin-notify-to:  #新评论和留言通知收件邮箱
   visitor:
     verify-code:   #管理端游客登录用的邮箱验证码
   image:

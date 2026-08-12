@@ -14,4 +14,9 @@ public class EmailProperties {
     private String personal;
 
     private String from;
+
+    /**
+     * 接收新评论和留言通知的站长邮箱
+     */
+    private String adminNotifyTo;
 }

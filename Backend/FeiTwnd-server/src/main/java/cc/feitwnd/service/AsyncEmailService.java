@@ -12,6 +12,11 @@ public interface AsyncEmailService {
                                     String replyNickname, String replyContent, String type);
 
     /**
+     * 异步发送站长的新评论/留言通知邮件
+     */
+    void sendAdminContentNotificationAsync(String type, String nickname, String content);
+
+    /**
      * 异步发送新文章通知邮件
      */
     void sendNewArticleNotificationAsync(String toEmail, String nickname, String articleTitle,

@@ -22,7 +22,12 @@ public interface EmailService {
      * @param type 类型：message-留言 / comment-文章评论
      */
     void sendReplyNotification(String toEmail, String parentNickname, String parentContent,
-                               String replyNickname, String replyContent, String type);
+                                String replyNickname, String replyContent, String type);
+
+    /**
+     * 发送站长的新评论/留言通知邮件
+     */
+    void sendAdminContentNotification(String type, String nickname, String content);
 
     /**
      * 发送新文章通知邮件

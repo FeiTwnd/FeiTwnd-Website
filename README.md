@@ -207,6 +207,7 @@ cp application-dev.yml.template application-dev.yml
 | `spring.mail.password` | application.yml | QQ 邮箱授权码 |
 | `feitwnd.email.personal` | application.yml | 发件人昵称 |
 | `feitwnd.email.from` | application.yml | 发件人邮箱 |
+| `feitwnd.email.admin-notify-to` | application.yml | 接收新评论和留言通知的站长邮箱 |
 | `feitwnd.visitor.verify-code` | application.yml | 访客验证码 |
 | `feitwnd.website.*` | application.yml | 网站标题和 4 个子站地址 |
 | `feitwnd.jwt.ttl` | application-dev.yml | JWT 过期时间（毫秒） |
