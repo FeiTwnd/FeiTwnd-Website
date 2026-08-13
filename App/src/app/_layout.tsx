@@ -15,7 +15,11 @@ export default function RootLayout() {
   const session = useSession();
 
   useEffect(() => {
-    getToken().then((token) => setSession(token ? 'ok' : 'none'));
+    // SecureStore（Android Keystore）在备份恢复/重装等场景下可能抛错，
+    // 读取失败按未登录处理，避免 session 卡在 loading 导致白屏
+    getToken()
+      .then((token) => setSession(token ? 'ok' : 'none'))
+      .catch(() => setSession('none'));
     setUnauthorizedHandler(() => {
       clearSession();
       setSession('none');

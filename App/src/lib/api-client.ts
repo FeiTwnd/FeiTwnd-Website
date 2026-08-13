@@ -1,6 +1,8 @@
 import { API_BASE_URL } from './config';
 import { getToken } from './storage';
 
+const REQUEST_TIMEOUT_MS = 15000;
+
 export class ApiError extends Error {
   status?: number;
 
@@ -23,21 +25,38 @@ interface RequestOptions {
   body?: unknown;
 }
 
+/** fetch 封装：统一超时。超时按 ApiError 抛出，避免弱网下请求永久挂起 */
+async function fetchWithTimeout(input: string, init: RequestInit): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  try {
+    return await fetch(input, { ...init, signal: controller.signal });
+  } catch (e) {
+    if (controller.signal.aborted) throw new ApiError('请求超时，请检查网络后重试');
+    throw e;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function api<T = unknown>(path: string, options: RequestOptions = {}): Promise<T> {
   const token = await getToken();
 
-  const url = new URL(path, API_BASE_URL);
+  // API_BASE_URL 可能带路径前缀（如 /wo/chovy，由 nginx 剥离后转发）。
+  // 用字符串拼接保留前缀；不能用 new URL(path, base)——绝对路径会替换掉 base 的路径段。
+  let url = API_BASE_URL + path;
   if (options.query) {
-    for (const [key, value] of Object.entries(options.query)) {
-      if (value !== undefined) url.searchParams.set(key, String(value));
-    }
+    const pairs = Object.entries(options.query)
+      .filter(([, v]) => v !== undefined)
+      .map(([k, v]) => `${encodeURIComponent(k)}=${encodeURIComponent(String(v))}`);
+    if (pairs.length > 0) url += '?' + pairs.join('&');
   }
 
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (token) headers.Authorization = token;
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
 
-  const response = await fetch(url, {
+  const response = await fetchWithTimeout(url, {
     method: options.method ?? 'GET',
     headers,
     body: options.body !== undefined ? JSON.stringify(options.body) : undefined,
@@ -49,7 +68,13 @@ export async function api<T = unknown>(path: string, options: RequestOptions = {
   }
 
   const text = await response.text();
-  const data = text ? JSON.parse(text) : {};
+  // 后端可能返回非 JSON（网关错误页等），统一按 ApiError 处理，避免抛 SyntaxError 破坏 instanceof 判断
+  let data: { code?: number; msg?: string; data?: T } = {};
+  try {
+    data = text ? JSON.parse(text) : {};
+  } catch {
+    throw new ApiError(`服务器响应异常（${response.status}）`, response.status);
+  }
 
   if (response.status !== 200) {
     throw new ApiError(data?.msg || `请求失败（${response.status}）`, response.status);

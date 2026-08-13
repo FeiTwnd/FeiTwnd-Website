@@ -8,7 +8,6 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 
 export function useTheme() {
   const scheme = useColorScheme();
-  const theme = scheme === 'unspecified' ? 'light' : scheme;
-
-  return Colors[theme];
+  // useColorScheme 可能返回 null/undefined，统一兜底为 light，避免 Colors[undefined] 崩溃
+  return Colors[scheme === 'dark' ? 'dark' : 'light'];
 }

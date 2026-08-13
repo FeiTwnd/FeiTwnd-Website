@@ -9,17 +9,11 @@
     "userInterfaceStyle": "automatic",
     "android": {
       "package": "cc.feitwnd.app",
-      "adaptiveIcon": {
-        "backgroundColor": "#f5f7fa",
-        "foregroundImage": "./assets/images/android-icon-foreground.png",
-        "backgroundImage": "./assets/images/android-icon-background.png",
-        "monochromeImage": "./assets/images/android-icon-monochrome.png"
-      },
+      "backgroundColor": "#f5f7fa",
       "predictiveBackGestureEnabled": false
     },
     "web": {
-      "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "output": "static"
     },
     "plugins": [
       "expo-router",

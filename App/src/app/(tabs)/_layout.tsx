@@ -7,7 +7,7 @@ import { useSession } from '@/lib/session';
 
 export default function TabsLayout() {
   const scheme = useColorScheme();
-  const colors = Colors[scheme === 'unspecified' ? 'light' : scheme];
+  const colors = Colors[scheme === 'dark' ? 'dark' : 'light'];
   const session = useSession();
 
   if (session !== 'ok') {
