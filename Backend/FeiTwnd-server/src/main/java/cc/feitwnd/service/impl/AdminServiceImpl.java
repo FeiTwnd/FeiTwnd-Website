@@ -134,6 +134,7 @@ public class AdminServiceImpl implements AdminService {
         // 构造管理员信息
         return AdminVO.builder()
                 .id(adminId)
+                .username(admin.getUsername())
                 .nickname(admin.getNickname())
                 .email(admin.getEmail())
                 .role(admin.getRole())
