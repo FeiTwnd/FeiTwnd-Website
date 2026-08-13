@@ -237,7 +237,6 @@ onMounted(() => {
       </div>
       <div class="toolbar-right">
         <el-button
-          type="danger"
           plain
           :disabled="!selected.length"
           @click="batchDelete"
