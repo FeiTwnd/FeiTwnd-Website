@@ -33,7 +33,6 @@ cp .env.example .env
 
 - `EXPO_PUBLIC_API_URL` 会在**构建时被内联**进 APK，改完 `.env` 必须重新打包才生效。
 - 建议使用 HTTPS（如 `https://api.example.com`），手机在任何网络下都能访问。
-- 若地址带路径前缀（如 `/wo/chovy`），App 会自动保留该前缀，但 nginx 需要配置"去掉前缀后转发"到后端。
 - ⚠️ 不要用 `http://` + 局域网 IP 打包正式 APK：**Android 9+ 默认禁止明文 HTTP**，release 包会连不上服务器。
 
 ### 3. 替换应用图标（可选）
