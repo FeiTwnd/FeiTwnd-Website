@@ -1,6 +1,6 @@
 # FeiTwnd Docker 部署指南
 
-> ⚠️ **重要提醒**: 文档中的域名 `example.com`、`admin.example.com` 等仅为示例，请根据实际情况替换为你自己的域名。
+> **重要提醒**: 文档中的域名 `example.com`、`admin.example.com` 等仅为示例，请根据实际情况替换为你自己的域名。
 
 本项目支持使用 Docker 进行快速部署，包含后端 Java 应用、MySQL、Redis 和 Nginx 反向代理。
 

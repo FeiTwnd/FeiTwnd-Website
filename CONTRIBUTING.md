@@ -64,6 +64,7 @@ git checkout -b fix/your-bug-fix
 - `admin` — 管理端前端
 - `home` — 个人主页前端
 - `cv` — 简历前端
+- `app` — 移动端管理 App（Expo / React Native）
 - `backend` — 后端服务
 - `db` — 数据库相关
 
@@ -76,7 +77,7 @@ docs: 更新部署文档
 
 ### PR 要求
 
-1. 确保代码能正常构建（`mvn clean package -DskipTests` / `pnpm build`）
+1. 确保代码能正常构建（`mvn clean package -DskipTests` / `pnpm build`；App 目录通过 `npx expo lint` + `npx tsc --noEmit` 检查）
 2. 前端代码需通过 ESLint 检查（`pnpm lint`）
 3. 一个 PR 只做一件事，保持改动范围清晰
 4. 如果涉及数据库变更，请在 PR 描述中说明 SQL 变更内容
@@ -95,6 +96,12 @@ docs: 更新部署文档
 - 组件使用 PascalCase 命名
 - CSS 使用 scoped + CSS 变量适配暗黑模式
 - 提交前执行 `pnpm lint` 确保代码风格一致
+
+### 移动端 App (React Native)
+- 使用 TypeScript 严格模式（`tsconfig` 已开启 `strict`）
+- 组件使用 PascalCase 命名
+- 颜色、间距从 `constants/theme` 取用，支持暗黑模式
+- 提交前执行 `npx expo lint` 和 `npx tsc --noEmit`
 
 ## 协议
 

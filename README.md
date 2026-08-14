@@ -5,12 +5,13 @@
   <img src="https://img.shields.io/badge/Vite-7-blueviolet?style=flat-square&logo=vite" alt="Vite">
   <img src="https://img.shields.io/badge/MySQL-8.0-blue?style=flat-square&logo=mysql" alt="MySQL">
   <img src="https://img.shields.io/badge/Redis-7-red?style=flat-square&logo=redis" alt="Redis">
+  <img src="https://img.shields.io/badge/Expo-57-black?style=flat-square&logo=expo" alt="Expo">
   <img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square" alt="License">
 </p>
 
 # FeiTwnd — 个人全栈网站
 
-一套基于 **Spring Boot 3 + Vue 3** 的个人网站全栈解决方案，包含博客、后台管理、个人主页、在线简历四个子站点和一个统一后端服务。
+一套基于 **Spring Boot 3 + Vue 3 + Expo (React Native)** 的个人网站全栈解决方案，包含博客、后台管理、个人主页、在线简历四个 Web 子站点、一个移动端管理 App，以及一个统一后端服务。
 
 > 在线演示：[blog.feitwnd.cc](https://blog.feitwnd.cc) · [feitwnd.cc](https://feitwnd.cc) · [cv.feitwnd.cc](https://cv.feitwnd.cc)
 
@@ -57,9 +58,18 @@
 - 技能标签
 - 响应式布局，适合分享
 
+### 移动端管理 App (App)
+- Expo (React Native) 移动端管理后台，与管理端共用后端接口
+- 登录（用户名 + 密码 + 邮箱验证码）
+- 数据看板（访问统计、趋势图、省份分布、热门文章 Top 10）
+- 评论 / 留言待审核提醒（前台轮询 + 本地通知）
+- 文章管理
+- 个人信息 / 城市足迹管理
+- 暗黑模式（跟随系统）
+
 ---
 
-## 🏗 技术架构
+## 技术架构
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -90,6 +100,8 @@
     ▼
  Aliyun OSS (图片/文件存储)
 ```
+
+移动端管理 App（Expo/React Native）通过 HTTPS 调用后端 API（Nginx `api` 子域名反向代理），与四个 Web 子站共用同一套后端服务。
 
 ### 后端技术栈
 
@@ -123,6 +135,7 @@
 | ECharts | 数据可视化（管理端） |
 | Axios | HTTP 客户端 |
 | Sass | CSS 预处理器 |
+| Expo (React Native) | 移动端管理 App 框架 |
 
 ---
 
@@ -143,7 +156,8 @@ FeiTwnd/
 ├── Frontend-Blog/              # 博客前端
 ├── Frontend-Admin/             # 管理后台前端
 ├── Frontend-Home/              # 个人主页前端
-└── Frontend-Cv/                # 在线简历前端
+├── Frontend-Cv/                # 在线简历前端
+└── App/                        # 移动端管理 App（Expo / React Native）
 ```
 
 ---
@@ -263,6 +277,18 @@ pnpm dev
 
 > 首次使用需要在数据库管理员账号或访客账号（如果需要），然后在管理端配置个人信息等内容。
 
+### 7. 移动端 App（可选）
+
+`App/` 是移动端管理后台，与四个 Web 子站共用后端接口，通过 EAS 云端打包成 APK 安装到手机，不需要本地 Android 环境：
+
+```bash
+cd App
+pnpm install
+npx eas-cli build -p android --profile preview
+```
+
+详细的首次配置（EAS 项目关联、服务器地址、图标替换）见 [App/BUILD.md](App/BUILD.md)。
+
 ---
 
 ## 生产部署
@@ -287,6 +313,10 @@ pnpm install
 pnpm build
 # 产出：dist/ 目录，部署到 Nginx 对应站点即可
 ```
+
+### 移动端 App
+
+App 通过 EAS 云端构建产出可直接安装的 APK，打包流程见 [App/BUILD.md](App/BUILD.md)。
 
 ### Nginx 配置参考
 

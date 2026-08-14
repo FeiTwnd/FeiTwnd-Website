@@ -54,7 +54,7 @@ npx eas-cli init
 
 ### 4. 配置服务器地址（EAS 云端构建）
 
-> ⚠️ EAS 云端构建**不读取本地 `.env`**，环境变量必须通过 `eas env:set` 存在 EAS 服务端（同样不进仓库）。
+> EAS 云端构建**不读取本地 `.env`**，环境变量必须通过 `eas env:set` 存在 EAS 服务端（同样不进仓库）。
 
 ```bash
 npx eas-cli env:set EXPO_PUBLIC_API_URL https://你的后端地址
