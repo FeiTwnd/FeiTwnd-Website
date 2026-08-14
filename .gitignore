@@ -48,6 +48,8 @@ coverage/
 .expo/
 web-build/
 expo-env.d.ts
+# EAS 项目标识本地配置（个人 projectId/owner，不入库）
+.local.eas.json
 *.orig.*
 *.jks
 *.p8
