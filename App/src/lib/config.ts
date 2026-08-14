@@ -5,7 +5,7 @@
  * （必须用点号引用 process.env.EXPO_PUBLIC_API_URL 这种形式才会被内联）。
  *
  * EXPO_PUBLIC_API_URL 的配置来源：
- * - EAS 云端构建：`npx eas-cli env:set EXPO_PUBLIC_API_URL <地址>`（存在 EAS 服务端，不入 git）
+ * - EAS 云端构建：`npx eas-cli env:set --name EXPO_PUBLIC_API_URL --value <地址> --visibility plaintext`（存在 EAS 服务端，不入 git）
  * - 本地开发（expo start / Expo Go / expo export）：项目根目录 `.env`
  *
  * ⚠️ 此处不能 throw：bundle 求值期的异常会导致 App 启动即闪退（EAS 云端构建不读取本地 .env，

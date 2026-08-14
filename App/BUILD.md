@@ -57,10 +57,11 @@ npx eas-cli init
 > EAS 云端构建**不读取本地 `.env`**，环境变量必须通过 `eas env:set` 存在 EAS 服务端（同样不进仓库）。
 
 ```bash
-npx eas-cli env:set EXPO_PUBLIC_API_URL https://你的后端地址
+npx eas-cli env:set --name EXPO_PUBLIC_API_URL --value https://你的后端地址 --visibility plaintext
 ```
 
-按提示选择：可见性选 **Plain text**，环境范围按默认（全部）即可。
+- `--name` / `--value` 是新版 eas-cli 的 flag 写法（不要写成 `eas env:set 名字 值`，会被当成位置参数而报错）。
+- 环境范围按默认（`production`、`preview`、`development` 全部）即可。
 
 > 本地用 Expo Go / `expo start` 调试时才需要项目根目录的 `.env`（不影响云端打包）：
 >
