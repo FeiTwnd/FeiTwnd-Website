@@ -189,7 +189,10 @@ export default function DashboardScreen() {
                   <View
                     style={[
                       styles.topBarFill,
-                      { width: `${(top10.viewCountList[i] / maxView) * 100}%` },
+                      {
+                        width: `${(top10.viewCountList[i] / maxView) * 100}%`,
+                        backgroundColor: theme.text,
+                      },
                     ]}
                   />
                 </View>
@@ -268,7 +271,6 @@ const styles = StyleSheet.create({
   },
   topRank: {
     width: 20,
-    color: '#303133',
     fontWeight: '700',
   },
   topBody: {
@@ -285,7 +287,6 @@ const styles = StyleSheet.create({
   },
   topBarFill: {
     height: 4,
-    backgroundColor: '#303133',
     borderRadius: 2,
   },
 });
