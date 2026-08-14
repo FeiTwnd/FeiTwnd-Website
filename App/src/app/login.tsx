@@ -13,10 +13,11 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context'
 
 import * as authApi from '@/api/auth'
-import { Btn, Input, useColors } from '@/components/ui'
+import { Btn, DANGER, Input, useColors } from '@/components/ui'
 import { ThemedText } from '@/components/themed-text'
 import { ThemedView } from '@/components/themed-view'
 import { Spacing } from '@/constants/theme'
+import { API_BASE_URL } from '@/lib/config'
 import { ApiError } from '@/lib/api-client'
 import { setSession, useSession } from '@/lib/session'
 import { clearSession, setAdminId, setToken } from '@/lib/storage'
@@ -122,6 +123,15 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.formArea}>
+              {/* env 未注入时提示，避免请求全部静默失败；配置方法见 lib/config.ts */}
+              {!API_BASE_URL && (
+                <ThemedText
+                  type="small"
+                  style={{ color: DANGER, textAlign: 'center', marginBottom: Spacing.two }}>
+                  服务器地址未配置：请检查 EXPO_PUBLIC_API_URL（本地开发改 .env，EAS 构建用
+                  npx eas-cli env:set 配置）
+                </ThemedText>
+              )}
               <ThemedView type="backgroundElement" style={styles.form}>
                 <Input
                   label="用户名"
