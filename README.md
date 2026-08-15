@@ -304,6 +304,38 @@ mvn clean package -DskipTests
 java -jar FeiTwnd-server-1.0-SNAPSHOT.jar --spring.profiles.active=prod
 ```
 
+### AI 摘要模块（可选扩展）
+
+管理端写文章时可勾选"AI 生成摘要"，发布后后端异步调用大模型生成约 100 字摘要并回填，无需手动复制文章去网页版 AI。
+
+该模块是**可插拔扩展**：默认构建不包含任何 AI 相关依赖（jar 体积不变），需要时以 `-Pwith-ai` 构建即可：
+
+```bash
+cd Backend
+mvn clean package -DskipTests -Pwith-ai
+```
+
+启用后需在配置文件（或环境变量）中填写模型参数，支持任意 OpenAI 兼容协议的服务（DeepSeek / 通义 / 智谱 / Kimi / OpenRouter / Ollama 等），切换模型厂商只需改配置：
+
+```yaml
+feitwnd:
+  ai:
+    enabled: true                          # 是否启用 AI 摘要生成
+    base-url: https://api.deepseek.com/v1  # 模型接口地址（OpenAI 兼容协议）
+    api-key: ${AI_API_KEY}                 # API 秘钥，通过环境变量注入，勿写死在 yml
+    model-name: deepseek-chat              # 模型名称
+    temperature: 0.3                       # 采样温度
+    timeout-seconds: 60                    # 请求超时（秒）
+```
+
+> 各 AI 功能（摘要、后续的错别字修正等）的提示词存放在 ai 模块内部 `prompt` 包下的独立常量类（如 `FeiTwnd-ai/.../ai/prompt/ArticleSummaryPrompt.java`，一个功能一个常量类），不在 yml 中配置，新增功能时在模块内扩展即可。
+
+使用说明：
+- 管理端编辑页在"摘要"输入框下方出现"AI 生成摘要"开关；后端未打包该模块或未启用时，开关自动隐藏；
+- 勾选后点击发布：发布接口正常返回，摘要异步生成回填，稍后刷新页面可见；
+- 已有手写摘要时不触发 AI 生成，不会覆盖手动填写的内容；
+- AI 服务不可用时只记录日志，不影响文章发布。
+
 ### 前端打包
 
 ```bash
@@ -369,6 +401,8 @@ docker compose logs -f
 ```
 
 > Docker 镜像基于 `eclipse-temurin:21-jre-alpine` 运行后端，前端通过 Nginx 容器托管。详见仓库内 Dockerfile 和 compose 配置。
+
+如需在 Docker 部署中启用 AI 摘要模块，在 `.env` 文件中设置 `AI_ENABLED=true` 并填写 `AI_API_KEY` 等参数后重新构建镜像即可（默认不打包 AI 模块）。
 
 ---
 
