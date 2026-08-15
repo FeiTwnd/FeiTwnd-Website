@@ -3,6 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter, onBeforeRouteLeave } from 'vue-router'
 import { useArticleStore } from '@/stores'
 import { uploadFile } from '@/api/settings'
+import { getAiStatus } from '@/api/ai'
 import { MdEditor } from 'md-editor-v3'
 import EmojiPicker from '@/components/EmojiPicker.vue'
 import 'md-editor-v3/lib/style.css'
@@ -12,6 +13,9 @@ const router = useRouter()
 const articleStore = useArticleStore()
 
 const isEdit = computed(() => !!route.params.id)
+
+// 后端是否启用了 AI 摘要模块（未打包或未启用时为 false，隐藏 AI 开关）
+const aiEnabled = ref(false)
 
 const form = ref({
   id: null,
@@ -23,7 +27,8 @@ const form = ref({
   tagIds: [],
   contentMarkdown: '',
   contentHtml: '',
-  isPublished: 0
+  isPublished: 0,
+  aiGenerateSummary: false,
 })
 
 /* ---- 同步编辑器渲染后的 HTML ---- */
@@ -44,7 +49,7 @@ const onUploadImg = async (files, callback) => {
         fd.append('file', file)
         const res = await uploadFile(fd)
         return res.data
-      })
+      }),
     )
     callback(urls)
     ElMessage.success('图片上传成功')
@@ -106,7 +111,7 @@ const insertEditorEmoji = (char) => {
 const isSaved = ref(false)
 const handleSave = async (
   isPublished,
-  { redirectAfterSave = isPublished === 1 } = {}
+  { redirectAfterSave = isPublished === 1 } = {},
 ) => {
   if (!form.value.title.trim()) return ElMessage.warning('请输入文章标题')
   if (!form.value.slug.trim())
@@ -118,10 +123,18 @@ const handleSave = async (
   saving.value = true
   try {
     form.value.isPublished = isPublished
-    await articleStore.saveArticle({ ...form.value })
+    // 勾选AI生成摘要时：本地保留用户手写摘要（取消勾选可恢复），但发布时不传递，交给后端异步生成
+    const payload = { ...form.value }
+    if (isPublished === 1 && form.value.aiGenerateSummary) {
+      payload.summary = ''
+    }
+    await articleStore.saveArticle(payload)
     isSaved.value = isPublished === 1 && redirectAfterSave
     takeSnapshot()
     ElMessage.success(isPublished ? '发布成功' : '保存草稿成功')
+    if (isPublished === 1 && form.value.aiGenerateSummary) {
+      ElMessage.info('AI 摘要生成中，稍后刷新页面可见')
+    }
     if (redirectAfterSave) {
       router.push('/article/list')
     }
@@ -156,7 +169,7 @@ const hasUnsavedChanges = () => {
     coverImage: form.value.coverImage,
     categoryId: form.value.categoryId,
     tagIds: form.value.tagIds,
-    contentMarkdown: form.value.contentMarkdown
+    contentMarkdown: form.value.contentMarkdown,
   })
   return current !== initialSnapshot.value
 }
@@ -169,7 +182,7 @@ const takeSnapshot = () => {
     coverImage: form.value.coverImage,
     categoryId: form.value.categoryId,
     tagIds: form.value.tagIds,
-    contentMarkdown: form.value.contentMarkdown
+    contentMarkdown: form.value.contentMarkdown,
   })
 }
 
@@ -180,7 +193,7 @@ onBeforeRouteLeave(async () => {
       confirmButtonText: '保存草稿',
       cancelButtonText: '不保存',
       distinguishCancelAndClose: true,
-      type: 'warning'
+      type: 'warning',
     })
     // 用户点击保存草稿
     await handleSave(0, { redirectAfterSave: false })
@@ -200,6 +213,10 @@ onMounted(async () => {
 
   takeSnapshot()
 
+  // 探测后端 AI 模块能力：未打包或未启用时自动隐藏"AI 生成摘要"开关
+  const aiStatus = await getAiStatus()
+  aiEnabled.value = aiStatus?.enabled === true
+
   await Promise.all([articleStore.fetchCategories(), articleStore.fetchTags()])
   if (isEdit.value) {
     const res = await articleStore.fetchDetail(route.params.id)
@@ -213,7 +230,7 @@ onMounted(async () => {
         categoryId: res.categoryId,
         tagIds: res.tagIds ?? [],
         contentMarkdown: res.contentMarkdown || res.contentHtml || '',
-        isPublished: res.isPublished ?? 0
+        isPublished: res.isPublished ?? 0,
       })
     }
   }
@@ -291,12 +308,17 @@ onBeforeUnmount(() => {
         <div class="aside-section">
           <div class="aside-label">摘要</div>
           <el-input
+            v-if="!form.aiGenerateSummary"
             v-model="form.summary"
             type="textarea"
             :rows="3"
             placeholder="文章摘要（选填）"
             size="small"
           />
+          <div v-if="aiEnabled" class="ai-summary-switch">
+            <el-switch v-model="form.aiGenerateSummary" size="small" />
+            <span class="ai-summary-tip">AI 生成摘要</span>
+          </div>
         </div>
 
         <div class="aside-section">
@@ -483,6 +505,19 @@ onBeforeUnmount(() => {
 }
 .req {
   color: #f56c6c;
+}
+
+/* AI 生成摘要开关 */
+.ai-summary-switch {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+}
+.ai-summary-tip {
+  font-size: 12px;
+  color: #909399;
+  line-height: 1.4;
 }
 
 /* 封面上传 */
