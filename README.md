@@ -47,6 +47,7 @@
 - 访客统计 / 数据看板（ECharts）
 - 系统配置（站点设置、关于页面、模块开关）
 - 操作日志
+- AI 摘要生成（可选扩展模块：写文章时可勾选，发布后异步调用大模型生成摘要并回填）
 
 ### 个人主页 (Frontend-Home)
 - 个人信息展示
@@ -146,11 +147,14 @@ FeiTwnd/
 ├── Backend/                    # Spring Boot 后端
 │   ├── FeiTwnd-common/         # 公共模块（工具类、常量、异常）
 │   ├── FeiTwnd-pojo/           # 实体/DTO/VO
+│   ├── FeiTwnd-extension-api/  # 扩展模块契约层（可插拔模块与主程序间的接口）
+│   ├── FeiTwnd-ai/             # AI 摘要模块（可选，-Pwith-ai 构建时打包）
 │   └── FeiTwnd-server/         # 主服务（Controller、Service、Mapper）
 │       └── src/main/resources/
 │           ├── application.yml.template      # 配置模板
 │           ├── application-dev.yml.template   # 开发环境模板
 │           ├── application-prod.yml.template  # 生产环境模板
+│           ├── application-docker.yml         # Docker 环境配置
 │           ├── database/feitwnd.sql           # 数据库建表脚本
 │           └── mapper/                        # MyBatis XML
 ├── Frontend-Blog/              # 博客前端
@@ -400,7 +404,7 @@ docker compose ps
 docker compose logs -f
 ```
 
-> Docker 镜像基于 `eclipse-temurin:21-jre-alpine` 运行后端，前端通过 Nginx 容器托管。详见仓库内 Dockerfile 和 compose 配置。
+> Docker 镜像基于 `eclipse-temurin:21-jre-alpine` 运行后端，前端通过 Nginx 容器托管。**完整的 Docker 部署步骤（环境变量、数据库自动初始化、前端静态文件、HTTPS 等）见 [docker/README.md](docker/README.md)。**
 
 如需在 Docker 部署中启用 AI 摘要模块，在 `.env` 文件中设置 `AI_ENABLED=true` 并填写 `AI_API_KEY` 等参数后重新构建镜像即可（默认不打包 AI 模块）。
 

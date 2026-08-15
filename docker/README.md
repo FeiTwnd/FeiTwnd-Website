@@ -17,7 +17,7 @@ FeiTwnd/
     │   ├── conf.d/
     │   │   └── feitwnd-backend.conf  # 后端代理配置
     │   └── sites-enabled/
-    │       └── example.com      # 前端站点配置
+    │       └── feitwnd.cc      # 前端站点配置（使用自己的域名时需重命名该文件并修改 server_name/root）
     ├── mysql/
     │   └── init/           # MySQL 初始化脚本
     └── html/               # 前端静态文件目录
@@ -34,8 +34,8 @@ FeiTwnd/
 ### 1. 配置环境变量
 
 ```bash
-cd docker
-cp .env.example .env
+# 注意：.env 必须放在仓库根目录（与 docker-compose.yml 同级），docker compose 只读取该位置的 .env
+cp docker/.env.example .env
 ```
 
 编辑 `.env` 文件，**必须修改以下配置**：
@@ -83,26 +83,11 @@ WEBSITE_CV=https://cv.example.com
 WEBSITE_BLOG=https://blog.example.com
 ```
 
-### 2. 导入数据库
+### 2. 初始化数据库
 
-首次部署需要初始化数据库：
+**无需手动导入**：MySQL 容器首次启动时会自动执行 `docker/mysql/init/feitwnd.sql`（挂载到 `/docker-entrypoint-initdb.d`），自动创建 `FeiTwnd` 数据库、`feitwnd` 用户及全部数据表。
 
-```bash
-# 启动 MySQL 容器
-docker-compose up -d mysql
-
-# 等待 MySQL 启动完成，然后进入容器
-docker exec -it feitwnd-mysql mysql -uroot -p
-
-# 在 MySQL 中创建数据库和用户
-CREATE DATABASE FeiTwnd CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-GRANT ALL PRIVILEGES ON FeiTwnd.* TO 'feitwnd'@'%';
-FLUSH PRIVILEGES;
-exit;
-
-# 导入初始化SQL (如果有)
-docker exec -i feitwnd-mysql mysql -uroot -p -e "FeiTwnd" < docker/mysql/init/init.sql
-```
+> 已包含：管理员账号、游客账号、系统配置等初始数据。初始 SQL 中管理员/游客账号为 `xxx` 占位符，**登录前需先修改数据库**：用户名改为你自己的，密码需用后端测试类 `FeiTwndBackendApplicationTests.testPassword` 生成加密值（SHA-256(password+salt)）后更新（详见根目录 README"快速开始"章节）。
 
 ### 3. 放入前端静态文件
 
@@ -126,20 +111,41 @@ mkdir -p docker/html/admin.example.com/html
 cp -r ../Frontend-Admin/dist/* docker/html/admin.example.com/html/
 ```
 
+> 目录名中的域名（如 `blog.example.com`）必须与 `docker/nginx/sites-enabled/` 配置里的 `server_name` 和 `root` 保持一致（默认配置为 `feitwnd.cc` 系列域名，使用自己的域名时请统一修改）。
+
 ### 4. 构建并启动服务
 
 ```bash
 # 构建并启动所有服务
-docker-compose up -d --build
+docker compose up -d --build
 
 # 查看运行状态
-docker-compose ps
+docker compose ps
 
 # 查看日志
-docker-compose logs -f
+docker compose logs -f
 ```
 
-### 5. 配置 HTTPS（可选）
+### 5. 启用 AI 摘要模块（可选）
+
+默认镜像不包含 AI 模块（包体最小）。如需启用，在 `.env` 中设置：
+
+```bash
+AI_ENABLED=true            # 以 -Pwith-ai 构建镜像（包含 langchain4j）
+AI_BASE_URL=https://api.deepseek.com/v1   # OpenAI 兼容协议接口地址
+AI_API_KEY=your-api-key    # 模型 API 秘钥
+AI_MODEL_NAME=deepseek-chat
+```
+
+然后重新构建启动：
+
+```bash
+docker compose up -d --build backend
+```
+
+启用后管理端文章编辑页会出现"AI 生成摘要"开关（详见根目录 README 的"AI 摘要模块"章节）。
+
+### 6. 配置 HTTPS（可选）
 
 #### 使用 Certbot 自动配置
 
@@ -203,24 +209,28 @@ server {
 | `WEBSITE_ADMIN` | 否 | 管理后台地址 | - |
 | `WEBSITE_CV` | 否 | 简历地址 | - |
 | `WEBSITE_BLOG` | 否 | 博客地址 | - |
+| `AI_ENABLED` | 否 | 是否构建并启用 AI 摘要模块 | false |
+| `AI_BASE_URL` | 否 | 模型接口地址（OpenAI 兼容协议） | https://api.deepseek.com/v1 |
+| `AI_API_KEY` | 否 | 模型 API 秘钥 | - |
+| `AI_MODEL_NAME` | 否 | 模型名称 | deepseek-chat |
 
 ## 常用命令
 
 ```bash
 # 启动服务
-docker-compose up -d
+docker compose up -d
 
 # 停止服务
-docker-compose down
+docker compose down
 
 # 重启服务
-docker-compose restart
+docker compose restart
 
 # 查看日志
-docker-compose logs -f backend    # 后端日志
-docker-compose logs -f nginx       # Nginx 日志
-docker-compose logs -f mysql       # MySQL 日志
-docker-compose logs -f redis       # Redis 日志
+docker compose logs -f backend    # 后端日志
+docker compose logs -f nginx       # Nginx 日志
+docker compose logs -f mysql       # MySQL 日志
+docker compose logs -f redis       # Redis 日志
 
 # 进入容器
 docker exec -it feitwnd-backend sh
@@ -228,8 +238,8 @@ docker exec -it feitwnd-mysql mysql -uroot -p
 docker exec -it feitwnd-redis redis-cli
 
 # 重新构建后端
-docker-compose build backend
-docker-compose up -d backend
+docker compose build backend
+docker compose up -d backend
 ```
 
 ## 数据持久化
@@ -242,14 +252,15 @@ docker-compose up -d backend
 
 ## 注意事项
 
-1. **数据库初始化**: 首次部署需要手动创建数据库和导入 SQL 脚本
-2. **敏感信息**: `.env` 文件包含敏感信息，请勿提交到版本控制
-3. **内存配置**: Dockerfile 中 JVM 堆内存设置为 `-Xmx2048m -Xms512m`，可根据服务器配置调整
+1. **数据库初始化**: MySQL 容器首次启动自动执行 `docker/mysql/init/feitwnd.sql`，无需手动导入；若需重置数据，删除 `mysql_data` 卷后重新启动
+2. **敏感信息**: `.env` 文件包含敏感信息，请勿提交到版本控制（已加入 .gitignore）
+3. **内存配置**: Dockerfile 中 JVM 堆内存设置为 `-Xmx1024m -Xms256m`（4GB 内存机器同时运行 MySQL/Redis/Nginx），可根据服务器配置调整
 4. **安全建议**:
    - 修改默认端口（5922）
    - 使用强密码
    - 配置防火墙规则
 5. **前端 API 地址**: 确保前端构建时配置的 API 地址指向正确的后端地址
+6. **AI 模块**: 默认镜像不含 AI 模块，启用方式见上文第 5 步；秘钥仅存于 `.env`，不会写入镜像
 
 ## 故障排查
 
@@ -257,7 +268,7 @@ docker-compose up -d backend
 
 ```bash
 # 查看后端日志
-docker-compose logs backend
+docker compose logs backend
 
 # 检查数据库连接
 docker exec -it feitwnd-backend sh
@@ -268,7 +279,7 @@ docker exec -it feitwnd-backend sh
 
 ```bash
 # 检查后端是否运行
-docker-compose ps
+docker compose ps
 
 # 检查 Nginx 配置
 docker exec feitwnd-nginx nginx -t
@@ -278,8 +289,8 @@ docker exec feitwnd-nginx nginx -t
 
 ```bash
 # 检查 MySQL 是否就绪
-docker-compose ps
+docker compose ps
 
 # 查看 MySQL 日志
-docker-compose logs mysql
+docker compose logs mysql
 ```

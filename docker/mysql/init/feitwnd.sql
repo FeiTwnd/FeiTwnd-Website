@@ -367,6 +367,34 @@ create table music(
 
     index idx_sort_visible (sort, is_visible,id desc)
 ) comment '音乐表';
+
+-- 城市足迹表
+create table city_footprints(
+    id int primary key auto_increment,
+    city_code varchar(20) not null comment '城市编码',
+    city_name varchar(50) not null comment '城市名称',
+    visit_time date comment '访问时间',
+    is_visible tinyint default 1 comment '是否可见',
+    create_time datetime comment '创建时间',
+    update_time datetime comment '更新时间',
+
+    index idx_visit_time (visit_time desc),
+    index idx_city_code (city_code)
+) comment '城市足迹表';
+
+-- 城市图片表
+create table city_images(
+    id int primary key auto_increment,
+    city_id int not null comment '城市id',
+    image_url varchar(255) not null comment '图片url',
+    sort int comment '排序，越小越靠前',
+    is_visible tinyint default 1 comment '是否可见',
+    create_time datetime comment '创建时间',
+    update_time datetime comment '更新时间',
+
+    index idx_city_code (city_id),
+    index idx_sort_visible (sort, is_visible,id desc)
+) comment '城市图片表';
 -- ==========================================================
 
 -- 插入必要的初始数据
@@ -395,3 +423,9 @@ values ('gongan-beian','xxx','string','公安备案',now(),now());
 -- 网站建立时间
 insert into system_config(config_key, config_value, config_type, description, create_time, update_time)
 values ('start-time','xxxx-xx-xx','string','网站建立时间',now(),now());
+
+-- 是否使用扩展模块，前端会根据这个配置来决定是否显示扩展模块的入口，默认不使用
+
+-- 足迹模块
+insert into system_config(config_key, config_value, config_type, description, create_time, update_time)
+values ('use-footprint','false','boolean','是否使用足迹模块',now(),now());
