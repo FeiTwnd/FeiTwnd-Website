@@ -29,6 +29,13 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
+        <!-- 扩展模块契约层：编译期只依赖接口，AI 等扩展模块通过该层与主程序解耦 -->
+        <dependency>
+            <groupId>cc.feitwnd</groupId>
+            <artifactId>FeiTwnd-extension-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
         <!-- Spring Boot 核心依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -219,4 +226,18 @@
             </plugin>
         </plugins>
     </build>
+
+    <!-- 可插拔扩展模块：与父 pom 的 with-ai profile 联动，激活时才把 AI 模块打进产物 -->
+    <profiles>
+        <profile>
+            <id>with-ai</id>
+            <dependencies>
+                <dependency>
+                    <groupId>cc.feitwnd</groupId>
+                    <artifactId>FeiTwnd-ai</artifactId>
+                    <version>1.0-SNAPSHOT</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

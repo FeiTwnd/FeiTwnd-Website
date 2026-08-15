@@ -15,6 +15,7 @@
     <modules>
         <module>FeiTwnd-common</module>
         <module>FeiTwnd-pojo</module>
+        <module>FeiTwnd-extension-api</module>
         <module>FeiTwnd-server</module>
     </modules>
 
@@ -43,6 +44,7 @@
         <bucket4j-jcache>8.3.0</bucket4j-jcache>
         <cache-api>1.1.1</cache-api>
         <ip2region>3.3.7</ip2region>
+        <langchain4j>1.9.1</langchain4j>
     </properties>
 
     <dependencyManagement>
@@ -233,6 +235,20 @@
                 <version>${ip2region}</version>
             </dependency>
 
+            <!-- LangChain4j 核心 -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j</artifactId>
+                <version>${langchain4j}</version>
+            </dependency>
+
+            <!-- LangChain4j OpenAI 兼容协议（支持 DeepSeek/通义/智谱/OpenRouter 等） -->
+            <dependency>
+                <groupId>dev.langchain4j</groupId>
+                <artifactId>langchain4j-open-ai</artifactId>
+                <version>${langchain4j}</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
@@ -273,4 +289,15 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <!-- 可插拔扩展模块：默认不构建，需显式激活对应 profile（如 -Pwith-ai）才会进入构建与打包 -->
+    <profiles>
+        <!-- AI 摘要模块：激活后构建 FeiTwnd-ai 并打进最终产物，未激活时完全不引入 langchain4j 依赖 -->
+        <profile>
+            <id>with-ai</id>
+            <modules>
+                <module>FeiTwnd-ai</module>
+            </modules>
+        </profile>
+    </profiles>
 </project>

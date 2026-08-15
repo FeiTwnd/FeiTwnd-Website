@@ -84,6 +84,14 @@ feitwnd:
     admin: ${WEBSITE_ADMIN:}
     cv: ${WEBSITE_CV:}
     blog: ${WEBSITE_BLOG:}
+  # AI 模块配置（需以 AI_ENABLED=true 构建镜像才会打包该模块，秘钥通过环境变量注入）
+  ai:
+    enabled: ${AI_ENABLED:false}
+    base-url: ${AI_BASE_URL:https://api.deepseek.com/v1}
+    api-key: ${AI_API_KEY:}
+    model-name: ${AI_MODEL_NAME:deepseek-chat}
+    temperature: ${AI_TEMPERATURE:0.3}
+    timeout-seconds: ${AI_TIMEOUT_SECONDS:60}
 
 # MyBatis 配置
 mybatis:

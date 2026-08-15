@@ -15,6 +15,7 @@ import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleService;
 import cc.feitwnd.service.AsyncEmailService;
+import cc.feitwnd.service.SummaryBackfillAsyncService;
 import cc.feitwnd.utils.MarkdownUtil;
 import cc.feitwnd.vo.ArticleArchiveItemVO;
 import cc.feitwnd.vo.ArticleArchiveVO;
@@ -63,6 +64,9 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private SummaryBackfillAsyncService summaryBackfillAsyncService;
 
     private static final String VIEW_COUNT_KEY = "article:viewCount";
 
@@ -124,7 +128,23 @@ public class ArticleServiceImpl implements ArticleService {
         // 仅首次发布时通知RSS订阅者
         if (firstPublishNow) {
             notifyRssSubscribers(articles);
+            // 勾选AI生成摘要且本次未填写摘要时，异步生成并回填（不影响发布接口返回）
+            if (shouldGenerateSummary(articleDTO.getAiGenerateSummary(), articleDTO.getSummary())) {
+                summaryBackfillAsyncService.backfillSummaryAsync(
+                        articles.getId(), articles.getTitle(), articles.getContentMarkdown());
+            }
         }
+    }
+
+    /**
+     * 判断是否需要触发AI摘要生成：勾选了AI生成且本次提交的摘要为空
+     * @param aiGenerateSummary 是否勾选AI生成摘要
+     * @param summary 本次提交的摘要
+     * @return 是否需要生成
+     */
+    private boolean shouldGenerateSummary(Boolean aiGenerateSummary, String summary) {
+        return Boolean.TRUE.equals(aiGenerateSummary)
+                && (summary == null || summary.isBlank());
     }
 
     /**
@@ -213,6 +233,11 @@ public class ArticleServiceImpl implements ArticleService {
         // 仅首次发布时通知RSS订阅者
         if (firstPublishNow) {
             notifyRssSubscribers(articles);
+            // 勾选AI生成摘要且本次未填写摘要时，异步生成并回填（不影响发布接口返回）
+            if (shouldGenerateSummary(articleDTO.getAiGenerateSummary(), articleDTO.getSummary())) {
+                summaryBackfillAsyncService.backfillSummaryAsync(
+                        articles.getId(), articles.getTitle(), articles.getContentMarkdown());
+            }
         }
     }
 

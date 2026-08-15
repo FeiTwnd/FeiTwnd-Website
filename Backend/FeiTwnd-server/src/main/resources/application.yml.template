@@ -99,3 +99,14 @@ feitwnd:
     admin:       # 后台管理地址
     cv:          # 个人简历地址
     blog:        # 博客地址
+  # AI 摘要模块配置（可插拔扩展模块）
+  # 注意：该模块需在构建时以 -Pwith-ai 激活才会打包进产物，仅改本配置不会自动启用模块
+  # 秘钥务必通过环境变量注入，不要直接写死在 yml 中
+  # 各功能（摘要/错别字修正等）的提示词存放在 ai 模块内部 prompt 包下的常量类中，不在 yml 中配置
+  ai:
+    enabled: false                          # 是否启用AI摘要生成
+    base-url: https://api.deepseek.com/v1   # 模型接口地址(OpenAI兼容协议)
+    api-key:                                # API秘钥
+    model-name: deepseek-v4-flash           # 模型名称
+    temperature: 0.3                        # 采样温度
+    timeout-seconds: 60                     # 请求超时时间(秒)

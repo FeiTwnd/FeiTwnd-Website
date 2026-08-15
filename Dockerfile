@@ -3,13 +3,24 @@ FROM maven:3.9-eclipse-temurin-21 AS builder
 
 WORKDIR /build
 
-# 复制pom文件并下载依赖
+# 是否启用AI摘要模块（默认关闭；启用时以 -Pwith-ai 构建，将 langchain4j 与 AI 模块打进产物）
+ARG AI_ENABLED=false
+
+# 复制pom文件并下载依赖（AI_ENABLED=true 时提前下载 langchain4j 依赖，加快后续构建）
 COPY Backend/pom.xml .
-RUN mvn dependency:go-offline -B
+RUN if [ "$AI_ENABLED" = "true" ]; then \
+      mvn dependency:go-offline -B -Pwith-ai; \
+    else \
+      mvn dependency:go-offline -B; \
+    fi
 
 # 复制源代码并构建
 COPY Backend/ .
-RUN mvn clean package -DskipTests -B
+RUN if [ "$AI_ENABLED" = "true" ]; then \
+      mvn clean package -DskipTests -B -Pwith-ai; \
+    else \
+      mvn clean package -DskipTests -B; \
+    fi
 
 # 运行阶段
 FROM eclipse-temurin:21-jre-alpine

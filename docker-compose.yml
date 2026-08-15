@@ -52,6 +52,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        # 是否构建AI摘要模块（true 时镜像包含 langchain4j 与 AI 模块，包体增大；默认关闭）
+        AI_ENABLED: ${AI_ENABLED:-false}
     container_name: feitwnd-backend
     restart: always
     environment:
@@ -91,6 +94,11 @@ services:
       WEBSITE_ADMIN: ${WEBSITE_ADMIN}
       WEBSITE_CV: ${WEBSITE_CV}
       WEBSITE_BLOG: ${WEBSITE_BLOG}
+      # AI摘要模块配置（需构建镜像时 AI_ENABLED=true 才打包该模块；秘钥通过 .env 注入，勿写死在 compose 中）
+      AI_ENABLED: ${AI_ENABLED:-false}
+      AI_BASE_URL: ${AI_BASE_URL:-https://api.deepseek.com/v1}
+      AI_API_KEY: ${AI_API_KEY:-}
+      AI_MODEL_NAME: ${AI_MODEL_NAME:-deepseek-chat}
     ports:
       - "5922:5922"
     networks:

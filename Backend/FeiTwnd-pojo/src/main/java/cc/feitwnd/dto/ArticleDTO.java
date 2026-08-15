@@ -57,4 +57,7 @@ public class ArticleDTO {
 
     // 标签ID列表
     private List<Long> tagIds;
+
+    // 是否使用AI生成摘要（勾选后发布时异步生成并回填，需后端已打包AI模块）
+    private Boolean aiGenerateSummary;
 }
