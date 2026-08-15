@@ -37,6 +37,8 @@ dist/
 dist-ssr/
 .output
 coverage/
+# pnpm 本地依赖仓库（install 时按需在项目内生成）
+.pnpm-store/
 
 # 环境变量（.env.example 保留跟踪，本地私有配置不提交）
 *.local
