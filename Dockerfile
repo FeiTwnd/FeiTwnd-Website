@@ -6,8 +6,14 @@ WORKDIR /build
 # 是否启用AI摘要模块（默认关闭；启用时以 -Pwith-ai 构建，将 langchain4j 与 AI 模块打进产物）
 ARG AI_ENABLED=false
 
-# 复制pom文件并下载依赖（AI_ENABLED=true 时提前下载 langchain4j 依赖，加快后续构建）
+# 复制全部模块的pom文件并提前下载依赖（go-offline 需解析完整 reactor，子模块 pom 缺一不可；
+# AI_ENABLED=true 时同时预下载 langchain4j 依赖，加快后续构建）
 COPY Backend/pom.xml .
+COPY Backend/FeiTwnd-common/pom.xml FeiTwnd-common/pom.xml
+COPY Backend/FeiTwnd-pojo/pom.xml FeiTwnd-pojo/pom.xml
+COPY Backend/FeiTwnd-extension-api/pom.xml FeiTwnd-extension-api/pom.xml
+COPY Backend/FeiTwnd-server/pom.xml FeiTwnd-server/pom.xml
+COPY Backend/FeiTwnd-ai/pom.xml FeiTwnd-ai/pom.xml
 RUN if [ "$AI_ENABLED" = "true" ]; then \
       mvn dependency:go-offline -B -Pwith-ai; \
     else \

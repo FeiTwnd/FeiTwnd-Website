@@ -129,6 +129,36 @@
 
     </springProfile>
 
+    <!-- ==================== Docker 环境：控制台 + 文件（/app/logs，Dockerfile 已创建并授权） ==================== -->
+    <springProfile name="docker">
+
+        <!-- 主应用日志文件 -->
+        <appender name="DOCKER_APPLICATION_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+            <file>/app/logs/${APP_NAME}-application.log</file>
+            <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+                <fileNamePattern>/app/logs/${APP_NAME}-application-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+                <maxHistory>${MAX_HISTORY}</maxHistory>
+                <maxFileSize>${MAX_FILE_SIZE}</maxFileSize>
+                <totalSizeCap>${TOTAL_SIZE_CAP}</totalSizeCap>
+            </rollingPolicy>
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{ip:-}] %-5level %logger{36} - %msg%n</pattern>
+            </encoder>
+        </appender>
+
+        <!-- 404错误处理（输出到控制台，便于容器日志排查） -->
+        <logger name="org.springframework.web.servlet.PageNotFound" level="ERROR" additivity="false">
+            <appender-ref ref="CONSOLE" />
+        </logger>
+
+        <!-- 根日志 -->
+        <root level="INFO">
+            <appender-ref ref="CONSOLE" />
+            <appender-ref ref="DOCKER_APPLICATION_FILE" />
+        </root>
+
+    </springProfile>
+
     <!-- ==================== 所有环境通用 ==================== -->
     <logger name="org.apache.tomcat" level="ERROR" />
     <logger name="org.apache.coyote" level="ERROR" />

@@ -1,0 +1,27 @@
+# VCS 与 IDE
+.git
+.gitignore
+.idea
+*.iml
+
+# 构建产物（避免几百 MB 的前端依赖进入构建上下文）
+**/target
+**/node_modules
+**/dist
+**/.output
+**/coverage
+.pnpm-store
+
+# 本地私有配置：docker 镜像使用仓库内的 application-docker.yml（环境变量版），
+# 排除本地 application.yml（含真实秘钥），避免真实秘钥被拷入镜像或打进 jar
+**/application.yml
+**/application-*.yml
+!**/application-docker.yml
+
+# 环境变量与日志
+.env
+*.log
+logs/
+
+# 其他
+screenshots/
