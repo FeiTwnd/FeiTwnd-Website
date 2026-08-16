@@ -77,6 +77,7 @@ package-lock.json
 
 # Tooling local state
 .claude/
+nohup.out
 
 CLAUDE.md
 AGENTS.md
