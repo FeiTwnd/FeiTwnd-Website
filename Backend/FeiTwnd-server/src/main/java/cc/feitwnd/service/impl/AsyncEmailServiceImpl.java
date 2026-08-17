@@ -32,9 +32,9 @@ public class AsyncEmailServiceImpl implements AsyncEmailService {
     }
 
     @Async("taskExecutor")
-    public void sendAdminContentNotificationAsync(String type, String nickname, String content) {
+    public void sendAdminContentNotificationAsync(String type, String nickname, String content, String articleTitle) {
         try {
-            emailService.sendAdminContentNotification(type, nickname, content);
+            emailService.sendAdminContentNotification(type, nickname, content, articleTitle);
         } catch (Exception e) {
             log.error("异步发送站长内容通知邮件失败: type={}, ex={}", type, e.getMessage());
         }

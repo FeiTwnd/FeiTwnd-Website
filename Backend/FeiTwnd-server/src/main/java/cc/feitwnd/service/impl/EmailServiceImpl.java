@@ -166,7 +166,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public void sendAdminContentNotification(String type, String nickname, String content) {
+    public void sendAdminContentNotification(String type, String nickname, String content, String articleTitle) {
         String toEmail = emailProperties.getAdminNotifyTo();
         if (toEmail == null || toEmail.isBlank()) {
             log.warn("未配置站长内容通知邮箱，跳过 {} 通知", type);
@@ -180,7 +180,7 @@ public class EmailServiceImpl implements EmailService {
             helper.setFrom(emailProperties.getFrom(), emailProperties.getPersonal());
             helper.setTo(toEmail);
             helper.setSubject(websiteProperties.getTitle() + " - 有新的" + typeText + "待处理");
-            helper.setText(buildAdminContentNotificationEmailContent(typeText, nickname, content), true);
+            helper.setText(buildAdminContentNotificationEmailContent(typeText, nickname, content, articleTitle), true);
             mailSender.send(message);
             log.info("发送站长内容通知邮件成功: to={}, type={}", toEmail, type);
         } catch (Exception e) {
@@ -236,10 +236,15 @@ public class EmailServiceImpl implements EmailService {
                 "</html>";
     }
 
-    private String buildAdminContentNotificationEmailContent(String typeText, String nickname, String content) {
+    private String buildAdminContentNotificationEmailContent(String typeText, String nickname, String content, String articleTitle) {
         String year = String.valueOf(LocalDate.now().getYear());
         String safeNickname = HtmlUtils.htmlEscape(nickname);
         String safeContent = HtmlUtils.htmlEscape(content).replace("\n", "<br>");
+        // 文章标题需要转义后嵌入，评论场景展示来源文章，留言无文章则不展示
+        String safeArticleTitle = articleTitle != null ? HtmlUtils.htmlEscape(articleTitle) : null;
+        String articleLine = safeArticleTitle != null
+                ? "<p style='color: #555; font-size: 14px; line-height: 1.6; margin: 0 0 16px;'>来源文章：<strong>" + safeArticleTitle + "</strong></p>"
+                : "";
         return "<!DOCTYPE html>" +
                 "<html lang='zh-CN'>" +
                 "<head>" +
@@ -264,6 +269,7 @@ public class EmailServiceImpl implements EmailService {
                 "        <div class='email-content'>" +
                 "            <h2 style='color: #333; margin: 0 0 20px; font-size: 20px; font-weight: 500;'>有新的" + typeText + "待处理</h2>" +
                 "            <p style='color: #555; font-size: 15px; line-height: 1.6; margin: 0 0 16px;'><strong>" + safeNickname + "</strong> 提交了新的" + typeText + "：</p>" +
+                articleLine +
                 "            <div class='content-block'>" +
                 "                <p style='color: #333; margin: 0; font-size: 14px; line-height: 1.6;'>" + safeContent + "</p>" +
                 "            </div>" +

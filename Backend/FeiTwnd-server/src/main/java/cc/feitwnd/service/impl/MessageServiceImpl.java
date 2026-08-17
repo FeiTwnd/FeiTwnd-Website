@@ -9,6 +9,7 @@ import cc.feitwnd.dto.MessageReplyDTO;
 import cc.feitwnd.entity.Messages;
 import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.MessageMapper;
+import cc.feitwnd.properties.EmailProperties;
 import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.AsyncEmailService;
@@ -52,6 +53,9 @@ public class MessageServiceImpl implements MessageService {
 
     @Autowired
     private WebsiteProperties websiteProperties;
+
+    @Autowired
+    private EmailProperties emailProperties;
 
     @Autowired
     private CaptchaService captchaService;
@@ -228,6 +232,7 @@ public class MessageServiceImpl implements MessageService {
         messages.setIsAdminReply(StatusConstant.ENABLE);
         messages.setIsApproved(StatusConstant.ENABLE); // 管理员回复自动审核通过
         messages.setIsEdited(StatusConstant.DISABLE);
+        messages.setIsNotice(StatusConstant.ENABLE); // 站长回复默认开启接收回复通知，访客再回复时可通知到站长
         messages.setNickname(websiteProperties.getTitle());
         messages.setCreateTime(LocalDateTime.now());
         messages.setUpdateTime(LocalDateTime.now());
@@ -337,7 +342,8 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /**
-     * 检查父留言是否开启邮箱通知，如果是则发送通知邮件
+     * 检查父留言是否开启邮箱通知，如果是则发送通知邮件。
+     * 父留言为站长回复时，通知站长邮箱；否则按访客开启的邮箱通知设置发送
      */
     private void notifyParentIfNeeded(Long parentId, String replyNickname, String replyContent, String type) {
         if (parentId == null) {
@@ -345,8 +351,25 @@ public class MessageServiceImpl implements MessageService {
         }
         try {
             Messages parentMessage = messageMapper.getById(parentId);
-            if (parentMessage != null
-                    && parentMessage.getIsNotice() != null
+            if (parentMessage == null) {
+                return;
+            }
+            // 父留言是站长回复：站长默认开启接收回复通知，访客回复站长时通知站长邮箱（与普通用户通知形式一致）
+            if (StatusConstant.ENABLE.equals(parentMessage.getIsAdminReply())) {
+                String adminEmail = emailProperties.getAdminNotifyTo();
+                if (adminEmail != null && !adminEmail.isBlank()) {
+                    asyncEmailService.sendReplyNotificationAsync(
+                            adminEmail,
+                            parentMessage.getNickname(),
+                            parentMessage.getContent(),
+                            replyNickname,
+                            replyContent,
+                            type
+                    );
+                }
+                return;
+            }
+            if (parentMessage.getIsNotice() != null
                     && parentMessage.getIsNotice() == 1
                     && parentMessage.getEmailOrQq() != null) {
                 String emailOrQq = parentMessage.getEmailOrQq().trim();
@@ -374,15 +397,13 @@ public class MessageServiceImpl implements MessageService {
         }
     }
 
+    /**
+     * 根留言（无父留言）时通知站长有新留言；回复场景由 notifyParentIfNeeded 统一发送回复通知，避免重复
+     */
     private void notifyAdminIfNeeded(Long parentId, String nickname, String content) {
         if (parentId == null) {
-            asyncEmailService.sendAdminContentNotificationAsync("message", nickname, content);
-            return;
-        }
-
-        Messages parentMessage = messageMapper.getById(parentId);
-        if (parentMessage != null && StatusConstant.ENABLE.equals(parentMessage.getIsAdminReply())) {
-            asyncEmailService.sendAdminContentNotificationAsync("message", nickname, content);
+            // 留言无关联文章，文章标题传 null
+            asyncEmailService.sendAdminContentNotificationAsync("message", nickname, content, null);
         }
     }
 }

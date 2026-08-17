@@ -6,8 +6,11 @@ import cc.feitwnd.dto.ArticleCommentEditDTO;
 import cc.feitwnd.dto.ArticleCommentPageQueryDTO;
 import cc.feitwnd.dto.ArticleCommentReplyDTO;
 import cc.feitwnd.entity.ArticleComments;
+import cc.feitwnd.entity.Articles;
 import cc.feitwnd.exception.ValidationException;
 import cc.feitwnd.mapper.ArticleCommentMapper;
+import cc.feitwnd.mapper.ArticleMapper;
+import cc.feitwnd.properties.EmailProperties;
 import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.service.ArticleCommentService;
@@ -43,6 +46,9 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     private ArticleCommentMapper articleCommentMapper;
 
     @Autowired
+    private ArticleMapper articleMapper;
+
+    @Autowired
     private UserAgentService userAgentService;
 
     @Autowired
@@ -50,6 +56,9 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
 
     @Autowired
     private WebsiteProperties websiteProperties;
+
+    @Autowired
+    private EmailProperties emailProperties;
 
     @Autowired
     private CaptchaService captchaService;
@@ -148,6 +157,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         articleComments.setIsAdminReply(StatusConstant.ENABLE);
         articleComments.setIsApproved(StatusConstant.ENABLE);
         articleComments.setIsEdited(StatusConstant.DISABLE);
+        articleComments.setIsNotice(StatusConstant.ENABLE); // 站长回复默认开启接收回复通知，访客再回复时可通知到站长
         articleComments.setNickname(websiteProperties.getTitle());
 
         // 捕获 IP / 地理位置 / UserAgent
@@ -175,7 +185,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         }
 
         // 检查父评论是否开启邮箱通知
-        notifyParentIfNeeded(articleCommentReplyDTO.getParentId(), "FeiTwnd",
+        notifyParentIfNeeded(articleCommentReplyDTO.getParentId(), websiteProperties.getTitle(),
                 articleCommentReplyDTO.getContent(), "comment");
     }
 
@@ -280,7 +290,8 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
                     articleCommentDTO.getNickname(), articleCommentDTO.getContent(), "comment");
         }
 
-        notifyAdminIfNeeded(articleCommentDTO.getParentId(), articleCommentDTO.getNickname(), articleCommentDTO.getContent());
+        notifyAdminIfNeeded(articleCommentDTO.getParentId(), articleCommentDTO.getNickname(),
+                articleCommentDTO.getContent(), articleCommentDTO.getArticleId());
 
         log.info("访客提交文章评论成功: {}", articleComments);
     }
@@ -346,7 +357,8 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
     }
 
     /**
-     * 检查父评论是否开启邮箱通知，如果是则发送通知邮件
+     * 检查父评论是否开启邮箱通知，如果是则发送通知邮件。
+     * 父评论为站长回复时，通知站长邮箱；否则按访客开启的邮箱通知设置发送
      */
     private void notifyParentIfNeeded(Long parentId, String replyNickname, String replyContent, String type) {
         if (parentId == null) {
@@ -354,8 +366,25 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         }
         try {
             ArticleComments parentComment = articleCommentMapper.getById(parentId);
-            if (parentComment != null
-                    && parentComment.getIsNotice() != null
+            if (parentComment == null) {
+                return;
+            }
+            // 父评论是站长回复：站长默认开启接收回复通知，访客回复站长时通知站长邮箱（与普通用户通知形式一致）
+            if (StatusConstant.ENABLE.equals(parentComment.getIsAdminReply())) {
+                String adminEmail = emailProperties.getAdminNotifyTo();
+                if (adminEmail != null && !adminEmail.isBlank()) {
+                    asyncEmailService.sendReplyNotificationAsync(
+                            adminEmail,
+                            parentComment.getNickname(),
+                            parentComment.getContent(),
+                            replyNickname,
+                            replyContent,
+                            type
+                    );
+                }
+                return;
+            }
+            if (parentComment.getIsNotice() != null
                     && parentComment.getIsNotice() == 1
                     && parentComment.getEmailOrQq() != null) {
                 String emailOrQq = parentComment.getEmailOrQq().trim();
@@ -383,15 +412,21 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         }
     }
 
-    private void notifyAdminIfNeeded(Long parentId, String nickname, String content) {
+    /**
+     * 根评论（无父评论）时通知站长有新评论；回复场景由 notifyParentIfNeeded 统一发送回复通知，避免重复
+     * @param articleId 文章ID，用于在通知邮件中展示文章标题
+     */
+    private void notifyAdminIfNeeded(Long parentId, String nickname, String content, Long articleId) {
         if (parentId == null) {
-            asyncEmailService.sendAdminContentNotificationAsync("comment", nickname, content);
-            return;
-        }
-
-        ArticleComments parentComment = articleCommentMapper.getById(parentId);
-        if (parentComment != null && StatusConstant.ENABLE.equals(parentComment.getIsAdminReply())) {
-            asyncEmailService.sendAdminContentNotificationAsync("comment", nickname, content);
+            // 查询文章标题，通知站长时说明来自哪篇文章
+            String articleTitle = null;
+            if (articleId != null) {
+                Articles article = articleMapper.getById(articleId);
+                if (article != null) {
+                    articleTitle = article.getTitle();
+                }
+            }
+            asyncEmailService.sendAdminContentNotificationAsync("comment", nickname, content, articleTitle);
         }
     }
 
