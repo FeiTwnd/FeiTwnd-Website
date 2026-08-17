@@ -27,7 +27,6 @@
         <mybatis.spring>3.0.3</mybatis.spring>
         <lombok>1.18.40</lombok>
         <pagehelper>1.4.7</pagehelper>
-        <knife4j>4.5.0</knife4j>
         <aspectj>1.9.20.1</aspectj>
         <jjwt>0.12.5</jjwt>
         <aliyun-sdk-oss>3.17.4</aliyun-sdk-oss>
@@ -69,13 +68,6 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper}</version>
-            </dependency>
-
-            <!-- Knife4j -->
-            <dependency>
-                <groupId>com.github.xiaoymin</groupId>
-                <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
-                <version>${knife4j}</version>
             </dependency>
 
             <!-- Aspectj -->
