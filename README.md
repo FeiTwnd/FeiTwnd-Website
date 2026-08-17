@@ -319,6 +319,10 @@ cd Backend
 mvn clean package -DskipTests -Pwith-ai
 ```
 
+> 重要：**打包是否包含 AI 模块由构建期的 Maven profile（`with-ai`）决定，与配置文件里的 `feitwnd.ai.enabled` 无关**——`enabled` 只控制运行时是否启用，改它不会改变 jar 体积。
+>
+> **使用 IDEA 打包**：打开右侧 Maven 面板，在 "Profiles" 分组里勾选 `with-ai`（等价于命令行 `-Pwith-ai`），点击刷新（Reload All Maven Projects）后重新打包即可；不勾选则产出不含 AI 的 jar。命令行与 IDEA 两种方式效果一致，二选一。
+
 启用后需在配置文件（或环境变量）中填写模型参数，支持任意 OpenAI 兼容协议的服务（DeepSeek / 通义 / 智谱 / Kimi / OpenRouter / Ollama 等），切换模型厂商只需改配置：
 
 ```yaml
