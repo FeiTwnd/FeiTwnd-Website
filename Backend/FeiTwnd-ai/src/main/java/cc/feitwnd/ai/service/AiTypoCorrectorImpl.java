@@ -25,9 +25,6 @@ import java.time.Duration;
 @Slf4j
 public class AiTypoCorrectorImpl implements AiTypoCorrector {
 
-    /** 发送给模型的文章内容最大字符数，超出截断，防止超出模型上下文窗口 */
-    static final int MAX_CONTENT_CHARS = 12000;
-
     private final AiProperties properties;
     private volatile ChatModel chatModel;
 
@@ -52,18 +49,11 @@ public class AiTypoCorrectorImpl implements AiTypoCorrector {
                 return null;
             }
 
-            // 超长内容截断，避免超出模型上下文窗口
-            String content = contentMarkdown;
-            if (content.length() > MAX_CONTENT_CHARS) {
-                content = content.substring(0, MAX_CONTENT_CHARS);
-                log.warn("文章内容超过 {} 字符，已截断后发送给模型", MAX_CONTENT_CHARS);
-            }
-
             ChatRequest request = ChatRequest.builder()
-                    .messages(SystemMessage.from(TypoCorrectionPrompt.CORRECTION_PROMPT), UserMessage.from(content))
+                    .messages(SystemMessage.from(TypoCorrectionPrompt.CORRECTION_PROMPT), UserMessage.from(contentMarkdown))
                     .build();
-
             String corrected = model.chat(request).aiMessage().text();
+
             if (corrected == null || corrected.isBlank()) {
                 log.warn("AI 返回的纠错结果为空");
                 return null;

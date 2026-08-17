@@ -111,4 +111,4 @@ feitwnd:
     api-key:                                # API秘钥
     model-name: deepseek-v4-flash           # 模型名称
     temperature: 0.3                        # 采样温度
-    timeout-seconds: 60                     # 请求超时时间(秒)
+    timeout-seconds: 180                     # 请求超时时间(秒)

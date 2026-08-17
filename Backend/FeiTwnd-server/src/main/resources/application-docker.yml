@@ -90,7 +90,7 @@ feitwnd:
     api-key: ${AI_API_KEY:}
     model-name: ${AI_MODEL_NAME:deepseek-chat}
     temperature: ${AI_TEMPERATURE:0.3}
-    timeout-seconds: ${AI_TIMEOUT_SECONDS:60}
+    timeout-seconds: ${AI_TIMEOUT_SECONDS:180}
 
 # MyBatis 配置
 mybatis:

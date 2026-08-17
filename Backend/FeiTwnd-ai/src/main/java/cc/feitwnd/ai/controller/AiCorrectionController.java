@@ -3,6 +3,7 @@ package cc.feitwnd.ai.controller;
 import cc.feitwnd.extension.ai.AiTypoCorrector;
 import cc.feitwnd.result.Result;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,6 +20,7 @@ import java.util.Map;
  * 返回 AI 纠错后的完整 Markdown（由前端逐行 diff 展示并让用户确认）。
  * 未打包 AI 模块时该接口不存在（404），前端通过 /admin/ai/status 探测后隐藏按钮。
  */
+@Slf4j
 @RestController
 @RequestMapping("/admin/ai")
 @RequiredArgsConstructor
@@ -33,6 +35,7 @@ public class AiCorrectionController {
      */
     @PostMapping("/correct")
     public Result<Map<String, String>> correct(@RequestBody Map<String, String> body) {
+        log.info("AI纠错请求");
         String content = body.get("content");
         if (content == null || content.isBlank()) {
             return Result.error("文章内容不能为空");

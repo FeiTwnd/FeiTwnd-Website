@@ -25,9 +25,6 @@ import java.time.Duration;
 @Slf4j
 public class AiSummaryGeneratorImpl implements AiSummaryGenerator {
 
-    /** 发送给模型的文章内容最大字符数，超出截断，防止超出模型上下文窗口（包私有便于单元测试引用） */
-    static final int MAX_CONTENT_CHARS = 12000;
-
     private final AiProperties properties;
     private volatile ChatModel chatModel;
 
@@ -37,16 +34,6 @@ public class AiSummaryGeneratorImpl implements AiSummaryGenerator {
      */
     public AiSummaryGeneratorImpl(AiProperties properties) {
         this.properties = properties;
-    }
-
-    /**
-     * 供单元测试注入 mock 模型使用（包私有）
-     * @param properties AI 模块配置
-     * @param chatModel  模型客户端
-     */
-    AiSummaryGeneratorImpl(AiProperties properties, ChatModel chatModel) {
-        this.properties = properties;
-        this.chatModel = chatModel;
     }
 
     /**
@@ -63,14 +50,7 @@ public class AiSummaryGeneratorImpl implements AiSummaryGenerator {
                 return null;
             }
 
-            // 超长内容截断，避免超出模型上下文窗口
-            String content = contentMarkdown;
-            if (content.length() > MAX_CONTENT_CHARS) {
-                content = content.substring(0, MAX_CONTENT_CHARS);
-                log.warn("文章内容超过 {} 字符，已截断后发送给模型: title={}", MAX_CONTENT_CHARS, title);
-            }
-
-            String userPrompt = "文章标题：" + title + "\n\n文章内容：\n" + content;
+            String userPrompt = "文章标题：" + title + "\n\n文章内容：\n" + contentMarkdown;
             ChatRequest request = ChatRequest.builder()
                     .messages(SystemMessage.from(ArticleSummaryPrompt.SUMMARY_PROMPT), UserMessage.from(userPrompt))
                     .build();

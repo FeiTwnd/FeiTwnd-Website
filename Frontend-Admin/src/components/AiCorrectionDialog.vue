@@ -7,7 +7,7 @@ const props = defineProps({
   // 弹窗可见性
   modelValue: { type: Boolean, default: false },
   // 当前文章 Markdown 内容
-  content: { type: String, default: '' }
+  content: { type: String, default: '' },
 })
 
 const emit = defineEmits(['update:modelValue', 'applied'])
@@ -25,17 +25,17 @@ const diffItems = ref([])
 
 const visible = computed({
   get: () => props.modelValue,
-  set: (v) => emit('update:modelValue', v)
+  set: (v) => emit('update:modelValue', v),
 })
 
 const hasChanges = computed(() =>
-  diffItems.value.some((item) => item.type === 'change')
+  diffItems.value.some((item) => item.type === 'change'),
 )
 
 const acceptedCount = computed(
   () =>
     diffItems.value.filter((item) => item.type === 'change' && item.accepted)
-      .length
+      .length,
 )
 
 /**
@@ -62,7 +62,7 @@ watch(
     } finally {
       loading.value = false
     }
-  }
+  },
 )
 
 /**
@@ -88,7 +88,7 @@ const buildDiff = (oldText, newText) => {
           type: 'change',
           oldLines: [...lines],
           newLines: [],
-          accepted: true
+          accepted: true,
         })
       }
     } else if (part.added) {
@@ -106,7 +106,7 @@ const buildDiff = (oldText, newText) => {
           type: 'change',
           oldLines: [],
           newLines: [...lines],
-          accepted: true
+          accepted: true,
         })
       }
     } else {
@@ -150,35 +150,19 @@ const close = () => {
   >
     <!-- 等待动画：笔从左到右画曲线 -->
     <div v-if="loading" class="ai-loading">
-      <svg
-        class="ai-loading-svg"
-        viewBox="0 0 260 56"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          id="ai-wave"
-          d="M8 38 Q 22 12 36 38 T 64 38 T 92 38 T 120 38 T 148 38 T 176 38 T 204 38 T 232 38"
-          fill="none"
-          stroke="#909399"
-          stroke-width="2"
-          stroke-linecap="round"
-          class="ai-wave-line"
-        />
-        <g>
-          <animateMotion
-            dur="2.2s"
-            repeatCount="indefinite"
-            rotate="auto"
-            keyPoints="0;1"
-            keyTimes="0;1"
-          >
-            <mpath href="#ai-wave" />
-          </animateMotion>
-          <rect x="-5" y="-1.8" width="10" height="3.6" rx="1" fill="#000" />
-          <polygon points="5,-1.8 10,0 5,1.8" fill="#f56c6c" />
-          <rect x="-5" y="-3.4" width="3" height="6.8" rx="1" fill="#c0c4cc" />
-        </g>
-      </svg>
+      <div class="construction-icon loading-construction-icon" aria-hidden="true">
+        <svg class="file" viewBox="0 0 24 24">
+          <path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6z" />
+          <path d="M14 2v8h8" />
+          <path d="M16 13H8M16 17H8M10 9H8" />
+        </svg>
+        <svg class="pen" viewBox="0 0 24 24">
+          <path d="M12 19l7-7 3 3-7 7-3-3z" />
+          <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
+          <path d="M2 2l7.586 7.586" />
+          <circle cx="11" cy="11" r="2" />
+        </svg>
+      </div>
       <p class="ai-loading-text">AI 正在纠错，请稍候…</p>
     </div>
 
@@ -191,10 +175,6 @@ const close = () => {
     <!-- 结果：diff 对比 -->
     <div v-else-if="done" class="ai-diff">
       <div class="ai-diff-summary">
-        <span class="ai-diff-hint"
-          >勾选 = 采纳 AI 修改（删除原行 / 插入新行 / 替换），不勾选 =
-          保留原文</span
-        >
         <span v-if="acceptedCount" class="ai-diff-count"
           >已采纳 {{ acceptedCount }} 处</span
         >
@@ -272,28 +252,48 @@ const close = () => {
   min-height: 260px;
   gap: 16px;
 }
-.ai-loading-svg {
-  width: 300px;
+.loading-construction-icon {
+  width: 120px;
+  height: 120px;
+  position: relative;
+  color: #606266;
+  animation: pulse 2s infinite ease-in-out;
+}
+.loading-construction-icon .file,
+.loading-construction-icon .pen {
+  position: absolute;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.loading-construction-icon .file {
+  top: 20px;
+  left: 20px;
+  width: 60px;
   height: 60px;
+  animation: float 3s infinite ease-in-out;
 }
-.ai-wave-line {
-  stroke-dasharray: 260;
-  stroke-dashoffset: 260;
-  animation: ai-draw 2.2s linear infinite;
+.loading-construction-icon .pen {
+  right: 10px;
+  bottom: 10px;
+  width: 50px;
+  height: 50px;
+  animation: write 2s infinite alternate;
+  transform-origin: 40px 40px;
 }
-@keyframes ai-draw {
-  0% {
-    stroke-dashoffset: 260;
-  }
-  45% {
-    stroke-dashoffset: 0;
-  }
-  55% {
-    stroke-dashoffset: 0;
-  }
-  100% {
-    stroke-dashoffset: 260;
-  }
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.8; }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-5px) rotate(2deg); }
+}
+@keyframes write {
+  0% { transform: rotate(-5deg) scale(0.95); }
+  100% { transform: rotate(5deg) scale(1.05); }
 }
 .ai-loading-text {
   margin: 0;
@@ -331,10 +331,6 @@ const close = () => {
   padding: 6px 2px 10px;
   border-bottom: 1px solid #e4e7ed;
   flex-shrink: 0;
-}
-.ai-diff-hint {
-  font-size: 12px;
-  color: #909399;
 }
 .ai-diff-count {
   font-size: 12px;

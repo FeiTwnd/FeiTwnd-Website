@@ -32,5 +32,5 @@ public class AiProperties {
     private Double temperature = 0.3;
 
     /** 请求超时时间（秒），AI 服务不可用时快速失败，避免长时间占用虚拟线程 */
-    private Integer timeoutSeconds = 60;
+    private Integer timeoutSeconds = 180;
 }
