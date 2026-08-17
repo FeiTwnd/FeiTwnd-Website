@@ -6,6 +6,7 @@ import { uploadFile } from '@/api/settings'
 import { getAiStatus } from '@/api/ai'
 import { MdEditor } from 'md-editor-v3'
 import EmojiPicker from '@/components/EmojiPicker.vue'
+import AiCorrectionDialog from '@/components/AiCorrectionDialog.vue'
 import 'md-editor-v3/lib/style.css'
 
 const route = useRoute()
@@ -16,6 +17,9 @@ const isEdit = computed(() => !!route.params.id)
 
 // 后端是否启用了 AI 摘要模块（未打包或未启用时为 false，隐藏 AI 开关）
 const aiEnabled = ref(false)
+
+// AI 纠错弹窗可见性
+const showAiCorrection = ref(false)
 
 const form = ref({
   id: null,
@@ -28,7 +32,7 @@ const form = ref({
   contentMarkdown: '',
   contentHtml: '',
   isPublished: 0,
-  aiGenerateSummary: false,
+  aiGenerateSummary: false
 })
 
 /* ---- 同步编辑器渲染后的 HTML ---- */
@@ -49,7 +53,7 @@ const onUploadImg = async (files, callback) => {
         fd.append('file', file)
         const res = await uploadFile(fd)
         return res.data
-      }),
+      })
     )
     callback(urls)
     ElMessage.success('图片上传成功')
@@ -107,11 +111,23 @@ const insertEditorEmoji = (char) => {
   })
 }
 
+/* ---- AI 纠错 ---- */
+/**
+ * 应用 AI 纠错结果：将用户确认后的内容替换编辑器中的 Markdown，
+ * 并同步更新 HTML；替换后刷新快照，避免被误判为未保存
+ * @param {string} corrected 用户确认后的完整 Markdown 内容
+ */
+const applyAiCorrection = (corrected) => {
+  form.value.contentMarkdown = corrected
+  takeSnapshot()
+  ElMessage.success('AI 纠错内容已应用')
+}
+
 /* ---- 保存 / 发布 ---- */
 const isSaved = ref(false)
 const handleSave = async (
   isPublished,
-  { redirectAfterSave = isPublished === 1 } = {},
+  { redirectAfterSave = isPublished === 1 } = {}
 ) => {
   if (!form.value.title.trim()) return ElMessage.warning('请输入文章标题')
   if (!form.value.slug.trim())
@@ -169,7 +185,7 @@ const hasUnsavedChanges = () => {
     coverImage: form.value.coverImage,
     categoryId: form.value.categoryId,
     tagIds: form.value.tagIds,
-    contentMarkdown: form.value.contentMarkdown,
+    contentMarkdown: form.value.contentMarkdown
   })
   return current !== initialSnapshot.value
 }
@@ -182,7 +198,7 @@ const takeSnapshot = () => {
     coverImage: form.value.coverImage,
     categoryId: form.value.categoryId,
     tagIds: form.value.tagIds,
-    contentMarkdown: form.value.contentMarkdown,
+    contentMarkdown: form.value.contentMarkdown
   })
 }
 
@@ -193,7 +209,7 @@ onBeforeRouteLeave(async () => {
       confirmButtonText: '保存草稿',
       cancelButtonText: '不保存',
       distinguishCancelAndClose: true,
-      type: 'warning',
+      type: 'warning'
     })
     // 用户点击保存草稿
     await handleSave(0, { redirectAfterSave: false })
@@ -230,7 +246,7 @@ onMounted(async () => {
         categoryId: res.categoryId,
         tagIds: res.tagIds ?? [],
         contentMarkdown: res.contentMarkdown || res.contentHtml || '',
-        isPublished: res.isPublished ?? 0,
+        isPublished: res.isPublished ?? 0
       })
     }
   }
@@ -251,6 +267,13 @@ onBeforeUnmount(() => {
       <div class="edit-actions">
         <el-button size="small" @click="router.push('/article/list')"
           >返回</el-button
+        >
+        <el-button
+          v-if="aiEnabled"
+          size="small"
+          :disabled="!form.contentMarkdown.trim()"
+          @click="showAiCorrection = true"
+          >AI 纠错</el-button
         >
         <el-button size="small" :loading="saving" @click="handleSave(0)"
           >保存草稿</el-button
@@ -384,6 +407,13 @@ onBeforeUnmount(() => {
         </div>
       </aside>
     </div>
+
+    <!-- AI 错别字/病句纠错弹窗 -->
+    <AiCorrectionDialog
+      v-model="showAiCorrection"
+      :content="form.contentMarkdown"
+      @applied="applyAiCorrection"
+    />
   </div>
 </template>
 

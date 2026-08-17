@@ -13,3 +13,14 @@ export const getAiStatus = async () => {
     return null
   }
 }
+
+/**
+ * 调用 AI 对文章 Markdown 内容进行错别字/病句纠错
+ * 后端未打包 AI 模块时接口 404，抛异常由调用方处理
+ * @param {string} content 文章 Markdown 内容
+ * @returns {Promise<string>} 纠错后的完整 Markdown 内容
+ */
+export const correctTypo = async (content) => {
+  const res = await http.post('/admin/ai/correct', { content })
+  return res?.data?.correctedContent
+}
