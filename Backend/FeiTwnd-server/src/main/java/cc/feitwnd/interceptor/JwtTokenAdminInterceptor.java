@@ -8,7 +8,7 @@ import cc.feitwnd.exception.GuestReadOnlyException;
 import cc.feitwnd.exception.NotLoginException;
 import cc.feitwnd.exception.UnauthorizedException;
 import cc.feitwnd.properties.JwtProperties;
-import cc.feitwnd.service.TokenService;
+import cc.feitwnd.service.auth.TokenService;
 import cc.feitwnd.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.http.HttpServletRequest;

@@ -7,7 +7,7 @@ import cc.feitwnd.entity.ArticleComments;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.ArticleCommentService;
+import cc.feitwnd.service.article.ArticleCommentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

@@ -2,7 +2,7 @@ package cc.feitwnd.controller.home;
 
 import cc.feitwnd.entity.SystemConfig;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.SystemConfigService;
+import cc.feitwnd.service.system.SystemConfigService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

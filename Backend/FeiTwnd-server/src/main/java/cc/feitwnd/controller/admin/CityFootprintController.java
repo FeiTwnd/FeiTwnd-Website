@@ -6,7 +6,7 @@ import cc.feitwnd.dto.CityFootprintPageQueryDTO;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.CityFootprintService;
+import cc.feitwnd.service.city.CityFootprintService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

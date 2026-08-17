@@ -3,7 +3,7 @@ package cc.feitwnd.controller.admin;
 import cc.feitwnd.dto.OperationLogPageQueryDTO;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.OperationLogService;
+import cc.feitwnd.service.system.OperationLogService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

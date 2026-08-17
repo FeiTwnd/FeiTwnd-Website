@@ -3,7 +3,7 @@ package cc.feitwnd.controller.blog;
 import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.dto.VisitorRecordDTO;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.VisitorService;
+import cc.feitwnd.service.visitor.VisitorService;
 import cc.feitwnd.vo.VisitorRecordVO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;

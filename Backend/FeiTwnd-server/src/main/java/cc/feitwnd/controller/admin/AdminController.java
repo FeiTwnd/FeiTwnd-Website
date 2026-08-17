@@ -3,7 +3,7 @@ package cc.feitwnd.controller.admin;
 import cc.feitwnd.annotation.RateLimit;
 import cc.feitwnd.dto.*;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.AdminService;
+import cc.feitwnd.service.admin.AdminService;
 import cc.feitwnd.vo.AdminLoginVO;
 import cc.feitwnd.vo.AdminVO;
 import jakarta.validation.Valid;

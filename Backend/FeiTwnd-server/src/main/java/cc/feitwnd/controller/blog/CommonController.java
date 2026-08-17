@@ -1,7 +1,7 @@
 package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.CaptchaService;
+import cc.feitwnd.service.auth.CaptchaService;
 import cc.feitwnd.vo.CaptchaVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -33,6 +33,7 @@
         <jakarta.version>4.0.1</jakarta.version>
         <fastjson>2.0.50</fastjson>
         <commons.lang>2.6</commons.lang>
+        <commons.lang3>3.17.0</commons.lang3>
         <druid>1.2.20</druid>
         <thumbnailator>0.4.20</thumbnailator>
         <imageio-webp>3.9.4</imageio-webp>
@@ -135,6 +136,13 @@
                 <groupId>commons-lang</groupId>
                 <artifactId>commons-lang</artifactId>
                 <version>${commons.lang}</version>
+            </dependency>
+
+            <!-- commons-lang3（原由 springdoc 传递引入，移除文档依赖后显式声明） -->
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons.lang3}</version>
             </dependency>
 
             <!-- Druid -->

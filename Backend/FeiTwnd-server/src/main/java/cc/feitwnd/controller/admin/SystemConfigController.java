@@ -5,7 +5,7 @@ import cc.feitwnd.dto.SystemConfigDTO;
 import cc.feitwnd.entity.SystemConfig;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.SystemConfigService;
+import cc.feitwnd.service.system.SystemConfigService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

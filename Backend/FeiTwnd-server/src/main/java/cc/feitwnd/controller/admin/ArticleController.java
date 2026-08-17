@@ -7,7 +7,7 @@ import cc.feitwnd.entity.Articles;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.ArticleService;
+import cc.feitwnd.service.article.ArticleService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

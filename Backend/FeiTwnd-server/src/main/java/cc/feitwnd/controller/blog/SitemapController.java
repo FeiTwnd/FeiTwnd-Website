@@ -2,8 +2,8 @@ package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.PageResult;
-import cc.feitwnd.service.ArticleService;
-import cc.feitwnd.service.SitemapService;
+import cc.feitwnd.service.article.ArticleService;
+import cc.feitwnd.service.rss.SitemapService;
 import cc.feitwnd.vo.BlogArticleVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

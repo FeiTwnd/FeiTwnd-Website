@@ -6,7 +6,7 @@ import cc.feitwnd.entity.RssSubscriptions;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.PageResult;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.RssSubscriptionService;
+import cc.feitwnd.service.rss.RssSubscriptionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -2,7 +2,7 @@ package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.entity.ArticleCategories;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.ArticleCategoryService;
+import cc.feitwnd.service.article.ArticleCategoryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

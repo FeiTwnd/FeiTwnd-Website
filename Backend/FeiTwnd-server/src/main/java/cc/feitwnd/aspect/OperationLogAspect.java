@@ -1,7 +1,7 @@
 package cc.feitwnd.aspect;
 
 import cc.feitwnd.annotation.OperationLog;
-import cc.feitwnd.service.SaveLogAsyncService;
+import cc.feitwnd.service.async.SaveLogAsyncService;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

@@ -5,7 +5,7 @@ import cc.feitwnd.dto.CityImageDTO;
 import cc.feitwnd.entity.CityImage;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.CityImageService;
+import cc.feitwnd.service.city.CityImageService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.ReportService;
+import cc.feitwnd.service.system.ReportService;
 import cc.feitwnd.vo.BlogReportVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

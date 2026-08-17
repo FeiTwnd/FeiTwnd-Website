@@ -5,7 +5,7 @@ import cc.feitwnd.dto.ArticleCategoryDTO;
 import cc.feitwnd.entity.ArticleCategories;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.ArticleCategoryService;
+import cc.feitwnd.service.article.ArticleCategoryService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

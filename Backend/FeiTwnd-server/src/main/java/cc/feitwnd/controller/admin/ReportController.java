@@ -1,7 +1,7 @@
 package cc.feitwnd.controller.admin;
 
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.ReportService;
+import cc.feitwnd.service.system.ReportService;
 import cc.feitwnd.vo.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
