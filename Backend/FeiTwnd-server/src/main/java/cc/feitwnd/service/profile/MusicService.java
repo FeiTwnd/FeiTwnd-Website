@@ -1,4 +1,4 @@
-package cc.feitwnd.service.admin;
+package cc.feitwnd.service.profile;
 
 import cc.feitwnd.dto.MusicDTO;
 import cc.feitwnd.dto.MusicPageQueryDTO;

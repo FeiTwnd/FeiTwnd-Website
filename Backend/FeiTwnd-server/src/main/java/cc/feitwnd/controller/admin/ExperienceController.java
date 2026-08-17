@@ -5,7 +5,7 @@ import cc.feitwnd.dto.ExperienceDTO;
 import cc.feitwnd.entity.Experiences;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.ExperienceService;
+import cc.feitwnd.service.profile.ExperienceService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

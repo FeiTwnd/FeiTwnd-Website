@@ -1,9 +1,9 @@
-package cc.feitwnd.service.admin.impl;
+package cc.feitwnd.service.profile.impl;
 
 import cc.feitwnd.dto.ExperienceDTO;
 import cc.feitwnd.entity.Experiences;
 import cc.feitwnd.mapper.ExperienceMapper;
-import cc.feitwnd.service.admin.ExperienceService;
+import cc.feitwnd.service.profile.ExperienceService;
 import cc.feitwnd.vo.ExperienceVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

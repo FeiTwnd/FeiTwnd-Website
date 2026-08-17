@@ -1,7 +1,7 @@
 package cc.feitwnd.controller.home;
 
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.SocialMediaService;
+import cc.feitwnd.service.profile.SocialMediaService;
 import cc.feitwnd.vo.SocialMediaVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

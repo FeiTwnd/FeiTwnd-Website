@@ -5,7 +5,7 @@ import cc.feitwnd.dto.SkillDTO;
 import cc.feitwnd.entity.Skills;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.SkillService;
+import cc.feitwnd.service.profile.SkillService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

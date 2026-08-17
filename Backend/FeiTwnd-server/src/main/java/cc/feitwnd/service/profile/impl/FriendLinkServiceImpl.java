@@ -1,9 +1,9 @@
-package cc.feitwnd.service.admin.impl;
+package cc.feitwnd.service.profile.impl;
 
 import cc.feitwnd.dto.FriendLinkDTO;
 import cc.feitwnd.entity.FriendLinks;
 import cc.feitwnd.mapper.FriendLinkMapper;
-import cc.feitwnd.service.admin.FriendLinkService;
+import cc.feitwnd.service.profile.FriendLinkService;
 import cc.feitwnd.vo.FriendLinkVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

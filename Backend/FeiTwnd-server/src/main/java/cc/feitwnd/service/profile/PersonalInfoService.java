@@ -1,4 +1,4 @@
-package cc.feitwnd.service.admin;
+package cc.feitwnd.service.profile;
 
 import cc.feitwnd.dto.PersonalInfoDTO;
 import cc.feitwnd.entity.PersonalInfo;

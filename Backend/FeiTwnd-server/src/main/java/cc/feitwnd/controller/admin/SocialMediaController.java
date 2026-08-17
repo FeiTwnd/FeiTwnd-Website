@@ -5,7 +5,7 @@ import cc.feitwnd.dto.SocialMediaDTO;
 import cc.feitwnd.entity.SocialMedia;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.SocialMediaService;
+import cc.feitwnd.service.profile.SocialMediaService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,11 +1,11 @@
-package cc.feitwnd.service.admin.impl;
+package cc.feitwnd.service.profile.impl;
 
 import cc.feitwnd.dto.MusicDTO;
 import cc.feitwnd.dto.MusicPageQueryDTO;
 import cc.feitwnd.entity.Music;
 import cc.feitwnd.mapper.MusicMapper;
 import cc.feitwnd.result.PageResult;
-import cc.feitwnd.service.admin.MusicService;
+import cc.feitwnd.service.profile.MusicService;
 import cc.feitwnd.vo.MusicVO;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;

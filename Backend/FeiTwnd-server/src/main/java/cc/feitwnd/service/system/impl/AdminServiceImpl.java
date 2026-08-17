@@ -1,4 +1,4 @@
-package cc.feitwnd.service.admin.impl;
+package cc.feitwnd.service.system.impl;
 
 import cc.feitwnd.constant.MessageConstant;
 import cc.feitwnd.constant.StatusConstant;
@@ -8,7 +8,7 @@ import cc.feitwnd.entity.Admin;
 import cc.feitwnd.exception.*;
 import cc.feitwnd.mapper.AdminMapper;
 import cc.feitwnd.properties.VisitorProperties;
-import cc.feitwnd.service.admin.AdminService;
+import cc.feitwnd.service.system.AdminService;
 import cc.feitwnd.service.auth.EncryptPasswordService;
 import cc.feitwnd.service.auth.TokenService;
 import cc.feitwnd.service.auth.VerifyCodeService;

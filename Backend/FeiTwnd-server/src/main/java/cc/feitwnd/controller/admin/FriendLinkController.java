@@ -5,7 +5,7 @@ import cc.feitwnd.dto.FriendLinkDTO;
 import cc.feitwnd.entity.FriendLinks;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.FriendLinkService;
+import cc.feitwnd.service.profile.FriendLinkService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

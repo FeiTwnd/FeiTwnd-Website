@@ -1,9 +1,9 @@
-package cc.feitwnd.service.admin.impl;
+package cc.feitwnd.service.profile.impl;
 
 import cc.feitwnd.dto.SocialMediaDTO;
 import cc.feitwnd.entity.SocialMedia;
 import cc.feitwnd.mapper.SocialMediaMapper;
-import cc.feitwnd.service.admin.SocialMediaService;
+import cc.feitwnd.service.profile.SocialMediaService;
 import cc.feitwnd.vo.SocialMediaVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

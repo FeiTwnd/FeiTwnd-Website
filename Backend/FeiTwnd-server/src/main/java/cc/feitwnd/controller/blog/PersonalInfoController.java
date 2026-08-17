@@ -1,7 +1,7 @@
 package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.PersonalInfoService;
+import cc.feitwnd.service.profile.PersonalInfoService;
 import cc.feitwnd.vo.PersonalInfoVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

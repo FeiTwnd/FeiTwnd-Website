@@ -1,7 +1,7 @@
 package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.MusicService;
+import cc.feitwnd.service.profile.MusicService;
 import cc.feitwnd.vo.MusicVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

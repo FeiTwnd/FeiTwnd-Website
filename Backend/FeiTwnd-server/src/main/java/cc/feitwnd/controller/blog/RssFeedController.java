@@ -3,7 +3,7 @@ package cc.feitwnd.controller.blog;
 import cc.feitwnd.properties.WebsiteProperties;
 import cc.feitwnd.result.Result;
 import cc.feitwnd.service.article.ArticleService;
-import cc.feitwnd.service.admin.PersonalInfoService;
+import cc.feitwnd.service.profile.PersonalInfoService;
 import cc.feitwnd.service.rss.RssFeedService;
 import cc.feitwnd.vo.BlogArticleVO;
 import cc.feitwnd.vo.PersonalInfoVO;

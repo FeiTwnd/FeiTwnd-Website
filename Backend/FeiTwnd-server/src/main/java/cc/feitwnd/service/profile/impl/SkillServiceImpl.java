@@ -1,9 +1,9 @@
-package cc.feitwnd.service.admin.impl;
+package cc.feitwnd.service.profile.impl;
 
 import cc.feitwnd.dto.SkillDTO;
 import cc.feitwnd.entity.Skills;
 import cc.feitwnd.mapper.SkillMapper;
-import cc.feitwnd.service.admin.SkillService;
+import cc.feitwnd.service.profile.SkillService;
 import cc.feitwnd.vo.SkillVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

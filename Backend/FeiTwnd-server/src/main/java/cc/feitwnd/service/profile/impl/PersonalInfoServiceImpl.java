@@ -1,10 +1,10 @@
-package cc.feitwnd.service.admin.impl;
+package cc.feitwnd.service.profile.impl;
 
 
 import cc.feitwnd.dto.PersonalInfoDTO;
 import cc.feitwnd.entity.PersonalInfo;
 import cc.feitwnd.mapper.PersonalInfoMapper;
-import cc.feitwnd.service.admin.PersonalInfoService;
+import cc.feitwnd.service.profile.PersonalInfoService;
 import cc.feitwnd.vo.PersonalInfoVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;

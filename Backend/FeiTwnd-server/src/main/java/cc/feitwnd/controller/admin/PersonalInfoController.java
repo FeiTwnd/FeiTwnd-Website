@@ -5,7 +5,7 @@ import cc.feitwnd.dto.PersonalInfoDTO;
 import cc.feitwnd.entity.PersonalInfo;
 import cc.feitwnd.enumeration.OperationType;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.PersonalInfoService;
+import cc.feitwnd.service.profile.PersonalInfoService;
 import cc.feitwnd.vo.PersonalInfoVO;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;

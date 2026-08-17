@@ -1,4 +1,4 @@
-package cc.feitwnd.service.admin;
+package cc.feitwnd.service.profile;
 
 import cc.feitwnd.dto.FriendLinkDTO;
 import cc.feitwnd.entity.FriendLinks;

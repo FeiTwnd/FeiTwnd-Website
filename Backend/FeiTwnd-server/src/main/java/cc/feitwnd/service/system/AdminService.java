@@ -1,4 +1,4 @@
-package cc.feitwnd.service.admin;
+package cc.feitwnd.service.system;
 
 import cc.feitwnd.dto.*;
 import cc.feitwnd.vo.AdminLoginVO;

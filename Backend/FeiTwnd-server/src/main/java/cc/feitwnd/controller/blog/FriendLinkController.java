@@ -1,7 +1,7 @@
 package cc.feitwnd.controller.blog;
 
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.FriendLinkService;
+import cc.feitwnd.service.profile.FriendLinkService;
 import cc.feitwnd.vo.FriendLinkVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

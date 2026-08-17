@@ -2,7 +2,7 @@ package cc.feitwnd.controller.cv;
 
 import cc.feitwnd.entity.Experiences;
 import cc.feitwnd.result.Result;
-import cc.feitwnd.service.admin.ExperienceService;
+import cc.feitwnd.service.profile.ExperienceService;
 import cc.feitwnd.vo.ExperienceVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
