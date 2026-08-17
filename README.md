@@ -350,29 +350,72 @@ pnpm build
 # 产出：dist/ 目录，部署到 Nginx 对应站点即可
 ```
 
+> 前端构建产物使用**相对路径引用资源 + hash 路由**，部署到根路径或任意子路径（如 `/admin`、`/cv`）均无需重新构建或额外配置，直接将 `dist/` 放到 Nginx 站点目录即可。
+
 ### 移动端 App
 
 App 通过 EAS 云端构建产出可直接安装的 APK，打包流程见 [App/BUILD.md](App/BUILD.md)。
 
 ### Nginx 配置参考
 
+前端已内置**路径无关**部署能力（资源使用相对路径 + hash 路由），站点部署在根路径或任意子路径均可正常工作，Nginx 只需正确分发页面和 `/api` 请求即可。
+
+以下为适配本项目部署结构的 HTTPS 完整配置（HTTP 强制跳转 HTTPS，示例域名 `www.example.com` 请替换为你的域名）：
+
 ```nginx
-# 博客端
+# 静态资源缓存策略（资源仍由各 location 分发，仅附加缓存头）
+map $uri $cache_control {
+    default "";
+    ~*\.(js|css|png|jpg|jpeg|gif|webp|svg|ico|woff2?|eot|ttf)$ "public, max-age=604800";
+}
+
+# =============================================
+# HTTP -> HTTPS 强制跳转
+# =============================================
 server {
     listen 80;
-    server_name blog.yourdomain.com;
-    root /path/to/Frontend-Blog/dist;
-    index index.html;
+    server_name www.example.com;
 
-    location / {
-        try_files $uri $uri/ /index.html;
+    # ACME 证书签发校验（Let's Encrypt 等，可选）
+    location /.well-known/acme-challenge/ {
+        root /usr/share/nginx/html;
     }
 
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+# =============================================
+# HTTPS 主配置
+# =============================================
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name www.example.com;
+
+    # SSL 证书（换成你自己的证书路径）
+    ssl_certificate     /etc/nginx/ssl/www.example.com/fullchain.pem;
+    ssl_certificate_key /etc/nginx/ssl/www.example.com/privkey.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_ciphers HIGH:!aNULL:!MD5;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    ssl_session_timeout 10m;
+
+    access_log /var/log/nginx/www.example.com.access.log;
+    error_log  /var/log/nginx/www.example.com.error.log;
+
+    add_header Cache-Control $cache_control always;
+
+    # 后端 API 反向代理
     location /api/ {
         proxy_pass http://127.0.0.1:5922/;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
     }
 
     # WebSocket 支持（在线人数）
@@ -381,11 +424,49 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+
+    # 博客端（/blog 子路径）
+    location /blog {
+        alias /usr/share/nginx/blog/;
+        index index.html;
+        try_files $uri $uri/ /blog/index.html;
+    }
+
+    # 管理端（/admin 子路径）
+    location /admin {
+        alias /usr/share/nginx/admin/;
+        index index.html;
+        try_files $uri $uri/ /admin/index.html;
+    }
+
+    # 简历端（/cv 子路径）
+    location /cv {
+        alias /usr/share/nginx/cv/;
+        index index.html;
+        try_files $uri $uri/ /cv/index.html;
+    }
+
+    # 个人主页（/ 根路径）
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    error_page 500 502 503 504 /50x.html;
+    location = /50x.html {
+        root /usr/share/nginx/html;
     }
 }
-
-# 其他子站（home / admin / cv）配置类似，修改 server_name 和 root 即可
 ```
+
+> 说明：
+> - 部署结构与上面对应：主页 `/usr/share/nginx/html/`、博客 `/usr/share/nginx/blog/`、管理端 `/usr/share/nginx/admin/`、简历 `/usr/share/nginx/cv/`；
+> - 子路径站点（`/blog`、`/admin`、`/cv`）必须使用 `alias` 指向站点目录（不能用 `root`，否则路径会多一层子目录导致白屏），并将 `try_files` 的兜底改为 `/xxx/index.html`；
+> - 前端产物（`dist/`）直接放入对应站点目录即可，无需为每个子站额外配置资源路径，相对路径 + hash 路由会自动适配部署位置；
+> - 证书申请完成后替换 `ssl_certificate` / `ssl_certificate_key` 路径，然后执行 `nginx -s reload` 生效。
 
 ---
 
