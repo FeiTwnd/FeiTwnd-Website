@@ -100,7 +100,9 @@ feitwnd:
     cv:          # 个人简历地址
     blog:        # 博客地址
   # AI 摘要模块配置（可插拔扩展模块）
-  # 注意：该模块需在构建时以 -Pwith-ai 激活才会打包进产物，仅改本配置不会自动启用模块
+  # 重要：打包是否包含 AI 模块由构建期的 Maven profile 决定（-Pwith-ai），本配置的 enabled 只控制运行时是否启用。
+  # 即：打包时不带 -Pwith-ai，无论 enabled 为何值，AI 模块和 langchain4j 都不会进入包体；
+  #     打包时带 -Pwith-ai，包体包含 AI 模块，此时 enabled=true 才真正启用 AI 功能。
   # 秘钥务必通过环境变量注入，不要直接写死在 yml 中
   # 各功能（摘要/错别字修正等）的提示词存放在 ai 模块内部 prompt 包下的常量类中，不在 yml 中配置
   ai:

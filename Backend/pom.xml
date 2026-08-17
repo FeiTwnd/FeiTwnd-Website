@@ -292,7 +292,7 @@
 
     <!-- 可插拔扩展模块：默认不构建，需显式激活对应 profile（如 -Pwith-ai）才会进入构建与打包 -->
     <profiles>
-        <!-- AI 摘要模块：激活后构建 FeiTwnd-ai 并打进最终产物，未激活时完全不引入 langchain4j 依赖 -->
+        <!-- AI 模块：激活后构建 FeiTwnd-ai 并打进最终产物，未激活时完全不引入 langchain4j 依赖 -->
         <profile>
             <id>with-ai</id>
             <modules>
