@@ -112,6 +112,10 @@ onMounted(() => {
                 <span class="contact-label">QQ</span>
                 <span class="contact-value">822824739</span>
               </div>
+              <div class="contact-item">
+                <span class="contact-label">交流群</span>
+                <span class="contact-value">1104658479</span>
+              </div>
               <div v-if="info.email" class="contact-item">
                 <span class="contact-label">邮箱</span>
                 <a :href="`mailto:${info.email}`" class="contact-link">{{

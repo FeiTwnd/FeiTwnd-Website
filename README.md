@@ -397,6 +397,42 @@ server {
 # 其他子站（home / admin / cv）配置类似，修改 server_name 和 root 即可
 ```
 
+### 部署到子路径（可选）
+
+本项目默认按**多站点**方式部署：每个前端跑在独立域名（或子域名）的根路径下，`base` 保持 `/`，路由使用 history 模式，URL 干净无 `#`，上面的 Nginx 配置即为此场景。
+
+如果你不想用多站点，希望把某个前端部署到同一域名的子路径（如 `https://yourdomain.com/admin/`），**无需改动源码**，只要在构建时通过 `--base` 指定子路径即可：
+
+```bash
+# 以管理端部署到 /admin/ 为例
+cd Frontend-Admin
+pnpm build --base=/admin/
+# 产出的 dist 内资源引用会带上 /admin/ 前缀
+```
+
+对应的 Nginx 用 `alias` 指向子路径目录，并把 `try_files` 的回退指到该子路径下的 `index.html`：
+
+```nginx
+server {
+    listen 80;
+    server_name yourdomain.com;
+
+    location /admin/ {
+        alias /path/to/Frontend-Admin/dist/;
+        try_files $uri $uri/ /admin/index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:5922/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+```
+
+> `--base` 的取值必须和 Nginx 里的子路径一致（含首尾斜杠，如 `/admin/`）；换部署路径时重新用对应的 `--base` 构建即可。这样既保留了默认多站点用法的干净 URL，也能满足单域名子路径部署的需求。
+
 ---
 
 ## Docker 部署
@@ -437,6 +473,13 @@ docker compose logs -f
 ## 贡献
 
 欢迎提交 Issue 和 Pull Request！详见 [CONTRIBUTING.md](CONTRIBUTING.md)。
+
+## 交流与联系
+
+有问题、建议或想一起交流的，欢迎联系：
+
+- QQ：822824739
+- 交流群：1104658479
 
 ## 开源协议
 
