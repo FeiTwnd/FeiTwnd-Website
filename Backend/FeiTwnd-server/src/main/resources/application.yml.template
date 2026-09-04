@@ -80,6 +80,8 @@ feitwnd:
     access-key-id: your-alioss-access-key-id
     access-key-secret: your-alioss-access-key-secret
     bucket-name: your-bucket-name
+    cdn-domain:               # 可选：CDN 加速域名。配置后上传返回该域名 URL，
+                              # 需配合 Bucket 私有读 + CDN 私有回源，防盗刷见 README"OSS 防盗刷配置"
   email:
     personal:    #SMTP邮件发送者昵称
     from:   #SMTP邮件发送者邮箱，跟上面那个邮箱配置的username一致即可

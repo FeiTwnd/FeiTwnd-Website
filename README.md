@@ -366,22 +366,60 @@ App 通过 EAS 云端构建产出可直接安装的 APK，打包流程见 [App/B
 
 ### OSS 防盗刷配置
 
-上传接口是写 OSS 的唯一入口，若 Bucket 公开读且缺少防护，拿到图片 URL 的人可直接刷流量产生费用（曾有用户因此损失 78 元）。代码侧已内置防线：**扩展名白名单 + 单文件 15MB 上限 + 图片内容魔数校验 + 上传接口全局限流**。除此之外还需在阿里云控制台完成以下配置（代码无法替代，务必设置）：
+上传接口是写 OSS 的唯一入口，若 Bucket 公开读且缺少防护，拿到图片 URL 的人可直接刷流量产生费用（曾有用户因此损失 78 元）。代码侧已内置防线：**扩展名白名单 + 单文件 15MB 上限 + 图片内容魔数校验 + 上传接口全局限流 + 上传失败抛异常（不再返回假 URL）**。
 
-1. **费用阈值告警（最先做）**：阿里云控制台 → 费用与成本 → 阈值告警，设置日费用上限（如 10 元），超限短信+邮件提醒，可及时止损
-2. **RAM 子账号最小权限**：不要用主账号 AccessKey，创建 RAM 子账号并只授予该 Bucket 的 `oss:PutObject` 等必需权限，禁用 ListBucket/Delete 等敏感权限；AccessKey 泄露时到 RAM 控制台立即禁用
-3. **Bucket 读写权限**：个人小站可保持"公开读"，但必须配置 **Referer 防盗链**（OSS 控制台 → 传输管理 → 防盗链，白名单填自己站点域名）；要求更严格时改为"私有"并接 **CDN 私有回源**（CDN 自动签名回源，浏览器只接触 CDN 域名，拿不到 OSS 直链）
-4. 本项目上传接口仅限管理端登录后使用（JWT 拦截 + 全局限流），不存在访客匿名上传；若二改后开放了公开上传，务必改用 STS 临时凭证，切勿暴露长期 AccessKey
+**推荐方案：CDN 私有回源**（能根治"一直访问刷流量"）——OSS Bucket 设为私有，对外统一走 CDN，浏览器只接触 CDN 域名、拿不到 OSS 直链，无 URL 可盗刷；配合 CDN 限速/Referer 后可进一步限制恶意刷量。操作步骤：
+
+1. **开通并配置 CDN**：阿里云控制台 → CDN → 添加域名（如 `cdn.yourdomain.com`），源站选 OSS Bucket 并开启**私有回源**（回源时 CDN 自动签名，无需公开读）
+2. **代码配置 CDN 域名**：在配置文件 `feitwnd.alioss.cdn-domain` 填 CDN 域名（如 `cdn.yourdomain.com`）。配置后**新上传**的文件返回 CDN URL 并入库，浏览器只走 CDN
+3. **Bucket 读写权限设为"私有"**：OSS 控制台 → 权限管理 → 读写权限 → 私有
+4. **CDN 防护**：CDN 控制台开启 Referer 防盗链（白名单填自己站点域名）+ 可设置单 IP 限速/带宽上限
+
+> 注意：切换 CDN 后**历史已入库的 OSS 直链 URL 不会自动改写**。若历史图片也需走 CDN，可后续写一次性迁移脚本把数据库中 `https://{bucket}.{endpoint}/` 前缀替换为 CDN 域名（对象 key 不变，CDN 回源自动签名）。
+
+以下设置无论是否接 CDN 都建议配置：
+
+- **费用阈值告警（最先做）**：阿里云控制台 → 费用与成本 → 阈值告警，设置日费用上限（如 10 元），超限短信+邮件提醒，可及时止损
+- **RAM 子账号最小权限**：不要用主账号 AccessKey，创建 RAM 子账号并只授予该 Bucket 的 `oss:PutObject` 等必需权限，禁用 ListBucket/Delete 等敏感权限；AccessKey 泄露时到 RAM 控制台立即禁用
+- 本项目上传接口仅限管理端登录后使用（JWT 拦截 + 全局限流），不存在访客匿名上传；若二改后开放了公开上传，务必改用 STS 临时凭证，切勿暴露长期 AccessKey
+
+**低成本替代**：不接 CDN 时，保持 Bucket 公开读但配置 **Referer 防盗链**（OSS 控制台 → 传输管理 → 防盗链，白名单填自己站点域名）。注意 Referer 可被伪造绕过，仅适合个人小站低风险场景。
 
 ### Nginx 配置参考
 
 ```nginx
+# 各站点启用 gzip 压缩与静态资源长缓存（JS/CSS 传输体积约降 70%）
+gzip on;
+gzip_min_length 1k;
+gzip_comp_level 6;
+gzip_types text/plain text/css application/json application/javascript image/svg+xml application/xml;
+gzip_vary on;
+
 # 博客端
 server {
     listen 80;
     server_name blog.yourdomain.com;
     root /path/to/Frontend-Blog/dist;
     index index.html;
+
+    # 带 hash 的静态资源（JS/CSS/图片）可长缓存，文件内容变化时 hash 会变，无需担心缓存过期
+    location /assets/ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+    }
+    location /js/ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+    }
+    location /city/ {
+        # 城市地图 GeoJSON 较大（约 6.4MB，gzip 后 1.4MB），长缓存避免重复下载
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+    }
+    location ~* \.(png|jpe?g|gif|webp|svg|ico|woff2?)$ {
+        expires 30d;
+        add_header Cache-Control "public, max-age=2592000, immutable";
+    }
 
     location / {
         try_files $uri $uri/ /index.html;
@@ -405,6 +443,8 @@ server {
 
 # 其他子站（home / admin / cv）配置类似，修改 server_name 和 root 即可
 ```
+
+> 若启用 Brotli（比 gzip 再省约 20%），安装 `ngx_brotli` 模块后加 `brotli on; brotli_types text/css application/javascript ...;` 即可。`index.html` 本身**不要**加长缓存（需始终回源拿最新入口）。
 
 ### 部署到子路径（可选）
 

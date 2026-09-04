@@ -19,6 +19,8 @@ public class AliOssUtil {
     private String accessKeyId;
     private String accessKeySecret;
     private String bucketName;
+    /** CDN 加速域名（可选）：配置后返回的访问 URL 使用 CDN 域名而非 OSS 直链，防盗刷需配合私有 Bucket + CDN 私有回源 */
+    private String cdnDomain;
 
     /**
      * 文件上传
@@ -52,14 +54,14 @@ public class AliOssUtil {
             }
         }
 
-        //文件访问路径规则 https://BucketName.Endpoint/ObjectName
+        // 访问 URL：优先使用 CDN 域名（防盗刷场景，浏览器只接触 CDN），否则退回 OSS 直链
         StringBuilder stringBuilder = new StringBuilder("https://");
-        stringBuilder
-                .append(bucketName)
-                .append(".")
-                .append(endpoint)
-                .append("/")
-                .append(objectName);
+        if (cdnDomain != null && !cdnDomain.isBlank()) {
+            stringBuilder.append(cdnDomain);
+        } else {
+            stringBuilder.append(bucketName).append(".").append(endpoint);
+        }
+        stringBuilder.append("/").append(objectName);
 
         log.info("文件上传到:{}", stringBuilder.toString());
 

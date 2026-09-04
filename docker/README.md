@@ -201,6 +201,7 @@ server {
 | `ALIOSS_ACCESS_KEY_ID` | 是 | 阿里云 AccessKey ID | - |
 | `ALIOSS_ACCESS_KEY_SECRET` | 是 | 阿里云 AccessKey Secret | - |
 | `ALIOSS_BUCKET_NAME` | 是 | 阿里云 OSS Bucket 名称 | - |
+| `ALIOSS_CDN_DOMAIN` | 否 | CDN 加速域名（配合私有 Bucket + CDN 私有回源防盗刷），留空使用 OSS 直链 | - |
 | `EMAIL_PERSONAL` | 是 | 邮件发送者昵称 | - |
 | `EMAIL_FROM` | 是 | 邮件发送者邮箱 | - |
 | `VISITOR_VERIFY_CODE` | 是 | 访客登录验证码 | - |

@@ -79,6 +79,8 @@ services:
       ALIOSS_ACCESS_KEY_ID: ${ALIOSS_ACCESS_KEY_ID}
       ALIOSS_ACCESS_KEY_SECRET: ${ALIOSS_ACCESS_KEY_SECRET}
       ALIOSS_BUCKET_NAME: ${ALIOSS_BUCKET_NAME}
+      # 可选：CDN 加速域名（配合私有 Bucket + CDN 私有回源防盗刷），不填则使用 OSS 直链
+      ALIOSS_CDN_DOMAIN: ${ALIOSS_CDN_DOMAIN:-}
       # 邮件配置
       MAIL_HOST: ${MAIL_HOST}
       MAIL_PORT: ${MAIL_PORT}

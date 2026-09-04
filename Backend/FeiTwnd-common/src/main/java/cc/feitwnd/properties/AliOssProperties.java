@@ -15,4 +15,8 @@ public class AliOssProperties {
     private String accessKeyId;
     private String accessKeySecret;
     private String bucketName;
+    /**
+     * CDN 加速域名（可选）：配置后上传返回的 URL 使用该域名，配合私有 Bucket + CDN 私有回源防盗刷
+     */
+    private String cdnDomain;
 }

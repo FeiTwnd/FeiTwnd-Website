@@ -65,6 +65,7 @@ feitwnd:
     access-key-id: ${ALIOSS_ACCESS_KEY_ID}
     access-key-secret: ${ALIOSS_ACCESS_KEY_SECRET}
     bucket-name: ${ALIOSS_BUCKET_NAME}
+    cdn-domain: ${ALIOSS_CDN_DOMAIN:}
   email:
     personal: ${EMAIL_PERSONAL}
     from: ${EMAIL_FROM}
