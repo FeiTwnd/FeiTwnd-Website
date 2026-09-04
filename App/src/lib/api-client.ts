@@ -1,5 +1,13 @@
 import { API_BASE_URL } from './config';
 import { getToken } from './storage';
+import { Platform } from 'react-native';
+
+/**
+ * 客户端标识头：后端据此区分请求来自浏览器管理端还是移动端 App。
+ * App 环境没有浏览器 User-Agent，后端可读取这些头来记录设备信息（如站长回复的来源）。
+ */
+const CLIENT_TYPE = 'feitwnd-app';
+const CLIENT_OS = Platform.OS === 'ios' ? 'iOS' : 'Android';
 
 const REQUEST_TIMEOUT_MS = 15000;
 
@@ -55,6 +63,9 @@ export async function api<T = unknown>(path: string, options: RequestOptions = {
   const headers: Record<string, string> = { Accept: 'application/json' };
   if (token) headers.Authorization = token;
   if (options.body !== undefined) headers['Content-Type'] = 'application/json';
+  // 标记客户端来源与设备系统，供后端区分移动端 App（无浏览器 UA）场景
+  headers['X-Client-Type'] = CLIENT_TYPE;
+  headers['X-Client-OS'] = CLIENT_OS;
 
   const response = await fetchWithTimeout(url, {
     method: options.method ?? 'GET',

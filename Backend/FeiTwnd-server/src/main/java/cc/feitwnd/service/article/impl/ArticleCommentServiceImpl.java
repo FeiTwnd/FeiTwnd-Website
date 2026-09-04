@@ -160,7 +160,7 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
         articleComments.setIsNotice(StatusConstant.ENABLE); // 站长回复默认开启接收回复通知，访客再回复时可通知到站长
         articleComments.setNickname(websiteProperties.getTitle());
 
-        // 捕获 IP / 地理位置 / UserAgent
+        // 捕获 IP / 地理位置 / 设备信息
         if (request != null) {
             String clientIp = IpUtil.getClientIp(request);
             Map<String, String> geoInfo = IpUtil.getGeoInfo(clientIp);
@@ -172,9 +172,16 @@ public class ArticleCommentServiceImpl implements ArticleCommentService {
             if(location != null && !location.isEmpty()) {
                 articleComments.setLocation(location);
             }
-            String userAgent = request.getHeader("User-Agent");
-            articleComments.setUserAgentOs(userAgentService.getOsName(userAgent));
-            articleComments.setUserAgentBrowser(userAgentService.getBrowserName(userAgent));
+            // 移动端管理 App 无浏览器 UA，改用客户端自定义头记录设备系统；浏览器端照常解析 UA
+            if ("feitwnd-app".equals(request.getHeader("X-Client-Type"))) {
+                String clientOs = request.getHeader("X-Client-OS");
+                articleComments.setUserAgentOs(clientOs != null && !clientOs.isBlank() ? clientOs : "App");
+                articleComments.setUserAgentBrowser("FeiTwnd App");
+            } else {
+                String userAgent = request.getHeader("User-Agent");
+                articleComments.setUserAgentOs(userAgentService.getOsName(userAgent));
+                articleComments.setUserAgentBrowser(userAgentService.getBrowserName(userAgent));
+            }
         }
 
         articleCommentMapper.save(articleComments);

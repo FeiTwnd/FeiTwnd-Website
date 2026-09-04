@@ -156,7 +156,8 @@ export default function ReviewScreen() {
         await replyComment({
           articleId: replyTarget!.articleId!,
           parentId: replyTarget!.id,
-          rootId: replyTarget!.rootId,
+          // 回复根级记录时 rootId 用记录自身 id，保证树形挂接正确（与 Web 管理端一致）
+          rootId: replyTarget!.rootId ?? replyTarget!.id,
           parentNickname: replyTarget!.nickname,
           content: replyText.trim(),
           isMarkdown: 0,
@@ -164,7 +165,8 @@ export default function ReviewScreen() {
       } else {
         await replyMessage({
           parentId: replyTarget!.id,
-          rootId: replyTarget!.rootId,
+          // 回复根级记录时 rootId 用记录自身 id，保证树形挂接正确（与 Web 管理端一致）
+          rootId: replyTarget!.rootId ?? replyTarget!.id,
           parentNickname: replyTarget!.nickname,
           content: replyText.trim(),
           isMarkdown: 0,
