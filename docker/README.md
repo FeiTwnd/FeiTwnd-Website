@@ -61,6 +61,8 @@ ALIOSS_ENDPOINT=oss-cn-shanghai.aliyuncs.com
 ALIOSS_ACCESS_KEY_ID=your-access-key-id
 ALIOSS_ACCESS_KEY_SECRET=your-access-key-secret
 ALIOSS_BUCKET_NAME=your-bucket-name
+# 可选：CDN 加速域名（配合私有 Bucket + CDN 私有回源防盗刷），留空则使用 OSS 直链
+ALIOSS_CDN_DOMAIN=
 
 # ============================================
 # 邮件配置 (必须修改)
