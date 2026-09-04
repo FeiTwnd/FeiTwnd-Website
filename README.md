@@ -368,7 +368,7 @@ App 通过 EAS 云端构建产出可直接安装的 APK，打包流程见 [App/B
 
 上传接口是写 OSS 的唯一入口，若 Bucket 公开读且缺少防护，拿到图片 URL 的人可直接刷流量产生费用。代码侧已内置防线：**扩展名白名单 + 单文件 60MB 上限 + 图片文件头魔数校验（只读头部不全图解码，兼容大尺寸相机原图）+ 上传接口全局限流 + 上传失败抛异常（不再返回假 URL）**。
 
-> 单文件上限为 60MB（Spring `multipart.max-file-size` 需同步调大，见下方说明）：足以容纳大疆等设备约 30MB 的相机原图；图片上传后服务端会压缩，OSS 落库的是压缩产物，不会显著放大存储。如仍不够可自行调大 `CommonServiceImpl.MAX_FILE_SIZE` 与 `spring.servlet.multipart.max-file-size`。
+> 单文件上限为 60MB（Spring `multipart.max-file-size` 需同步调大，见下方说明）：图片上传后服务端会压缩，OSS 落库的是压缩产物，不会显著放大存储。如仍不够可自行调大 `CommonServiceImpl.MAX_FILE_SIZE` 与 `spring.servlet.multipart.max-file-size`。
 
 **推荐方案：CDN 私有回源**（能根治"一直访问刷流量"）——OSS Bucket 设为私有，对外统一走 CDN，浏览器只接触 CDN 域名、拿不到 OSS 直链，无 URL 可盗刷；配合 CDN 限速/Referer 后可进一步限制恶意刷量。操作步骤：
 
