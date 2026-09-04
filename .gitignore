@@ -80,3 +80,6 @@ package-lock.json
 
 CLAUDE.md
 AGENTS.md
+
+# 站点私有迁移执行单（含真实域名，不入库）
+docs/oss-cdn-migration.feitwnd.cc.md

@@ -375,7 +375,7 @@ App 通过 EAS 云端构建产出可直接安装的 APK，打包流程见 [App/B
 3. **Bucket 读写权限设为"私有"**：OSS 控制台 → 权限管理 → 读写权限 → 私有
 4. **CDN 防护**：CDN 控制台开启 Referer 防盗链（白名单填自己站点域名）+ 可设置单 IP 限速/带宽上限
 
-> 注意：切换 CDN 后**历史已入库的 OSS 直链 URL 不会自动改写**。若历史图片也需走 CDN，可后续写一次性迁移脚本把数据库中 `https://{bucket}.{endpoint}/` 前缀替换为 CDN 域名（对象 key 不变，CDN 回源自动签名）。
+> 切换 CDN 后**历史已入库的 OSS 直链 URL 不会自动改写**，Bucket 改私有后旧直链会 403，需要执行一次数据库前缀替换（对象 key 不变，CDN 回源自动签名）。完整可执行步骤与全部表/列的 SQL 见 [docs/oss-cdn-migration.md](docs/oss-cdn-migration.md)。
 
 以下设置无论是否接 CDN 都建议配置：
 
