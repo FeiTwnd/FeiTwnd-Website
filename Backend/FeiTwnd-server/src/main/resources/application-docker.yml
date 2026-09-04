@@ -16,8 +16,8 @@ spring:
     allow-circular-references: true
   servlet:
     multipart:
-      max-file-size: 30MB
-      max-request-size: 50MB
+      max-file-size: 60MB
+      max-request-size: 100MB
   #数据库连接信息（Spring Boot 只识别 url/username/password，host/port/database 需拼进 url）
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource

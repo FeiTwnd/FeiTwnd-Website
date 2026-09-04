@@ -13,8 +13,8 @@ spring:
     allow-circular-references: true #允许循环引用
   servlet:
     multipart:
-      max-file-size: 30MB      # 单个文件最大大小
-      max-request-size: 50MB   # 请求体最大大小
+      max-file-size: 60MB      # 单个文件最大大小
+      max-request-size: 100MB   # 请求体最大大小
   #数据库连接信息
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource

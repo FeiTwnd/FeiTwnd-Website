@@ -366,7 +366,9 @@ App 通过 EAS 云端构建产出可直接安装的 APK，打包流程见 [App/B
 
 ### OSS 防盗刷配置
 
-上传接口是写 OSS 的唯一入口，若 Bucket 公开读且缺少防护，拿到图片 URL 的人可直接刷流量产生费用（曾有用户因此损失 78 元）。代码侧已内置防线：**扩展名白名单 + 单文件 15MB 上限 + 图片内容魔数校验 + 上传接口全局限流 + 上传失败抛异常（不再返回假 URL）**。
+上传接口是写 OSS 的唯一入口，若 Bucket 公开读且缺少防护，拿到图片 URL 的人可直接刷流量产生费用。代码侧已内置防线：**扩展名白名单 + 单文件 60MB 上限 + 图片文件头魔数校验（只读头部不全图解码，兼容大尺寸相机原图）+ 上传接口全局限流 + 上传失败抛异常（不再返回假 URL）**。
+
+> 单文件上限为 60MB（Spring `multipart.max-file-size` 需同步调大，见下方说明）：足以容纳大疆等设备约 30MB 的相机原图；图片上传后服务端会压缩，OSS 落库的是压缩产物，不会显著放大存储。如仍不够可自行调大 `CommonServiceImpl.MAX_FILE_SIZE` 与 `spring.servlet.multipart.max-file-size`。
 
 **推荐方案：CDN 私有回源**（能根治"一直访问刷流量"）——OSS Bucket 设为私有，对外统一走 CDN，浏览器只接触 CDN 域名、拿不到 OSS 直链，无 URL 可盗刷；配合 CDN 限速/Referer 后可进一步限制恶意刷量。操作步骤：
 
@@ -386,6 +388,8 @@ App 通过 EAS 云端构建产出可直接安装的 APK，打包流程见 [App/B
 **低成本替代**：不接 CDN 时，保持 Bucket 公开读但配置 **Referer 防盗链**（OSS 控制台 → 传输管理 → 防盗链，白名单填自己站点域名）。注意 Referer 可被伪造绕过，仅适合个人小站低风险场景。
 
 ### Nginx 配置参考
+
+> 注意：上传大尺寸相机原图时，Nginx 请求体上限（`client_max_body_size`，http 层或站点层）需不小于 Spring 的 `multipart.max-file-size`（默认 60MB），否则图片会在 Nginx 层被直接 413 拒绝。
 
 ```nginx
 # 各站点启用 gzip 压缩与静态资源长缓存（JS/CSS 传输体积约降 70%）
